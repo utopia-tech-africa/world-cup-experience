@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+// Prisma 7: url is configured in prisma.config.ts
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  fullName     String   @map("full_name")
+  role         UserRole @default(admin)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  confirmedBookings Booking[] @relation("ConfirmedBy")
+
+  @@map("users")
+}
+
+enum UserRole {
+  admin
+  super_admin
+}
+
+model Booking {
+  id                  String            @id @default(uuid())
+  bookingReference    String            @unique @map("booking_reference")
+  fullName            String            @map("full_name")
+  email               String
+  phone               String
+  passportNumber      String            @map("passport_number")
+  passportExpiry      DateTime          @map("passport_expiry")
+  packageType         PackageType       @map("package_type")
+  accommodationType   AccommodationType @map("accommodation_type")
+  numberOfTravelers   Int               @map("number_of_travelers")
+  specialRequests     String?           @map("special_requests")
+  paymentAccountType  PaymentAccountType @map("payment_account_type")
+  basePackagePrice    Decimal           @map("base_package_price") @db.Decimal(10, 2)
+  addonsTotalPrice    Decimal           @default(0) @map("addons_total_price") @db.Decimal(10, 2)
+  totalAmount         Decimal           @map("total_amount") @db.Decimal(10, 2)
+  paymentProofUrl     String            @map("payment_proof_url")
+  bookingStatus       BookingStatus     @default(pending) @map("booking_status")
+  rejectionReason     String?           @map("rejection_reason")
+  submittedAt         DateTime          @default(now()) @map("submitted_at")
+  confirmedAt         DateTime?         @map("confirmed_at")
+  confirmedBy         String?           @map("confirmed_by")
+  updatedAt           DateTime          @updatedAt @map("updated_at")
+
+  confirmedByUser User?            @relation("ConfirmedBy", fields: [confirmedBy], references: [id])
+  bookingAddOns   BookingAddOn[]
+
+  @@map("bookings")
+}
+
+enum PackageType {
+  single_game
+  double_game
+}
+
+enum AccommodationType {
+  hotel
+  hostel
+}
+
+enum PaymentAccountType {
+  local
+  international
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  rejected
+}
+
+model AddOn {
+  id          String   @id @default(uuid())
+  name        String
+  description String   @db.Text
+  price       Decimal  @db.Decimal(10, 2)
+  category    AddOnCategory
+  isActive    Boolean  @default(true) @map("is_active")
+  displayOrder Int     @map("display_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  bookingAddOns BookingAddOn[]
+
+  @@map("addons")
+}
+
+enum AddOnCategory {
+  merch
+  transport
+  experience
+  food
+}
+
+model BookingAddOn {
+  id            String   @id @default(uuid())
+  bookingId     String   @map("booking_id")
+  addonId       String   @map("addon_id")
+  quantity      Int      @default(1)
+  priceAtBooking Decimal @map("price_at_booking") @db.Decimal(10, 2)
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  addOn   AddOn   @relation(fields: [addonId], references: [id], onDelete: Cascade)
+
+  @@unique([bookingId, addonId])
+  @@map("booking_addons")
+}
