@@ -1,29 +1,29 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { ArrowLeft, ChevronRight, Loader2, Search } from 'lucide-react';
-import { useBookings } from '@/hooks/queries/useBookings';
-import { StatusBadge } from '@/components/admin/status-badge';
-import { formatCurrency, formatDate } from '@/lib/format';
-import type { Booking } from '@/types/booking';
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { ArrowLeft, ChevronRight, Loader2, Search } from "lucide-react";
+import { useBookings } from "@/hooks/queries/useBookings";
+import { StatusBadge } from "@/components/admin/status-badge";
+import { formatCurrency, formatDate } from "@/lib/format";
+import type { Booking } from "@/types/booking";
 
 const STATUS_OPTIONS = [
-  { value: '', label: 'All statuses' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'confirmed', label: 'Confirmed' },
-  { value: 'rejected', label: 'Rejected' },
+  { value: "", label: "All statuses" },
+  { value: "pending", label: "Pending" },
+  { value: "confirmed", label: "Confirmed" },
+  { value: "rejected", label: "Rejected" },
 ];
 
 const PAGE_SIZE = 10;
@@ -118,8 +118,7 @@ function BookingsCards({
         <Link
           key={b.id}
           href={`/admin/bookings/${b.id}`}
-          className="block rounded-lg border bg-card p-4 shadow-sm transition-colors hover:bg-muted/50"
-        >
+          className="block rounded-lg border bg-card p-4 shadow-sm transition-colors hover:bg-muted/50">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <p className="font-mono text-xs text-muted-foreground">
@@ -145,9 +144,9 @@ function BookingsCards({
 
 export default function AdminBookingsPage() {
   const router = useRouter();
-  const [status, setStatus] = useState('');
-  const [search, setSearch] = useState('');
-  const [searchInput, setSearchInput] = useState('');
+  const [status, setStatus] = useState("");
+  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [page, setPage] = useState(1);
 
   const { data, isLoading } = useBookings({
@@ -159,9 +158,9 @@ export default function AdminBookingsPage() {
 
   useEffect(() => {
     const token =
-      typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
     if (!token) {
-      router.replace('/admin/login');
+      router.replace("/admin/login");
     }
   }, [router]);
 
@@ -200,17 +199,14 @@ export default function AdminBookingsPage() {
               </CardDescription>
             </div>
             <div className="flex w-full flex-col gap-4 md:flex-row md:items-end md:gap-3">
-              <form
-                onSubmit={handleSearchSubmit}
-                className="relative flex-1 md:flex-[0.8]"
-              >
+              <form onSubmit={handleSearchSubmit} className="relative flex-1">
                 <Search className="text-muted-foreground absolute left-3 top-1/2 size-4 -translate-y-1/2" />
                 <Input
                   type="search"
                   placeholder="Reference, name, email..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
-                  className="w-full pl-9"
+                  className="w-full md:w-full pl-9"
                   aria-label="Search bookings"
                 />
               </form>
@@ -223,7 +219,7 @@ export default function AdminBookingsPage() {
                   setPage(1);
                 }}
                 aria-label="Filter by status"
-                className="w-full md:flex-[0.2] md:shrink-0"
+                className="w-full md:w-full"
               />
             </div>
           </CardHeader>
@@ -247,16 +243,14 @@ export default function AdminBookingsPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={!hasPrev}
-                  >
+                    disabled={!hasPrev}>
                     Previous
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setPage((p) => p + 1)}
-                    disabled={!hasNext}
-                  >
+                    disabled={!hasNext}>
                     Next
                   </Button>
                 </div>

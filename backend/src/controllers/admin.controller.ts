@@ -130,8 +130,19 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
     const { flightDetails } = req.body;
     const userId = req.user!.userId;
 
-    const booking = await confirmBookingService(id, userId, flightDetails);
+    const booking = await prisma.booking.findUnique({
+      where: { id },
+      include: {
+        bookingAddOns: { include: { addOn: true } },
+      },
+    });
+    if (!booking) return res.status(404).json({ error: 'Booking not found' });
+    if (booking.bookingStatus !== 'pending') {
+      return res.status(400).json({ error: 'Booking is not pending' });
+    }
+
     await sendConfirmationEmail(booking);
+    await confirmBookingService(id, userId, flightDetails);
 
     res.json({
       success: true,
@@ -149,12 +160,23 @@ export const rejectBooking = async (req: Request, res: Response) => {
     if (!id) return res.status(400).json({ error: 'Booking ID is required' });
     const { rejectionReason } = req.body;
 
-    if (!rejectionReason) {
+    if (!rejectionReason || typeof rejectionReason !== 'string') {
       return res.status(400).json({ error: 'Rejection reason is required' });
     }
 
-    const booking = await rejectBookingService(id, rejectionReason);
-    await sendRejectionEmail(booking);
+    const booking = await prisma.booking.findUnique({
+      where: { id },
+      include: {
+        bookingAddOns: { include: { addOn: true } },
+      },
+    });
+    if (!booking) return res.status(404).json({ error: 'Booking not found' });
+    if (booking.bookingStatus !== 'pending') {
+      return res.status(400).json({ error: 'Booking is not pending' });
+    }
+
+    await sendRejectionEmail(booking, rejectionReason.trim());
+    await rejectBookingService(id, rejectionReason.trim());
 
     res.json({
       success: true,

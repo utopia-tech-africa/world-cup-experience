@@ -24,6 +24,8 @@ import { useRejectBooking } from '@/hooks/mutations/useRejectBooking';
 import { StatusBadge } from '@/components/admin/status-badge';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/components/ui/toast';
+import type { Booking } from '@/types/booking';
 
 function DetailRow({
   label,
@@ -47,9 +49,10 @@ export default function AdminBookingDetailPage() {
   const [rejectReason, setRejectReason] = useState('');
   const [showRejectForm, setShowRejectForm] = useState(false);
 
-  const { data: booking, isLoading, error } = useBookingDetail(id);
+  const { data: booking, isLoading, error, refetch } = useBookingDetail(id);
   const confirmMutation = useConfirmBooking();
   const rejectMutation = useRejectBooking();
+  const { addToast } = useToast();
 
   useEffect(() => {
     const token =
@@ -66,6 +69,28 @@ export default function AdminBookingDetailPage() {
       {
         onSuccess: () => {
           setShowRejectForm(false);
+          addToast('Booking confirmed successfully', 'success');
+          // Small delay to show toast, then refetch to get latest status
+          setTimeout(() => {
+            void refetch();
+          }, 100);
+        },
+        onError: (error: unknown) => {
+          let message = 'Failed to confirm booking';
+          if (error && typeof error === 'object' && 'response' in error) {
+            const axiosError = error as { response?: { data?: { error?: string }; status?: number } };
+            const errorMessage = axiosError.response?.data?.error;
+            if (errorMessage?.includes('User not found')) {
+              message = 'Your session has expired. Please log out and log back in.';
+            } else {
+              message = errorMessage ?? 
+                (axiosError.response?.status === 500 ? 'Server error. Please try again.' : message);
+            }
+          } else if (error instanceof Error) {
+            message = error.message;
+          }
+          addToast(message, 'error');
+          console.error('Confirm booking error:', error);
         },
       }
     );
@@ -80,6 +105,18 @@ export default function AdminBookingDetailPage() {
         onSuccess: () => {
           setRejectReason('');
           setShowRejectForm(false);
+          addToast('Booking rejected successfully', 'success');
+          setTimeout(() => void refetch(), 100);
+        },
+        onError: (error: unknown) => {
+          let message = 'Failed to reject booking';
+          if (error && typeof error === 'object' && 'response' in error) {
+            const axiosError = error as { response?: { data?: { error?: string } } };
+            message = axiosError.response?.data?.error ?? message;
+          } else if (error instanceof Error) {
+            message = error.message;
+          }
+          addToast(message, 'error');
         },
       }
     );
@@ -289,17 +326,22 @@ export default function AdminBookingDetailPage() {
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
-                {booking.bookingAddOns.map((ba) => (
-                  <li
-                    key={ba.id}
-                    className="flex flex-wrap items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm"
-                  >
-                    <span>{ba.addOn.name}</span>
-                    <span className="text-muted-foreground tabular-nums">
-                      {ba.quantity} × {formatCurrency(Number(ba.priceAtBooking))}
-                    </span>
-                  </li>
-                ))}
+                {booking.bookingAddOns.map((ba: { id: string; quantity: number; priceAtBooking: number; addOn: { name: string } }) => {
+                  const addOn = ba.addOn;
+                  const quantity = ba.quantity;
+                  const priceAtBooking = ba.priceAtBooking;
+                  return (
+                    <li
+                      key={ba.id}
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm"
+                    >
+                      <span>{addOn.name}</span>
+                      <span className="text-muted-foreground tabular-nums">
+                        {quantity} × {formatCurrency(Number(priceAtBooking))}
+                      </span>
+                    </li>
+                  );
+                })}
               </ul>
             </CardContent>
           </Card>

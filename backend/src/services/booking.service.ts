@@ -47,6 +47,16 @@ export const confirmBookingService = async (
   userId: string,
   flightDetails?: string
 ) => {
+  // Verify user exists before setting confirmedBy
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true },
+  });
+
+  if (!user) {
+    throw new Error('User not found. Cannot confirm booking.');
+  }
+
   const booking = await prisma.booking.update({
     where: { id: bookingId },
     data: {

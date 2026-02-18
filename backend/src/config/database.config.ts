@@ -7,7 +7,12 @@ if (!connectionString) {
   throw new Error("DATABASE_URL is not set");
 }
 
-const adapter = new PrismaPg({ connectionString });
+const adapter = new PrismaPg({
+  connectionString,
+  // Avoid "Connection closed unexpectedly" – default idleTimeoutMillis is 10s
+  idleTimeoutMillis: 300_000, // 5 minutes
+  connectionTimeoutMillis: 10_000,
+});
 export const prisma = new PrismaClient({
   adapter,
   log:

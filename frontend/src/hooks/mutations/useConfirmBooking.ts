@@ -10,7 +10,7 @@ export const useConfirmBooking = () => {
   return useMutation({
     mutationFn: ({ id, flightDetails }: { id: string; flightDetails?: string }) =>
       confirmBooking(id, flightDetails),
-    onSuccess: (_, variables) => {
+    onSuccess: async (_, variables) => {
       const now = new Date().toISOString();
       queryClient.setQueryData<Booking>(['booking', variables.id], (old) => {
         if (!old) return old;
@@ -18,7 +18,10 @@ export const useConfirmBooking = () => {
       });
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
-      void queryClient.refetchQueries({ queryKey: ['booking', variables.id] });
+      // Refetch after a short delay to ensure server state is synced
+      setTimeout(() => {
+        void queryClient.refetchQueries({ queryKey: ['booking', variables.id] });
+      }, 500);
     },
   });
 };
