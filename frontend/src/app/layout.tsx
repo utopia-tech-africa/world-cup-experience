@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { QueryProvider } from "@/providers/QueryProvider";
+import { ToastProvider } from "@/components/ui/toast";
 import { NavbarWrapper } from "@/components/navbar-wrapper";
 import "./globals.css";
 import Footer from "@/components/footer/footer";
@@ -110,9 +111,11 @@ export default function RootLayout({
         className={`${generalSans.variable} ${clashDisplay.variable} font-sans antialiased`}
       >
         <QueryProvider>
-          <NavbarWrapper />
-          {children}
-          <Footer />
+          <ToastProvider>
+            <NavbarWrapper />
+            {children}
+            <Footer />
+          </ToastProvider>
         </QueryProvider>
       </body>
     </html>

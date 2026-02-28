@@ -1,0 +1,316 @@
+"use client";
+
+import { useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Building, Building2, Calendar } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useBookingStore } from "@/stores/booking-store";
+import { FormInputField } from "@/components/ui/input-field";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Controller } from "react-hook-form";
+import { toBackendDateString } from "@/lib/booking-api-payload";
+
+const BRAND_BLUE = "#354998";
+
+const bookingSchema = z.object({
+  accommodation: z.enum(["hostel", "hotel"]),
+  addOns: z.array(z.string()),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().min(1, "Email is required").email("Invalid email"),
+  phoneNumber: z.string().min(1, "Phone number is required"),
+  passportNumber: z
+    .string()
+    .min(5, "Passport number is required (at least 5 characters)"),
+  passportExpiryDate: z
+    .string()
+    .min(1, "Passport expiry date is required")
+    .refine(
+      (val) => {
+        const parsed = toBackendDateString(val);
+        if (!parsed) return false;
+        const d = new Date(parsed);
+        return !Number.isNaN(d.getTime()) && d > new Date();
+      },
+      "Passport expiry must be a future date"
+    ),
+  specialRequests: z.string().optional(),
+});
+
+export type BookingFormValues = z.infer<typeof bookingSchema>;
+
+const ADD_ONS = [
+  { id: "merch", label: "Merch Bundle (scarf/cap/flag kit)" },
+  { id: "suv", label: "Private Delegation SUV" },
+  { id: "meals", label: "Lunch / Dinner Meal Add-on" },
+  { id: "phl-shuttle", label: "PHL Airport Shuttle (round trip)" },
+  { id: "transfers", label: "Premium Match-Day Priority Transfers" },
+] as const;
+
+const defaultValues: BookingFormValues = {
+  accommodation: "hotel",
+  addOns: [],
+  firstName: "",
+  lastName: "",
+  email: "",
+  phoneNumber: "",
+  passportNumber: "",
+  passportExpiryDate: "",
+  specialRequests: "",
+};
+
+export function BookingForm() {
+  const router = useRouter();
+  const setBookingForm = useBookingStore((s) => s.setBookingForm);
+
+  const form = useForm<BookingFormValues>({
+    resolver: zodResolver(bookingSchema),
+    defaultValues,
+  });
+
+  useEffect(() => {
+    const state = useBookingStore.getState();
+    const hasStoredData =
+      state.firstName !== "" ||
+      state.lastName !== "" ||
+      state.email !== "";
+    if (hasStoredData) {
+      form.reset({
+        accommodation: state.accommodation,
+        addOns: state.addOns,
+        firstName: state.firstName,
+        lastName: state.lastName,
+        email: state.email,
+        phoneNumber: state.phoneNumber,
+        passportNumber: state.passportNumber ?? "",
+        passportExpiryDate: state.passportExpiryDate ?? "",
+        specialRequests: state.specialRequests ?? "",
+      });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- hydrate once from store on mount
+
+  const accommodation = form.watch("accommodation");
+  const addOns = form.watch("addOns");
+
+  useEffect(() => {
+    setBookingForm({ accommodation, addOns });
+  }, [accommodation, addOns, setBookingForm]);
+
+  const handleSubmit = form.handleSubmit(async (values) => {
+    setBookingForm({
+      accommodation: values.accommodation,
+      addOns: values.addOns,
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      phoneNumber: values.phoneNumber,
+      passportNumber: values.passportNumber ?? "",
+      passportExpiryDate: values.passportExpiryDate ?? "",
+      specialRequests: values.specialRequests ?? "",
+    });
+    router.push("/booking/summary");
+  });
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-10 rounded-lg border-[0.5px] border-[#BFBFBF]/80 p-4 sm:p-[30px]">
+      {/* Choose accommodation — Figma 112-1472 */}
+      <section className="flex flex-col gap-3">
+        <h2 className="text-foreground text-center text-lg font-bold">
+          Choose accommodation
+        </h2>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            {
+              value: "hostel" as const,
+              label: "Hostel",
+              price: "$1,000",
+              Icon: Building,
+            },
+            {
+              value: "hotel" as const,
+              label: "Hotel",
+              price: "$1,800",
+              Icon: Building2,
+            },
+          ].map(({ value, label, price, Icon }) => {
+            const selected = accommodation === value;
+            return (
+              <Button
+                key={value}
+                type="button"
+                variant={selected ? "default" : "outline"}
+                size="default"
+                className="w-full text-xs sm:text-sm"
+                onClick={() => form.setValue("accommodation", value)}>
+                <Icon
+                  className={cn(
+                    "size-4 shrink-0",
+                    selected ? "text-white" : "text-gray-500",
+                  )}
+                  strokeWidth={1.5}
+                />
+                {label} – {price}
+              </Button>
+            );
+          })}
+        </div>
+      </section>
+
+      <hr className="border-0 border-t border-[#BFBFBF]/80" />
+
+      {/* Optional Add-ons */}
+      <section className="flex flex-col gap-4">
+        <h2 className="text-foreground text-lg font-bold">Optional Add-ons</h2>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {ADD_ONS.map(({ id, label }) => (
+            <label
+              key={id}
+              className="text-foreground flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 hover:bg-gray-50 has-checked:border-[#354998] has-checked:bg-[#354998]/5">
+              <input
+                type="checkbox"
+                className="border-input h-4 w-4 rounded text-[#354998] focus:ring-[#354998]"
+                checked={form.watch("addOns").includes(id)}
+                onChange={(e) => {
+                  const prev = form.getValues("addOns");
+                  const next = e.target.checked
+                    ? [...prev, id]
+                    : prev.filter((x) => x !== id);
+                  form.setValue("addOns", next);
+                }}
+              />
+              <span className="text-sm">{label}</span>
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <hr className="border-0 border-t border-[#BFBFBF]/80" />
+
+      {/* Passenger Details */}
+      <section className="flex flex-col gap-6">
+        <h2 className="text-foreground text-center text-lg font-semibold">
+          Passenger Details
+        </h2>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <FormInputField
+            control={form.control}
+            name="firstName"
+            label="First name"
+            placeholder="Alex"
+            required
+          />
+          <FormInputField
+            control={form.control}
+            name="lastName"
+            label="Last name"
+            placeholder="Appiah"
+            required
+          />
+          <FormInputField
+            control={form.control}
+            name="email"
+            label="Email"
+            type="email"
+            placeholder="eg. alexappiah@gmail.com"
+            required
+          />
+          <FormInputField
+            control={form.control}
+            name="phoneNumber"
+            label="Phone number"
+            placeholder="+233 24XXXX XXX"
+            required
+          />
+          <FormInputField
+            control={form.control}
+            name="passportNumber"
+            label="Passport number"
+            placeholder="At least 5 characters"
+            required
+          />
+          <div className="flex w-full flex-col gap-2">
+            <Label
+              htmlFor="passportExpiryDate"
+              className="text-foreground text-sm font-medium leading-none">
+              Passport expiry date <span className="text-destructive">*</span>
+            </Label>
+            <Controller
+              control={form.control}
+              name="passportExpiryDate"
+              render={({ field, fieldState }) => (
+                <div className="relative">
+                  <Calendar className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+                  <Input
+                    {...field}
+                    id="passportExpiryDate"
+                    placeholder="DD/MM/YYYY"
+                    className="h-10 rounded-[4px] border-input bg-muted pl-10"
+                    aria-invalid={!!fieldState.error}
+                  />
+                  {fieldState.error?.message && (
+                    <p className="text-destructive mt-1 text-sm">
+                      {fieldState.error.message}
+                    </p>
+                  )}
+                </div>
+              )}
+            />
+          </div>
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label
+            htmlFor="specialRequests"
+            className="text-foreground text-sm font-medium leading-none">
+            Any special requests?
+          </Label>
+          <Controller
+            control={form.control}
+            name="specialRequests"
+            render={({ field, fieldState }) => (
+              <>
+                <Textarea
+                  id="specialRequests"
+                  placeholder=""
+                  rows={4}
+                  className="min-h-[120px] resize-y"
+                  {...field}
+                />
+                {fieldState.error?.message && (
+                  <p className="text-destructive text-sm">
+                    {fieldState.error.message}
+                  </p>
+                )}
+              </>
+            )}
+          />
+        </div>
+      </section>
+
+      {/* Actions — 50/50 on mobile, 30% / 70% from sm up (Figma 121-5168) */}
+      <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-[30%_1fr]">
+        <Button
+          variant="outline"
+          type="button"
+          asChild
+          className="w-full border-[#354998] text-[#354998] hover:bg-[#354998]/10">
+          <Link href="/">Go back</Link>
+        </Button>
+        <Button
+          type="submit"
+          className="w-full bg-[#354998] text-white hover:bg-[#354998]/90"
+          disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? "Booking…" : "Book Seat"}
+        </Button>
+      </div>
+    </form>
+  );
+}
