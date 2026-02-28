@@ -4,7 +4,7 @@ import { GameCard } from "./components";
 
 export default function Games() {
   return (
-    <section className="py-10 bg-neutral-100">
+    <section className=" bg-neutral-100">
       <ComponentLayout>
         {/* Header Section */}
         <div className="mb-6 max-w-2xl">
