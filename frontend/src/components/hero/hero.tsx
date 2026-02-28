@@ -5,7 +5,7 @@ import { BookingForm, HeroContent } from "./components";
 
 export function Hero() {
   return (
-    <section className="relative w-full min-h-screen bg-neutral-100 overflow-hidden">
+    <section className="relative flex min-h-dvh w-full flex-col bg-neutral-100 overflow-hidden mb-19 md:mb-22 lg:mb-30">
       {/* Background Pattern and Radial Gradient */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -23,7 +23,7 @@ export function Hero() {
         />
       </div>
 
-      <ComponentLayout className="relative z-10">
+      <ComponentLayout className="relative z-10 flex min-h-0 flex-1 flex-col">
         <HeroContent />
         <BookingForm />
       </ComponentLayout>

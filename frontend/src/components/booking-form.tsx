@@ -14,8 +14,10 @@ import { FormInputField } from "@/components/ui/input-field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Controller } from "react-hook-form";
 import { toBackendDateString } from "@/lib/booking-api-payload";
+import { getBasePackagePrice } from "@/lib/booking-pricing";
 import { useAddons } from "@/hooks/queries/useAddons";
 import type { AddOn } from "@/types/booking";
 
@@ -32,15 +34,12 @@ const bookingSchema = z.object({
   passportExpiryDate: z
     .string()
     .min(1, "Passport expiry date is required")
-    .refine(
-      (val) => {
-        const parsed = toBackendDateString(val);
-        if (!parsed) return false;
-        const d = new Date(parsed);
-        return !Number.isNaN(d.getTime()) && d > new Date();
-      },
-      "Passport expiry must be a future date"
-    ),
+    .refine((val) => {
+      const parsed = toBackendDateString(val);
+      if (!parsed) return false;
+      const d = new Date(parsed);
+      return !Number.isNaN(d.getTime()) && d > new Date();
+    }, "Passport expiry must be a future date"),
   specialRequests: z.string().optional(),
 });
 
@@ -60,8 +59,13 @@ const defaultValues: BookingFormValues = {
 
 export function BookingForm() {
   const router = useRouter();
+  const hasHydrated = useBookingStore((s) => s.hasHydrated);
+  const packageName = useBookingStore((s) => s.packageName);
   const setBookingForm = useBookingStore((s) => s.setBookingForm);
   const { data: apiAddons = [], isLoading: addonsLoading } = useAddons();
+
+  const hostelPrice = getBasePackagePrice(packageName, "hostel");
+  const hotelPrice = getBasePackagePrice(packageName, "hotel");
 
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
@@ -74,7 +78,8 @@ export function BookingForm() {
       state.firstName !== "" ||
       state.lastName !== "" ||
       state.email !== "";
-    if (hasStoredData) {
+    const hasPackageFromHero = state.packageName?.trim() !== "";
+    if (hasStoredData || hasPackageFromHero) {
       form.reset({
         accommodation: state.accommodation,
         addOns: state.addOns,
@@ -125,13 +130,13 @@ export function BookingForm() {
             {
               value: "hostel" as const,
               label: "Hostel",
-              price: "$1,000",
+              price: hostelPrice,
               Icon: Building,
             },
             {
               value: "hotel" as const,
               label: "Hotel",
-              price: "$1,800",
+              price: hotelPrice,
               Icon: Building2,
             },
           ].map(({ value, label, price, Icon }) => {
@@ -151,7 +156,12 @@ export function BookingForm() {
                   )}
                   strokeWidth={1.5}
                 />
-                {label} – {price}
+                {label} –{" "}
+                {hasHydrated ? (
+                  `$${price.toLocaleString()}`
+                ) : (
+                  <Skeleton className="ml-1 inline-block h-4 w-12" />
+                )}
               </Button>
             );
           })}
@@ -164,9 +174,23 @@ export function BookingForm() {
       <section className="flex flex-col gap-4">
         <h2 className="text-foreground text-lg font-bold">Optional Add-ons</h2>
         {addonsLoading ? (
-          <p className="text-muted-foreground text-sm">Loading add-ons…</p>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3">
+                <Skeleton className="h-4 w-4 shrink-0 rounded" />
+                <div className="flex flex-1 flex-col gap-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : apiAddons.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No add-ons available right now.</p>
+          <p className="text-muted-foreground text-sm">
+            No add-ons available right now.
+          </p>
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             {apiAddons.map((addon: AddOn) => (
@@ -250,23 +274,38 @@ export function BookingForm() {
             <Controller
               control={form.control}
               name="passportExpiryDate"
-              render={({ field, fieldState }) => (
-                <div className="relative">
-                  <Calendar className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-                  <Input
-                    {...field}
-                    id="passportExpiryDate"
-                    placeholder="DD/MM/YYYY"
-                    className="h-10 rounded-[4px] border-input bg-muted pl-10"
-                    aria-invalid={!!fieldState.error}
-                  />
-                  {fieldState.error?.message && (
-                    <p className="text-destructive mt-1 text-sm">
-                      {fieldState.error.message}
-                    </p>
-                  )}
-                </div>
-              )}
+              render={({ field, fieldState }) => {
+                const formatDateInput = (raw: string) => {
+                  const digits = raw.replace(/\D/g, "").slice(0, 8);
+                  if (digits.length <= 2) return digits;
+                  if (digits.length <= 4)
+                    return `${digits.slice(0, 2)}-${digits.slice(2)}`;
+                  return `${digits.slice(0, 2)}-${digits.slice(2, 4)}-${digits.slice(4)}`;
+                };
+                return (
+                  <div className="flex flex-col gap-1">
+                    <div className="relative">
+                      <Calendar className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+                      <Input
+                        {...field}
+                        id="passportExpiryDate"
+                        placeholder="DD-MM-YYYY"
+                        value={field.value}
+                        onChange={(e) =>
+                          field.onChange(formatDateInput(e.target.value))
+                        }
+                        className="h-10 rounded-[4px] border-input bg-muted pl-10"
+                        aria-invalid={!!fieldState.error}
+                      />
+                    </div>
+                    {fieldState.error?.message && (
+                      <p className="text-destructive text-sm">
+                        {fieldState.error.message}
+                      </p>
+                    )}
+                  </div>
+                );
+              }}
             />
           </div>
         </div>

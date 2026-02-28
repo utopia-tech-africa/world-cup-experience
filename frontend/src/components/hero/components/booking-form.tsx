@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Plane,
   PlaneTakeoff,
@@ -9,9 +10,48 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useBookingStore } from "@/stores/booking-store";
+import { getBasePackagePrice } from "@/lib/booking-pricing";
+
+/** Dates per PROJECT_SCOPE: Single Game June 25–29, Double Game June 22–29 */
+const PACKAGE_DATES = {
+  single: { start: "Jun 25", end: "Jun 29", year: "2026" },
+  double: { start: "Jun 22", end: "Jun 29", year: "2026" },
+} as const;
 
 export function BookingForm() {
-  const [tripType, setTripType] = useState("single");
+  const router = useRouter();
+  const setTripSummary = useBookingStore((s) => s.setTripSummary);
+  const setBookingForm = useBookingStore((s) => s.setBookingForm);
+  const [tripType, setTripType] = useState<"single" | "double">("single");
+
+  const dates = PACKAGE_DATES[tripType];
+  const packagePrice = getBasePackagePrice(
+    tripType === "single" ? "One Game" : "Double Game",
+    "hotel"
+  );
+
+  useEffect(() => {
+    const name = useBookingStore.getState().packageName;
+    if (name?.toLowerCase().includes("double")) setTripType("double");
+  }, []);
+
+  const handleTripTypeChange = (type: "single" | "double") => {
+    setTripType(type);
+    setTripSummary({
+      packageName: type === "single" ? "One Game" : "Double Game",
+      duration: type === "single" ? "4 nights (June 25-29)" : "7 nights (June 22-29)",
+    });
+  };
+
+  const handleBookSeat = () => {
+    setTripSummary({
+      packageName: tripType === "single" ? "One Game" : "Double Game",
+      duration: tripType === "single" ? "4 nights (June 25-29)" : "7 nights (June 22-29)",
+    });
+    setBookingForm({ accommodation: "hotel" });
+    router.push("/booking");
+  };
 
   return (
     <>
@@ -28,20 +68,18 @@ export function BookingForm() {
             className={`flex items-center gap-2 cursor-pointer group py-2 px-3 rounded-full transition-all ${
               tripType === "single" ? "bg-primary-100" : ""
             }`}
-            onClick={() => setTripType("single")}
-          >
+            onClick={() => handleTripTypeChange("single")}>
             <input
               type="radio"
               name="tripType"
               checked={tripType === "single"}
-              onChange={() => setTripType("single")}
+              onChange={() => handleTripTypeChange("single")}
               className="w-4 h-4 accent-primary-400 cursor-pointer"
             />
             <span
               className={`text-[14px] font-normal font-sans transition-colors ${
                 tripType === "single" ? "text-primary-400" : "text-neutral-200"
-              }`}
-            >
+              }`}>
               Single game
             </span>
           </label>
@@ -49,20 +87,18 @@ export function BookingForm() {
             className={`flex items-center gap-2 cursor-pointer group py-2 px-3 rounded-full transition-all ${
               tripType === "double" ? "bg-primary-100" : ""
             }`}
-            onClick={() => setTripType("double")}
-          >
+            onClick={() => handleTripTypeChange("double")}>
             <input
               type="radio"
               name="tripType"
               checked={tripType === "double"}
-              onChange={() => setTripType("double")}
+              onChange={() => handleTripTypeChange("double")}
               className="w-4 h-4 accent-primary-400 cursor-pointer"
             />
             <span
               className={`text-[14px] font-normal font-sans transition-colors ${
                 tripType === "double" ? "text-primary-400" : "text-neutral-200"
-              }`}
-            >
+              }`}>
               Double game
             </span>
           </label>
@@ -96,23 +132,26 @@ export function BookingForm() {
             </div>
           </div>
 
-          {/* Date Item */}
+          {/* Date Item — updates by package (Single: Jun 25–29, Double: Jun 22–29 per PROJECT_SCOPE) */}
           <div className="flex items-center gap-2 px-3 py-3 border-2 border-gray-200 rounded-full hover:border-primary-100 transition-colors md:max-w-[300px] lg:max-w-none lg:w-fit w-full">
             <CalendarDays size={20} className="text-gray-400 shrink-0" />
             <div className="flex items-center font-sans gap-2">
               <span className="text-[16px] font-bold text-neutral-400 leading-tight">
-                {tripType === "single" ? "Aug 27" : "Nov 27"}
+                {dates.start} {dates.year}
               </span>
               <ArrowRight size={16} className="text-neutral-500 " />
               <span className="text-[16px] font-bold text-neutral-400 leading-tight">
-                {tripType === "single" ? "Sep 27" : "Dec 27"}
+                {dates.end} {dates.year}
               </span>
             </div>
           </div>
 
-          {/* Book Seat Button */}
-          <Button className="w-full md:w-fit bg-primary-400 text-neutral-100 rounded-full py-6 px-8 text-[16px] font-semibold hover:bg-primary-300 transition-colors shadow-md shadow-primary-100 lg:ml-auto">
-            Book Seat
+          {/* Book Seat Button — price updates with Single/Double (Hotel by default) */}
+          <Button
+            type="button"
+            onClick={handleBookSeat}
+            className="w-full md:w-fit bg-primary-400 text-neutral-100 rounded-full py-6 px-8 text-[16px] font-semibold hover:bg-primary-300 transition-colors shadow-md shadow-primary-100 lg:ml-auto">
+            Book Seat · ${packagePrice.toLocaleString()}
           </Button>
         </div>
       </div>

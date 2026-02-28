@@ -1,8 +1,9 @@
 import { ghanaFlag, croatiaFlag, englandFlag } from "@/assets/img";
+import { getBasePackagePrice } from "@/lib/booking-pricing";
 
 export interface TeamInfo {
   name: string;
-  flag: any;
+  flag: unknown;
 }
 
 export interface Match {
@@ -20,6 +21,12 @@ export interface GameOffer {
   accommodation: string;
 }
 
+/** Build price string from shared pricing (Single: 1000/1800, Double: 1500/3000). */
+function formatPrice(packageName: string, accommodation: "hostel" | "hotel"): string {
+  const n = getBasePackagePrice(packageName, accommodation);
+  return `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
 export const gameOffers: GameOffer[] = [
   {
     id: 1,
@@ -32,7 +39,9 @@ export const gameOffers: GameOffer[] = [
         date: "June 27th 2026",
       },
     ],
-    price: "$1,000.00",
+    get price() {
+      return formatPrice("One Game", "hostel");
+    },
     accommodation: "Hostel (4 nights)",
   },
   {
@@ -46,7 +55,9 @@ export const gameOffers: GameOffer[] = [
         date: "June 27th 2026",
       },
     ],
-    price: "$1,800.00",
+    get price() {
+      return formatPrice("One Game", "hotel");
+    },
     accommodation: "Hotel (4 nights)",
   },
   {
@@ -66,7 +77,9 @@ export const gameOffers: GameOffer[] = [
         date: "June 27th 2026",
       },
     ],
-    price: "$1,500.00",
+    get price() {
+      return formatPrice("Double Game", "hostel");
+    },
     accommodation: "Hostel (7 nights)",
   },
   {
@@ -86,7 +99,9 @@ export const gameOffers: GameOffer[] = [
         date: "June 27th 2026",
       },
     ],
-    price: "$3,000.00",
+    get price() {
+      return formatPrice("Double Game", "hotel");
+    },
     accommodation: "Hotel (7 nights)",
   },
 ];

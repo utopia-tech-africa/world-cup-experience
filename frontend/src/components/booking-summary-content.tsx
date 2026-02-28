@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
-import { PACKAGE_PRICES } from "@/lib/booking-pricing";
+import { getBasePackagePrice } from "@/lib/booking-pricing";
 import { buildBookingPayload } from "@/lib/booking-api-payload";
 import { useBookingStore } from "@/stores/booking-store";
 import { useShallow } from "zustand/react/shallow";
@@ -63,7 +63,7 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
       passportNumber: s.passportNumber,
       passportExpiryDate: s.passportExpiryDate,
       specialRequests: s.specialRequests,
-    }))
+    })),
   );
   const accommodation = data?.accommodation ?? store.accommodation;
   const addOns = data?.addOns ?? store.addOns;
@@ -79,7 +79,7 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
   const createBookingMutation = useCreateBooking();
   const { addToast } = useToast();
 
-  const packagePrice = PACKAGE_PRICES[accommodation];
+  const packagePrice = getBasePackagePrice(packageName, accommodation);
   const accommodationLabel = accommodation === "hotel" ? "Hotel" : "Hostel";
 
   const addOnItems = addOns
@@ -109,8 +109,7 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
 
   const handleSubmit = async () => {
     if (!selectedFile || !canSubmit) {
-      if (!selectedFile)
-        addToast("Please upload proof of payment.", "error");
+      if (!selectedFile) addToast("Please upload proof of payment.", "error");
       else if (!store.passportNumber.trim() || !store.passportExpiryDate.trim())
         addToast("Passport details are required.", "error");
       else addToast("Please complete all required fields.", "error");
@@ -235,10 +234,7 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
         <h3 className="text-foreground text-center text-lg font-bold sm:text-left">
           Upload proof of payment (e.g. bank transfer receipt)
         </h3>
-        <FileUploadInput
-          file={selectedFile}
-          onFileChange={setSelectedFile}
-        />
+        <FileUploadInput file={selectedFile} onFileChange={setSelectedFile} />
         <p className="text-muted-foreground text-sm">{ACCEPTED_FORMATS}</p>
         <div className="rounded-lg bg-amber-50 p-4">
           <p className="text-foreground mb-2 text-sm font-semibold">
@@ -260,7 +256,11 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
           </p>
           <p className="text-muted-foreground mb-3 text-sm">
             Submit is disabled until the server is reachable. Check that the
-            backend is running and <code className="rounded bg-amber-100 px-1 text-xs">NEXT_PUBLIC_API_URL</code> points to it.
+            backend is running and{" "}
+            <code className="rounded bg-amber-100 px-1 text-xs">
+              NEXT_PUBLIC_API_URL
+            </code>{" "}
+            points to it.
           </p>
           <Button
             type="button"
@@ -285,7 +285,9 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
           className="w-full bg-[#354998] text-white hover:bg-[#354998]/90"
           disabled={isSubmitting || !canSubmit}
           onClick={handleSubmit}>
-          {isSubmitting ? "Submitting…" : "Submit"}
+          {isSubmitting
+            ? "Submitting…"
+            : `Submit · $${totalAmount.toLocaleString()}`}
         </Button>
       </div>
     </div>
