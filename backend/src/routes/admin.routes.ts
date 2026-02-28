@@ -1,6 +1,6 @@
 import express from 'express';
 import { getDashboardStats, getBookings, getBookingById, confirmBooking, rejectBooking } from '../controllers/admin.controller';
-import { getAdminAddons, createAddon } from '../controllers/admin-addon.controller';
+import { getAdminAddons, createAddon, updateAddon } from '../controllers/admin-addon.controller';
 import { authMiddleware } from '../middleware/auth.middleware';
 
 const router = express.Router();
@@ -15,5 +15,6 @@ router.patch('/bookings/:id/reject', rejectBooking);
 
 router.get('/addons', getAdminAddons);
 router.post('/addons', createAddon);
+router.patch('/addons/:id', updateAddon);
 
 export default router;

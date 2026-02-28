@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 const createAddonSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  description: z.string().min(1, 'Description is required'),
+  description: z.string().optional().default(''),
   price: z.number().positive('Price must be positive'),
   category: z.enum(['merch', 'transport', 'experience', 'food']),
   displayOrder: z.number().int().min(0).default(0),
@@ -54,6 +54,43 @@ export const createAddon = async (req: Request, res: Response) => {
     res.status(201).json({ addon: serializeAddon(addon) });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Failed to create add-on';
+    res.status(500).json({ error: message });
+  }
+};
+
+/** PATCH /api/admin/addons/:id — update addon */
+export const updateAddon = async (req: Request, res: Response) => {
+  try {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    if (!id) {
+      res.status(400).json({ error: 'Add-on ID is required' });
+      return;
+    }
+    const parsed = createAddonSchema.safeParse(req.body);
+    if (!parsed.success) {
+      const msg = parsed.error.issues.map((issue: { message: string }) => issue.message).join('; ');
+      res.status(400).json({ error: msg });
+      return;
+    }
+    const { name, description, price, category, displayOrder, isActive } = parsed.data;
+    const addon = await prisma.addOn.update({
+      where: { id },
+      data: {
+        name,
+        description,
+        price,
+        category,
+        displayOrder,
+        isActive,
+      },
+    });
+    res.json({ addon: serializeAddon(addon) });
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'code' in error && (error as { code: string }).code === 'P2025') {
+      res.status(404).json({ error: 'Add-on not found' });
+      return;
+    }
+    const message = error instanceof Error ? error.message : 'Failed to update add-on';
     res.status(500).json({ error: message });
   }
 };

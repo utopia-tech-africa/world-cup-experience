@@ -52,7 +52,7 @@ export const getAdminAddons = async (): Promise<AddOn[]> => {
 
 export type CreateAddonInput = {
   name: string;
-  description: string;
+  description?: string;
   price: number;
   category: 'merch' | 'transport' | 'experience' | 'food';
   displayOrder?: number;
@@ -62,6 +62,19 @@ export type CreateAddonInput = {
 export const createAddon = async (input: CreateAddonInput): Promise<AddOn> => {
   const { data } = await axios.post<{ addon: AddOn }>('/admin/addons', {
     ...input,
+    description: input.description ?? '',
+    displayOrder: input.displayOrder ?? 0,
+    isActive: input.isActive ?? true,
+  });
+  return data.addon;
+};
+
+export type UpdateAddonInput = CreateAddonInput;
+
+export const updateAddon = async (id: string, input: UpdateAddonInput): Promise<AddOn> => {
+  const { data } = await axios.patch<{ addon: AddOn }>(`/admin/addons/${id}`, {
+    ...input,
+    description: input.description ?? '',
     displayOrder: input.displayOrder ?? 0,
     isActive: input.isActive ?? true,
   });
