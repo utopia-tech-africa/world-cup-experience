@@ -1,15 +1,6 @@
 import type { BookingFormData } from "@/types/booking";
 import type { AddOn } from "@/types/booking";
-import { ADD_ON_PRICES, PACKAGE_PRICES } from "@/lib/booking-pricing";
-
-/** Map frontend addon slug to backend AddOn name (for resolving UUID from API). */
-const ADDON_SLUG_TO_BACKEND_NAME: Record<string, string> = {
-  merch: "Merch Bundle",
-  "phl-shuttle": "PHL Airport Shuttle",
-  transfers: "Premium Match-Day Priority Transfers",
-  suv: "Private Delegation SUV",
-  meals: "Lunch/Dinner Meal Add-on",
-};
+import { PACKAGE_PRICES } from "@/lib/booking-pricing";
 
 /**
  * Convert DD/MM/YYYY or similar to YYYY-MM-DD for backend.
@@ -29,21 +20,17 @@ export function toBackendDateString(value: string): string {
 }
 
 /**
- * Resolve frontend addon IDs to backend addon UUIDs and prices.
- * Uses API addons list; prices come from frontend pricing (price at booking).
+ * Resolve selected addon IDs (from API) to payload shape. Uses API addons for id and price.
  */
 export function resolveAddonsForPayload(
-  frontendAddonIds: string[],
+  addonIds: string[],
   apiAddons: AddOn[]
 ): Array<{ id: string; quantity: number; price: number }> {
   const result: Array<{ id: string; quantity: number; price: number }> = [];
-  for (const slug of frontendAddonIds) {
-    const backendName = ADDON_SLUG_TO_BACKEND_NAME[slug];
-    const price = ADD_ON_PRICES[slug];
-    if (backendName == null || price == null) continue;
-    const addon = apiAddons.find((a) => a.name === backendName);
+  for (const id of addonIds) {
+    const addon = apiAddons.find((a) => a.id === id);
     if (addon) {
-      result.push({ id: addon.id, quantity: 1, price });
+      result.push({ id: addon.id, quantity: 1, price: Number(addon.price) });
     }
   }
   return result;

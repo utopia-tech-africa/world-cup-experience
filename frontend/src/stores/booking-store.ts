@@ -1,8 +1,6 @@
 import { create } from "zustand";
-import {
-  ADD_ON_PRICES,
-  PACKAGE_PRICES,
-} from "@/lib/booking-pricing";
+import { PACKAGE_PRICES } from "@/lib/booking-pricing";
+import type { AddOn } from "@/types/booking";
 
 export type AccommodationType = "hostel" | "hotel";
 
@@ -42,11 +40,16 @@ const defaultTripSummary: TripSummaryState = {
   duration: "4 nights",
 };
 
-function computeTotalCost(accommodation: AccommodationType, addOns: string[]): number {
+/** Compute total from accommodation + selected addon IDs and API addons list. */
+export function computeBookingTotal(
+  accommodation: AccommodationType,
+  addonIds: string[],
+  apiAddons: AddOn[]
+): number {
   const packagePrice = PACKAGE_PRICES[accommodation];
-  const addOnsTotal = addOns.reduce(
-    (sum, id) => sum + (ADD_ON_PRICES[id] ?? 0),
-    0,
+  const addOnsTotal = addonIds.reduce(
+    (sum, id) => sum + (Number(apiAddons.find((a) => a.id === id)?.price) || 0),
+    0
   );
   return packagePrice + addOnsTotal;
 }
@@ -55,22 +58,16 @@ type BookingStore = BookingFormState &
   TripSummaryState & {
     setBookingForm: (values: Partial<BookingFormState>) => void;
     setTripSummary: (values: Partial<TripSummaryState>) => void;
-    getTotalCost: () => number;
     reset: () => void;
   };
 
-export const useBookingStore = create<BookingStore>((set, get) => ({
+export const useBookingStore = create<BookingStore>((set) => ({
   ...defaultFormState,
   ...defaultTripSummary,
 
   setBookingForm: (values) => set((state) => ({ ...state, ...values })),
 
   setTripSummary: (values) => set((state) => ({ ...state, ...values })),
-
-  getTotalCost: () => {
-    const { accommodation, addOns } = get();
-    return computeTotalCost(accommodation, addOns);
-  },
 
   reset: () =>
     set({
