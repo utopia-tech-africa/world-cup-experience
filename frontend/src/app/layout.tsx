@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { NavbarWrapper } from "@/components/navbar-wrapper";
 import "./globals.css";
+import Footer from "@/components/footer/footer";
 
 const generalSans = localFont({
   src: [
@@ -111,6 +112,7 @@ export default function RootLayout({
         <QueryProvider>
           <NavbarWrapper />
           {children}
+          <Footer />
         </QueryProvider>
       </body>
     </html>
