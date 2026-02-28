@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
+import localFont from "next/font/local";
+import { Geist, Geist_Mono } from "next/font/google";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { NavbarWrapper } from "@/components/navbar-wrapper";
 import "./globals.css";
@@ -14,11 +15,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-/** Figma uses "General Sans Variable"; Plus Jakarta Sans is the closest Google Fonts alternative. */
-const plusJakartaSans = Plus_Jakarta_Sans({
+const generalSans = localFont({
+  src: "./fonts/GeneralSans-Variable.ttf",
   variable: "--font-general-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${plusJakartaSans.variable} antialiased`}>
+        className={`${geistSans.variable} ${geistMono.variable} ${generalSans.variable} antialiased`}>
         <QueryProvider>
           <NavbarWrapper />
           {children}
