@@ -53,12 +53,28 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
   const [paymentType, setPaymentType] = useState<PaymentAccountType>("local");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const store = useBookingStore.getState();
+  const store = useBookingStore((s) => ({
+    accommodation: s.accommodation,
+    addOns: s.addOns,
+    packageName: s.packageName,
+    firstName: s.firstName,
+    lastName: s.lastName,
+    email: s.email,
+    phoneNumber: s.phoneNumber,
+    passportNumber: s.passportNumber,
+    passportExpiryDate: s.passportExpiryDate,
+    specialRequests: s.specialRequests,
+  }));
   const accommodation = data?.accommodation ?? store.accommodation;
   const addOns = data?.addOns ?? store.addOns;
   const packageName = data?.packageName ?? store.packageName;
 
-  const { data: apiAddons = [], isLoading: addonsLoading } = useAddons();
+  const {
+    data: apiAddons = [],
+    isLoading: addonsLoading,
+    isError: addonsError,
+    refetch: refetchAddons,
+  } = useAddons();
   const uploadFileMutation = useUploadFile();
   const createBookingMutation = useCreateBooking();
   const { addToast } = useToast();
@@ -234,6 +250,26 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
           </ul>
         </div>
       </section>
+
+      {/* Add-ons failed to load — common in production when API URL is wrong or CORS */}
+      {!addonsLoading && (addonsError || apiAddons.length === 0) && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <p className="text-foreground mb-2 text-sm font-semibold">
+            Add-ons could not be loaded
+          </p>
+          <p className="text-muted-foreground mb-3 text-sm">
+            Submit is disabled until the server is reachable. Check that the
+            backend is running and <code className="rounded bg-amber-100 px-1 text-xs">NEXT_PUBLIC_API_URL</code> points to it.
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => refetchAddons()}>
+            Retry loading add-ons
+          </Button>
+        </div>
+      )}
 
       {/* Bottom actions — 50/50 on mobile, 30/70 from sm up */}
       <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-[30%_1fr]">
