@@ -2,12 +2,27 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  /* Primary Colors */
+  --color-primary-100: #eef1ff;
+  --color-primary-200: #003377;
+  --color-primary-300: #00193a;
+  --color-primary-400: #354998;
+
+  /* Neutral Colors */
+  --color-neutral-100: #ffffff;
+  --color-neutral-200: #303030;
+  --color-neutral-300: #1a1a1a;
+  --color-neutral-400: #000000;
+
+  /* Font Mapping */
+  --font-sans: var(--font-general);
+  --font-clash: var(--font-clash);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-general-sans: var(--font-general-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -118,10 +133,15 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    @apply border-border outline-ring/50;
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
   body {
-    @apply bg-background text-foreground;
     @apply bg-background text-foreground;
   }
 }
