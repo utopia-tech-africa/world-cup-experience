@@ -83,7 +83,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
               .join(" ") || undefined
           }
           className={cn(
-            "bg-muted placeholder:text-muted-foreground h-10 rounded-lg border border-input text-sm",
+            "bg-muted placeholder:text-muted-foreground h-10 rounded-[4px] border border-input text-sm",
             className
           )}
           {...inputProps}

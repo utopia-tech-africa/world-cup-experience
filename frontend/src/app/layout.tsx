@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Geist, Geist_Mono } from "next/font/google";
 import { QueryProvider } from "@/providers/QueryProvider";
+import { ToastProvider } from "@/components/ui/toast";
 import { NavbarWrapper } from "@/components/navbar-wrapper";
 import "./globals.css";
 
@@ -36,8 +37,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${generalSans.variable} antialiased`}>
         <QueryProvider>
-          <NavbarWrapper />
-          {children}
+          <ToastProvider>
+            <NavbarWrapper />
+            {children}
+          </ToastProvider>
         </QueryProvider>
       </body>
     </html>
