@@ -5,13 +5,11 @@ import Link from "next/link";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
-import {
-  ADD_ON_LABELS,
-  ADD_ON_PRICES,
-  PACKAGE_PRICES,
-} from "@/lib/booking-pricing";
+import { PACKAGE_PRICES } from "@/lib/booking-pricing";
 import { buildBookingPayload } from "@/lib/booking-api-payload";
 import { useBookingStore } from "@/stores/booking-store";
+import { useShallow } from "zustand/react/shallow";
+import type { AddOn } from "@/types/booking";
 import { useAddons } from "@/hooks/queries/useAddons";
 import { useUploadFile } from "@/hooks/mutations/useUploadFile";
 import { useCreateBooking } from "@/hooks/mutations/useCreateBooking";
@@ -53,18 +51,20 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
   const [paymentType, setPaymentType] = useState<PaymentAccountType>("local");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const store = useBookingStore((s) => ({
-    accommodation: s.accommodation,
-    addOns: s.addOns,
-    packageName: s.packageName,
-    firstName: s.firstName,
-    lastName: s.lastName,
-    email: s.email,
-    phoneNumber: s.phoneNumber,
-    passportNumber: s.passportNumber,
-    passportExpiryDate: s.passportExpiryDate,
-    specialRequests: s.specialRequests,
-  }));
+  const store = useBookingStore(
+    useShallow((s) => ({
+      accommodation: s.accommodation,
+      addOns: s.addOns,
+      packageName: s.packageName,
+      firstName: s.firstName,
+      lastName: s.lastName,
+      email: s.email,
+      phoneNumber: s.phoneNumber,
+      passportNumber: s.passportNumber,
+      passportExpiryDate: s.passportExpiryDate,
+      specialRequests: s.specialRequests,
+    }))
+  );
   const accommodation = data?.accommodation ?? store.accommodation;
   const addOns = data?.addOns ?? store.addOns;
   const packageName = data?.packageName ?? store.packageName;
@@ -83,11 +83,12 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
   const accommodationLabel = accommodation === "hotel" ? "Hotel" : "Hostel";
 
   const addOnItems = addOns
-    .filter((id) => ADD_ON_PRICES[id] != null)
-    .map((id) => ({
-      id,
-      label: ADD_ON_LABELS[id] ?? id,
-      price: ADD_ON_PRICES[id] ?? 0,
+    .map((id) => apiAddons.find((a: AddOn) => a.id === id))
+    .filter((a): a is AddOn => a != null)
+    .map((addon) => ({
+      id: addon.id,
+      label: addon.name,
+      price: Number(addon.price),
     }));
 
   const addOnsTotal = addOnItems.reduce((sum, item) => sum + item.price, 0);

@@ -1,4 +1,5 @@
 import axios from '@/lib/axios';
+import type { AddOn } from '@/types/booking';
 
 export type DashboardStats = {
   totalBookings: number;
@@ -42,4 +43,27 @@ export const rejectBooking = async (id: string, rejectionReason: string) => {
     rejectionReason,
   });
   return data;
+};
+
+export const getAdminAddons = async (): Promise<AddOn[]> => {
+  const { data } = await axios.get<{ addons: AddOn[] }>('/admin/addons');
+  return data.addons;
+};
+
+export type CreateAddonInput = {
+  name: string;
+  description: string;
+  price: number;
+  category: 'merch' | 'transport' | 'experience' | 'food';
+  displayOrder?: number;
+  isActive?: boolean;
+};
+
+export const createAddon = async (input: CreateAddonInput): Promise<AddOn> => {
+  const { data } = await axios.post<{ addon: AddOn }>('/admin/addons', {
+    ...input,
+    displayOrder: input.displayOrder ?? 0,
+    isActive: input.isActive ?? true,
+  });
+  return data.addon;
 };

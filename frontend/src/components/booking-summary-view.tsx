@@ -2,7 +2,8 @@
 
 import { BookingSummaryBar } from "@/components/booking-summary-bar";
 import { BookingSummaryContent } from "@/components/booking-summary-content";
-import { useBookingStore } from "@/stores/booking-store";
+import { useBookingStore, computeBookingTotal } from "@/stores/booking-store";
+import { useAddons } from "@/hooks/queries/useAddons";
 
 /**
  * Client wrapper for the booking summary page. Reads from the booking store
@@ -12,12 +13,10 @@ export function BookingSummaryView() {
   const route = useBookingStore((s) => s.route);
   const packageName = useBookingStore((s) => s.packageName);
   const duration = useBookingStore((s) => s.duration);
-  const getTotalCost = useBookingStore((s) => s.getTotalCost);
-
   const accommodation = useBookingStore((s) => s.accommodation);
   const addOns = useBookingStore((s) => s.addOns);
-
-  const totalCost = getTotalCost();
+  const { data: apiAddons = [] } = useAddons();
+  const totalCost = computeBookingTotal(accommodation, addOns, apiAddons);
 
   return (
     <>

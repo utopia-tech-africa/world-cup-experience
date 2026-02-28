@@ -17,10 +17,10 @@ import {
   LogOut,
   Clock,
   CheckCircle,
-  XCircle,
   DollarSign,
   ChevronRight,
   Loader2,
+  Package,
 } from 'lucide-react';
 import { useDashboardStats } from '@/hooks/queries/useDashboardStats';
 import { useBookings } from '@/hooks/queries/useBookings';
@@ -163,13 +163,22 @@ export default function AdminDashboardPage() {
     <div className="min-h-svh bg-muted/30">
       <header className="border-b bg-background">
         <div className="flex h-14 items-center justify-between px-4 md:px-6">
-          <Link
-            href="/admin/dashboard"
-            className="flex items-center gap-2 font-semibold"
-          >
-            <LayoutDashboard className="size-5" />
-            <span className="hidden sm:inline">Admin Dashboard</span>
-          </Link>
+          <nav className="flex items-center gap-4">
+            <Link
+              href="/admin/dashboard"
+              className="flex items-center gap-2 font-semibold"
+            >
+              <LayoutDashboard className="size-5" />
+              <span className="hidden sm:inline">Admin Dashboard</span>
+            </Link>
+            <Link
+              href="/admin/addons"
+              className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm font-medium"
+            >
+              <Package className="size-4" />
+              Add-ons
+            </Link>
+          </nav>
           <Button variant="ghost" size="sm" onClick={handleLogout}>
             <LogOut className="mr-2 size-4" />
             Log out

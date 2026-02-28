@@ -16,8 +16,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Controller } from "react-hook-form";
 import { toBackendDateString } from "@/lib/booking-api-payload";
-
-const BRAND_BLUE = "#354998";
+import { useAddons } from "@/hooks/queries/useAddons";
+import type { AddOn } from "@/types/booking";
 
 const bookingSchema = z.object({
   accommodation: z.enum(["hostel", "hotel"]),
@@ -46,14 +46,6 @@ const bookingSchema = z.object({
 
 export type BookingFormValues = z.infer<typeof bookingSchema>;
 
-const ADD_ONS = [
-  { id: "merch", label: "Merch Bundle (scarf/cap/flag kit)" },
-  { id: "suv", label: "Private Delegation SUV" },
-  { id: "meals", label: "Lunch / Dinner Meal Add-on" },
-  { id: "phl-shuttle", label: "PHL Airport Shuttle (round trip)" },
-  { id: "transfers", label: "Premium Match-Day Priority Transfers" },
-] as const;
-
 const defaultValues: BookingFormValues = {
   accommodation: "hotel",
   addOns: [],
@@ -69,6 +61,7 @@ const defaultValues: BookingFormValues = {
 export function BookingForm() {
   const router = useRouter();
   const setBookingForm = useBookingStore((s) => s.setBookingForm);
+  const { data: apiAddons = [], isLoading: addonsLoading } = useAddons();
 
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
@@ -167,30 +160,41 @@ export function BookingForm() {
 
       <hr className="border-0 border-t border-[#BFBFBF]/80" />
 
-      {/* Optional Add-ons */}
+      {/* Optional Add-ons — from API (admin-managed) */}
       <section className="flex flex-col gap-4">
         <h2 className="text-foreground text-lg font-bold">Optional Add-ons</h2>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {ADD_ONS.map(({ id, label }) => (
-            <label
-              key={id}
-              className="text-foreground flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 hover:bg-gray-50 has-checked:border-[#354998] has-checked:bg-[#354998]/5">
-              <input
-                type="checkbox"
-                className="border-input h-4 w-4 rounded text-[#354998] focus:ring-[#354998]"
-                checked={form.watch("addOns").includes(id)}
-                onChange={(e) => {
-                  const prev = form.getValues("addOns");
-                  const next = e.target.checked
-                    ? [...prev, id]
-                    : prev.filter((x) => x !== id);
-                  form.setValue("addOns", next);
-                }}
-              />
-              <span className="text-sm">{label}</span>
-            </label>
-          ))}
-        </div>
+        {addonsLoading ? (
+          <p className="text-muted-foreground text-sm">Loading add-ons…</p>
+        ) : apiAddons.length === 0 ? (
+          <p className="text-muted-foreground text-sm">No add-ons available right now.</p>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {apiAddons.map((addon: AddOn) => (
+              <label
+                key={addon.id}
+                className="text-foreground flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 hover:bg-gray-50 has-checked:border-[#354998] has-checked:bg-[#354998]/5">
+                <input
+                  type="checkbox"
+                  className="border-input h-4 w-4 rounded text-[#354998] focus:ring-[#354998]"
+                  checked={form.watch("addOns").includes(addon.id)}
+                  onChange={(e) => {
+                    const prev = form.getValues("addOns");
+                    const next = e.target.checked
+                      ? [...prev, addon.id]
+                      : prev.filter((x) => x !== addon.id);
+                    form.setValue("addOns", next);
+                  }}
+                />
+                <span className="text-sm">
+                  {addon.name}
+                  <span className="text-muted-foreground ml-1">
+                    (${Number(addon.price).toLocaleString()})
+                  </span>
+                </span>
+              </label>
+            ))}
+          </div>
+        )}
       </section>
 
       <hr className="border-0 border-t border-[#BFBFBF]/80" />
