@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { BookingSummaryBar } from "@/components/booking-summary-bar";
 import { BookingSummaryContent } from "@/components/booking-summary-content";
 import { useBookingStore, computeBookingTotal } from "@/stores/booking-store";
@@ -12,6 +13,10 @@ import { useBookingStoreRehydrated } from "@/hooks/use-booking-store-rehydrated"
  */
 export function BookingSummaryView() {
   useBookingStoreRehydrated();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, []);
   const hasHydrated = useBookingStore((s) => s.hasHydrated);
   const route = useBookingStore((s) => s.route);
   const packageName = useBookingStore((s) => s.packageName);

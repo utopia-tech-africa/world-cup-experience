@@ -6,7 +6,7 @@ import Book from "@/components/book/book";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col space-y-16">
+    <main className="flex min-h-screen flex-col">
       <Hero />
       <Games />
       <FifaFanfest />

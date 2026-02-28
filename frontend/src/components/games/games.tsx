@@ -4,7 +4,7 @@ import { GameCard } from "./components";
 
 export default function Games() {
   return (
-    <section className=" bg-neutral-100">
+    <section className="mb:10 md:mb-22 lg:mb-30">
       <ComponentLayout>
         {/* Header Section */}
         <div className="mb-6 max-w-2xl">

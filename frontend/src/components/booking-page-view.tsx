@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { BookingSummaryBar } from "@/components/booking-summary-bar";
 import { BookingPageContent } from "@/components/booking-page-content";
 import { BookingForm } from "@/components/booking-form";
@@ -13,6 +14,11 @@ import { useBookingStoreRehydrated } from "@/hooks/use-booking-store-rehydrated"
  */
 export function BookingPageView() {
   useBookingStoreRehydrated();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, []);
+
   const hasHydrated = useBookingStore((s) => s.hasHydrated);
   const route = useBookingStore((s) => s.route);
   const packageName = useBookingStore((s) => s.packageName);

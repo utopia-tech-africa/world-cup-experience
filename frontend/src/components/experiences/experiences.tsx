@@ -43,7 +43,7 @@ const experiencesData = [
 
 const Experiences = () => {
   return (
-    <ComponentLayout>
+    <ComponentLayout className="mb:10 md:mb-22 lg:mb-30">
       <div className="flex flex-col gap-3 mb-6">
         <h2 className="text-[32px] md:text-4xl lg:text-5xl font-medium leading-[110%] max-w-2xl font-clash">
           Exciting experiences

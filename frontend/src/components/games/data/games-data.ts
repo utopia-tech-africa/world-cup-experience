@@ -1,9 +1,10 @@
+import type { StaticImageData } from "next/image";
 import { ghanaFlag, croatiaFlag, englandFlag } from "@/assets/img";
 import { getBasePackagePrice } from "@/lib/booking-pricing";
 
 export interface TeamInfo {
   name: string;
-  flag: unknown;
+  flag: StaticImageData;
 }
 
 export interface Match {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -72,6 +72,8 @@ export function BookingForm() {
     defaultValues,
   });
 
+  const didSyncFormFromStore = useRef(false);
+
   useEffect(() => {
     const state = useBookingStore.getState();
     const hasStoredData =
@@ -80,6 +82,7 @@ export function BookingForm() {
       state.email !== "";
     const hasPackageFromHero = state.packageName?.trim() !== "";
     if (hasStoredData || hasPackageFromHero) {
+      didSyncFormFromStore.current = true;
       form.reset({
         accommodation: state.accommodation,
         addOns: state.addOns,
@@ -98,6 +101,10 @@ export function BookingForm() {
   const addOns = form.watch("addOns");
 
   useEffect(() => {
+    if (didSyncFormFromStore.current) {
+      didSyncFormFromStore.current = false;
+      return;
+    }
     setBookingForm({ accommodation, addOns });
   }, [accommodation, addOns, setBookingForm]);
 

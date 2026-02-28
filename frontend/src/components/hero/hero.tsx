@@ -5,7 +5,7 @@ import { BookingForm, HeroContent } from "./components";
 
 export function Hero() {
   return (
-    <section className="relative flex min-h-dvh w-full flex-col bg-neutral-100 overflow-hidden mb-19 md:mb-22 lg:mb-30">
+    <section id="hero" className="relative flex min-h-dvh w-full flex-col bg-neutral-100 overflow-hidden mb-19 md:mb-22 lg:mb-30">
       {/* Background Pattern and Radial Gradient */}
       <div className="absolute inset-0 z-0">
         <Image
