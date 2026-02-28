@@ -1,0 +1,132 @@
+"use client";
+
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+export type BookingSummaryBarProps = {
+  /** Route (e.g. from landing page): "Accra (ACC) ✈ USA (US)" */
+  route: string;
+  /** Package name (e.g. "One Game") */
+  packageName: string;
+  /** Duration (e.g. "4 nights") */
+  duration: string;
+  /** Cost in dollars (number or formatted string) */
+  cost: number | string;
+  /** Back link – e.g. "/" for landing when on /booking, "/booking" when on /booking/summary */
+  backHref?: string;
+  /** Optional: callback when back is clicked (if not using backHref) */
+  onBack?: () => void;
+  className?: string;
+};
+
+const BRAND_BLUE = "#354998";
+
+function formatCost(cost: number | string): {
+  dollars: string;
+  cents: string;
+} {
+  if (typeof cost === "number") {
+    const fixed = cost.toFixed(2);
+    const [d, c] = fixed.split(".");
+    return { dollars: `$${d}`, cents: c ?? "00" };
+  }
+  const match = String(cost).match(/^(\$?\d+)(?:\.(\d{2}))?$/);
+  if (match) {
+    return {
+      dollars: match[1].startsWith("$") ? match[1] : `$${match[1]}`,
+      cents: match[2] ?? "00",
+    };
+  }
+  return { dollars: `$${cost}`, cents: "" };
+}
+
+/**
+ * Nav bar for the booking flow (/booking, /booking/summary). Shows the package
+ * details the user selected (or will select on the landing page) and a back
+ * action to change the selection.
+ */
+export function BookingSummaryBar({
+  route,
+  packageName,
+  duration,
+  cost,
+  backHref,
+  onBack,
+  className,
+}: BookingSummaryBarProps) {
+  const { dollars, cents } = formatCost(cost);
+  const hasBackAction = backHref != null || onBack != null;
+
+  const backIcon = (
+    <span
+      className={cn(
+        "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 bg-white",
+        hasBackAction && "cursor-pointer hover:opacity-90",
+      )}
+      style={{ borderColor: BRAND_BLUE, color: BRAND_BLUE }}
+      aria-hidden>
+      <ArrowLeft className="h-6 w-6" strokeWidth={2.5} />
+    </span>
+  );
+
+  return (
+    <aside
+      data-slot="booking-summary-bar"
+      className={cn(
+        "w-full border-b border-gray-200 font-general-sans",
+        className,
+      )}>
+      <div className="mx-auto flex w-full max-w-[1512px] items-start justify-between gap-4 px-4 pt-[8px] pb-[12px] sm:gap-6 sm:px-8 md:gap-8 md:px-16 lg:px-[200px]">
+        <div className="flex min-w-0 flex-1 items-center gap-4 sm:gap-5">
+          {hasBackAction ? (
+            backHref != null ? (
+              <Link
+                href={backHref}
+                className="shrink-0 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#354998] focus-visible:ring-offset-2"
+                aria-label="Back to change selection">
+                {backIcon}
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={onBack}
+                className="shrink-0 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#354998] focus-visible:ring-offset-2"
+                aria-label="Back to change selection">
+                {backIcon}
+              </button>
+            )
+          ) : (
+            <div className="shrink-0">{backIcon}</div>
+          )}
+
+          <div className="min-w-0 flex-1">
+            <p className="text-foreground  text-sm font-medium leading-normal">
+              {route}
+            </p>
+            <h2 className="text-foreground text-2xl font-medium leading-tight">
+              {packageName}
+            </h2>
+            <p className="text-foreground text-sm font-medium leading-normal">
+              {duration}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex shrink-0 flex-col items-end gap-0.5 sm:items-start">
+          <span className="text-[#303030] text-sm font-normal">Cost</span>
+          <p
+            className="font-bold leading-none text-[#354998]"
+            aria-label={`Cost ${dollars}.${cents}`}>
+            <span className="text-2xl sm:text-[32px]">{dollars}.</span>
+            {cents ? (
+              <span className="text-base align-super font-normal sm:text-lg">
+                {cents}
+              </span>
+            ) : null}
+          </p>
+        </div>
+      </div>
+    </aside>
+  );
+}

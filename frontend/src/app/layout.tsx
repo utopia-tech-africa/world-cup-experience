@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { QueryProvider } from "@/providers/QueryProvider";
+import { NavbarWrapper } from "@/components/navbar-wrapper";
 import "./globals.css";
 
 const generalSans = localFont({
@@ -107,7 +108,10 @@ export default function RootLayout({
       <body
         className={`${generalSans.variable} ${clashDisplay.variable} font-sans antialiased`}
       >
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <NavbarWrapper />
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );
