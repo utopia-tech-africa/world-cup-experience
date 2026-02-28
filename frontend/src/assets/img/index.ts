@@ -1,1 +1,1 @@
-export * from "./";
+export * from "./hero-bg-img.webp";
