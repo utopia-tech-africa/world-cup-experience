@@ -1,1 +1,3 @@
-export * from "./hero-bg-pattern.svg";
+import heroBgPattern from "./hero-bg-pattern.svg";
+
+export { heroBgPattern };
