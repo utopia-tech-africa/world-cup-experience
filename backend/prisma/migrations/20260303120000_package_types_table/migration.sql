@@ -44,3 +44,15 @@ ALTER TABLE "bookings" RENAME COLUMN "package_type_new" TO "package_type";
 
 -- Drop enum
 DROP TYPE "PackageType";
+
+-- Add FK from games.type_id to package_types (games table created in 20260228120000, before package_types existed)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.table_constraints
+    WHERE constraint_name = 'games_type_id_fkey' AND table_name = 'games'
+  ) AND EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'games') THEN
+    ALTER TABLE "games" ADD CONSTRAINT "games_type_id_fkey"
+      FOREIGN KEY ("type_id") REFERENCES "package_types"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+END $$;

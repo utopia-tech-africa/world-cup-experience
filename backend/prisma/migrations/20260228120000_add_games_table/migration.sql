@@ -1,5 +1,5 @@
--- CreateTable
-CREATE TABLE "games" (
+-- CreateTable (FK to package_types added later in 20260303120000 when package_types exists)
+CREATE TABLE IF NOT EXISTS "games" (
     "id" TEXT NOT NULL,
     "type_id" TEXT NOT NULL,
     "stadium" TEXT NOT NULL,
@@ -12,6 +12,3 @@ CREATE TABLE "games" (
 
     CONSTRAINT "games_pkey" PRIMARY KEY ("id")
 );
-
--- AddForeignKey
-ALTER TABLE "games" ADD CONSTRAINT "games_type_id_fkey" FOREIGN KEY ("type_id") REFERENCES "package_types"("id") ON DELETE CASCADE ON UPDATE CASCADE;
