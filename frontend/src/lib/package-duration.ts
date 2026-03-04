@@ -21,9 +21,9 @@ export function nightsBetween(
  * nights or startDate/endDate, otherwise returns package.duration (no date range).
  */
 export function getPackageDurationLabel(pkg: Pick<BookingPackage, "duration" | "startDate" | "endDate" | "nights">): string {
-  let nights = pkg.nights;
+  let nights: number | undefined = pkg.nights;
   if (nights == null && pkg.startDate && pkg.endDate) {
-    nights = nightsBetween(pkg.startDate, pkg.endDate);
+    nights = nightsBetween(pkg.startDate, pkg.endDate) ?? undefined;
   }
   if (nights != null && nights >= 0) {
     return `${nights} night${nights !== 1 ? "s" : ""}`;
