@@ -124,24 +124,12 @@ export default function AdminBookingDetailPage() {
 
   if (isLoading || !booking) {
     return (
-      <div className="min-h-svh bg-muted/30">
-        <header className="border-b bg-background">
-          <div className="flex h-14 items-center gap-4 px-4 md:px-6">
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="/admin/bookings">
-                <ArrowLeft className="size-4" aria-label="Back to bookings" />
-              </Link>
-            </Button>
-            <h1 className="text-lg font-semibold">Booking</h1>
-          </div>
-        </header>
-        <main className="flex items-center justify-center p-8">
-          {error ? (
-            <p className="text-destructive">Failed to load booking.</p>
-          ) : (
-            <Loader2 className="text-muted-foreground size-8 animate-spin" />
-          )}
-        </main>
+      <div className="flex items-center justify-center p-8">
+        {error ? (
+          <p className="text-destructive">Failed to load booking.</p>
+        ) : (
+          <Loader2 className="text-muted-foreground size-8 animate-spin" />
+        )}
       </div>
     );
   }
@@ -149,23 +137,18 @@ export default function AdminBookingDetailPage() {
   const isPending = booking.bookingStatus === 'pending';
 
   return (
-    <div className="min-h-svh bg-muted/30">
-      <header className="border-b bg-background">
-        <div className="flex h-14 items-center gap-4 px-4 md:px-6">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/admin/bookings">
-              <ArrowLeft className="size-4" aria-label="Back to bookings" />
-            </Link>
-          </Button>
-          <div className="flex flex-1 flex-wrap items-center gap-2">
-            <h1 className="text-lg font-semibold">
-              {booking.bookingReference}
-            </h1>
-            <StatusBadge status={booking.bookingStatus} />
-          </div>
-        </div>
-      </header>
-      <main className="space-y-6 p-4 md:p-6">
+    <div className="space-y-6 p-4 md:p-6">
+      <div className="flex flex-wrap items-center gap-2">
+        <Button variant="ghost" size="icon" asChild>
+          <Link href="/admin/bookings">
+            <ArrowLeft className="size-4" aria-label="Back to bookings" />
+          </Link>
+        </Button>
+        <h1 className="text-2xl font-bold tracking-tight">
+          {booking.bookingReference}
+        </h1>
+        <StatusBadge status={booking.bookingStatus} />
+      </div>
         {/* Actions for pending */}
         {isPending && (
           <Card>
@@ -395,7 +378,6 @@ export default function AdminBookingDetailPage() {
             </Button>
           </CardContent>
         </Card>
-      </main>
-    </div>
-  );
-}
+      </div>
+    );
+  }

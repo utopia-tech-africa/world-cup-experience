@@ -5,6 +5,7 @@ import { BookingSummaryBar } from "@/components/booking-summary-bar";
 import { BookingSummaryContent } from "@/components/booking-summary-content";
 import { useBookingStore, computeBookingTotal } from "@/stores/booking-store";
 import { useAddons } from "@/hooks/queries/useAddons";
+import { usePackages } from "@/hooks/queries/usePackages";
 import { useBookingStoreRehydrated } from "@/hooks/use-booking-store-rehydrated";
 
 /**
@@ -24,11 +25,13 @@ export function BookingSummaryView() {
   const accommodation = useBookingStore((s) => s.accommodation);
   const addOns = useBookingStore((s) => s.addOns);
   const { data: apiAddons = [] } = useAddons();
+  const { data: packages = [], isLoading: packagesLoading } = usePackages();
   const totalCost = computeBookingTotal(
     accommodation,
     addOns,
     apiAddons,
     packageName,
+    packages
   );
 
   return (
@@ -38,7 +41,7 @@ export function BookingSummaryView() {
         packageName={packageName}
         duration={duration}
         cost={totalCost}
-        costLoading={!hasHydrated}
+        costLoading={!hasHydrated || packagesLoading}
         backHref="/booking"
       />
       <div className="mx-auto w-full max-w-[1512px] px-4 py-8 sm:px-8 lg:px-[200px]">

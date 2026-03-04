@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { getBasePackagePrice } from "@/lib/booking-pricing";
-import type { AddOn } from "@/types/booking";
+import type { AddOn, BookingPackage } from "@/types/booking";
 
 export type AccommodationType = "hostel" | "hotel";
 
@@ -41,14 +41,15 @@ const defaultTripSummary: TripSummaryState = {
   duration: "4 nights",
 };
 
-/** Compute total from package, accommodation, and selected addons. */
+/** Compute total from package, accommodation, and selected addons. Uses API packages when provided. */
 export function computeBookingTotal(
   accommodation: AccommodationType,
   addonIds: string[],
   apiAddons: AddOn[],
-  packageName: string
+  packageName: string,
+  packages?: BookingPackage[]
 ): number {
-  const packagePrice = getBasePackagePrice(packageName, accommodation);
+  const packagePrice = getBasePackagePrice(packageName, accommodation, packages);
   const addOnsTotal = addonIds.reduce(
     (sum, id) => sum + (Number(apiAddons.find((a) => a.id === id)?.price) || 0),
     0

@@ -1,10 +1,9 @@
 import express from 'express';
-import { getPackages, createBooking, uploadFile } from '../controllers/booking.controller';
+import { createBooking, uploadFile } from '../controllers/booking.controller';
 import { upload } from '../middleware/upload.middleware';
 
 const router = express.Router();
 
-router.get('/packages', getPackages);
 router.post('/bookings', createBooking);
 router.post('/upload', upload.single('file'), uploadFile);
 

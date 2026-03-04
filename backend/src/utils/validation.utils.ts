@@ -9,7 +9,7 @@ export const bookingSchema = z.object({
     (date) => new Date(date) > new Date(),
     'Passport expiry must be a future date'
   ),
-  packageType: z.enum(['single_game', 'double_game']),
+  packageType: z.string().min(1, 'Package type is required'),
   accommodationType: z.enum(['hotel', 'hostel']),
   numberOfTravelers: z.number().int().min(1).max(10),
   specialRequests: z.string().optional(),

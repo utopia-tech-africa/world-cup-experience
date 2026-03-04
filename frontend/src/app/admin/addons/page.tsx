@@ -21,13 +21,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import {
-  LayoutDashboard,
-  LogOut,
-  Loader2,
-  Package,
-  Pencil,
-} from 'lucide-react';
+import { Loader2, Pencil } from 'lucide-react';
 import { useAdminAddons } from '@/hooks/queries/useAdminAddons';
 import { useCreateAddon } from '@/hooks/mutations/useCreateAddon';
 import { useUpdateAddon } from '@/hooks/mutations/useUpdateAddon';
@@ -73,15 +67,6 @@ export default function AdminAddonsPage() {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (!token) router.replace('/admin/login');
   }, [router]);
-
-  const handleLogout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-    }
-    router.push('/admin/login');
-    router.refresh();
-  };
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,33 +130,7 @@ export default function AdminAddonsPage() {
   };
 
   return (
-    <div className="min-h-svh bg-muted/30">
-      <header className="border-b bg-background">
-        <div className="flex h-14 items-center justify-between px-4 md:px-6">
-          <nav className="flex items-center gap-4">
-            <Link
-              href="/admin/dashboard"
-              className="flex items-center gap-2 font-semibold"
-            >
-              <LayoutDashboard className="size-5" />
-              <span className="hidden sm:inline">Dashboard</span>
-            </Link>
-            <Link
-              href="/admin/addons"
-              className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm font-medium"
-            >
-              <Package className="size-4" />
-              Add-ons
-            </Link>
-          </nav>
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
-            <LogOut className="mr-2 size-4" />
-            Log out
-          </Button>
-        </div>
-      </header>
-
-      <main className="flex-1 space-y-6 p-4 md:p-6">
+    <div className="space-y-6 p-4 md:p-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Add-ons</h1>
           <p className="text-muted-foreground">
@@ -412,7 +371,6 @@ export default function AdminAddonsPage() {
             </form>
           </DialogContent>
         </Dialog>
-      </main>
     </div>
   );
 }

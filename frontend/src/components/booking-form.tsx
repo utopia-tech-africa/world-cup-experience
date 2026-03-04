@@ -19,6 +19,7 @@ import { Controller } from "react-hook-form";
 import { toBackendDateString } from "@/lib/booking-api-payload";
 import { getBasePackagePrice } from "@/lib/booking-pricing";
 import { useAddons } from "@/hooks/queries/useAddons";
+import { usePackages } from "@/hooks/queries/usePackages";
 import type { AddOn } from "@/types/booking";
 
 const bookingSchema = z.object({
@@ -63,9 +64,10 @@ export function BookingForm() {
   const packageName = useBookingStore((s) => s.packageName);
   const setBookingForm = useBookingStore((s) => s.setBookingForm);
   const { data: apiAddons = [], isLoading: addonsLoading } = useAddons();
+  const { data: packages = [], isLoading: packagesLoading } = usePackages();
 
-  const hostelPrice = getBasePackagePrice(packageName, "hostel");
-  const hotelPrice = getBasePackagePrice(packageName, "hotel");
+  const hostelPrice = getBasePackagePrice(packageName, "hostel", packages);
+  const hotelPrice = getBasePackagePrice(packageName, "hotel", packages);
 
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
@@ -164,7 +166,7 @@ export function BookingForm() {
                   strokeWidth={1.5}
                 />
                 {label} –{" "}
-                {hasHydrated ? (
+                {hasHydrated && !packagesLoading ? (
                   `$${price.toLocaleString()}`
                 ) : (
                   <Skeleton className="ml-1 inline-block h-4 w-12" />

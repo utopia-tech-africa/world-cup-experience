@@ -30,6 +30,16 @@ function formatCurrency(value: number | string): string {
   }).format(num);
 }
 
+function packageTypeToLabel(packageType: string): string {
+  const labels: Record<string, string> = {
+    single_game: 'Single Game',
+    double_game: 'Double Game',
+    triple_game: 'Triple Game',
+    quad_game: 'Quad Game',
+  };
+  return labels[packageType] ?? packageType.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function emailLayout(content: string, preheader?: string): string {
   return `
 <!DOCTYPE html>
@@ -73,8 +83,7 @@ export async function sendSubmissionEmail(booking: Booking): Promise<void> {
   }
 
   const totalFormatted = formatCurrency(Number(booking.totalAmount));
-  const packageLabel =
-    booking.packageType === 'single_game' ? 'Single Game' : 'Double Game';
+  const packageLabel = packageTypeToLabel(booking.packageType);
   const accommodationLabel =
     booking.accommodationType === 'hotel' ? 'Hotel' : 'Hostel';
 
@@ -119,8 +128,7 @@ export async function sendConfirmationEmail(booking: Booking): Promise<void> {
   }
 
   const totalFormatted = formatCurrency(Number(booking.totalAmount));
-  const packageLabel =
-    booking.packageType === 'single_game' ? 'Single Game' : 'Double Game';
+  const packageLabel = packageTypeToLabel(booking.packageType);
   const accommodationLabel =
     booking.accommodationType === 'hotel' ? 'Hotel' : 'Hostel';
 

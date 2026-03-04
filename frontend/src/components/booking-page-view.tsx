@@ -6,6 +6,7 @@ import { BookingPageContent } from "@/components/booking-page-content";
 import { BookingForm } from "@/components/booking-form";
 import { useBookingStore, computeBookingTotal } from "@/stores/booking-store";
 import { useAddons } from "@/hooks/queries/useAddons";
+import { usePackages } from "@/hooks/queries/usePackages";
 import { useBookingStoreRehydrated } from "@/hooks/use-booking-store-rehydrated";
 
 /**
@@ -26,11 +27,13 @@ export function BookingPageView() {
   const accommodation = useBookingStore((s) => s.accommodation);
   const addOns = useBookingStore((s) => s.addOns);
   const { data: apiAddons = [] } = useAddons();
+  const { data: packages = [], isLoading: packagesLoading } = usePackages();
   const cost = computeBookingTotal(
     accommodation,
     addOns,
     apiAddons,
     packageName,
+    packages
   );
 
   return (
@@ -40,7 +43,7 @@ export function BookingPageView() {
         packageName={packageName}
         duration={duration}
         cost={cost}
-        costLoading={!hasHydrated}
+        costLoading={!hasHydrated || packagesLoading}
         backHref="/"
       />
       <BookingPageContent>

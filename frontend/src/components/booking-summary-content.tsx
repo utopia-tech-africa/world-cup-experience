@@ -5,12 +5,14 @@ import Link from "next/link";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
+import { SuccessModal } from "@/components/success-modal";
 import { getBasePackagePrice } from "@/lib/booking-pricing";
 import { buildBookingPayload } from "@/lib/booking-api-payload";
 import { useBookingStore } from "@/stores/booking-store";
 import { useShallow } from "zustand/react/shallow";
 import type { AddOn } from "@/types/booking";
 import { useAddons } from "@/hooks/queries/useAddons";
+import { usePackages } from "@/hooks/queries/usePackages";
 import { useUploadFile } from "@/hooks/mutations/useUploadFile";
 import { useCreateBooking } from "@/hooks/mutations/useCreateBooking";
 import { cn } from "@/lib/utils";
@@ -50,6 +52,8 @@ type BookingSummaryContentProps = {
 export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
   const [paymentType, setPaymentType] = useState<PaymentAccountType>("local");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [successBookingRef, setSuccessBookingRef] = useState<string | null>(null);
 
   const store = useBookingStore(
     useShallow((s) => ({
@@ -75,11 +79,12 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
     isError: addonsError,
     refetch: refetchAddons,
   } = useAddons();
+  const { data: packages = [] } = usePackages();
   const uploadFileMutation = useUploadFile();
   const createBookingMutation = useCreateBooking();
   const { addToast } = useToast();
 
-  const packagePrice = getBasePackagePrice(packageName, accommodation);
+  const packagePrice = getBasePackagePrice(packageName, accommodation, packages);
   const accommodationLabel = accommodation === "hotel" ? "Hotel" : "Hostel";
 
   const addOnItems = addOns
@@ -130,8 +135,11 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
         paymentAccountType: paymentType,
         paymentProofUrl: url,
         apiAddons,
+        packages,
       });
-      await createBookingMutation.mutateAsync(payload);
+      const result = await createBookingMutation.mutateAsync(payload);
+      setSuccessBookingRef(result.bookingReference);
+      setSuccessModalOpen(true);
     } catch {
       // Upload errors: useUploadFile onError shows toast
       // Create errors: useCreateBooking onError shows toast
@@ -139,7 +147,13 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
   };
 
   return (
-    <div className="flex flex-col gap-6 rounded-lg border-[0.5px] border-[#BFBFBF]/80 p-4 sm:gap-8 sm:p-[30px]">
+    <>
+      <SuccessModal
+        open={successModalOpen}
+        onOpenChange={setSuccessModalOpen}
+        bookingReference={successBookingRef}
+      />
+      <div className="flex flex-col gap-6 rounded-lg border-[0.5px] border-[#BFBFBF]/80 p-4 sm:gap-8 sm:p-[30px]">
       {/* Payment account type toggle — Figma 121-5495 mobile */}
       <section className="flex flex-col gap-3">
         <h2 className="text-foreground text-center text-lg font-bold">
@@ -291,6 +305,7 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
         </Button>
       </div>
     </div>
+    </>
   );
 }
 

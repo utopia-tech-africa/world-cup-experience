@@ -11,15 +11,15 @@ export function GameCard({ offer }: { offer: GameOffer }) {
   const router = useRouter();
   const setTripSummary = useBookingStore((s) => s.setTripSummary);
   const setBookingForm = useBookingStore((s) => s.setBookingForm);
-  const isDouble = offer.type === "Double game";
+  const accommodation =
+    offer.accommodation.toLowerCase().includes("hostel") ? "hostel" : "hotel";
+  const isDouble = offer.matches.length > 1;
+  const packageName = offer.packageName ?? (isDouble ? "Double Game" : "One Game");
+  const duration =
+    offer.duration ?? (isDouble ? "7 nights (June 22-29)" : "4 nights (June 25-29)");
 
   const handleBookSeat = () => {
-    const accommodation =
-      offer.accommodation.toLowerCase().includes("hostel") ? "hostel" : "hotel";
-    setTripSummary({
-      packageName: isDouble ? "Double Game" : "One Game",
-      duration: isDouble ? "7 nights (June 22-29)" : "4 nights (June 25-29)",
-    });
+    setTripSummary({ packageName, duration });
     setBookingForm({ accommodation });
     router.push("/booking");
   };

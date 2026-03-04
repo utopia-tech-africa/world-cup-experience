@@ -2,11 +2,9 @@
 
 import { useMutation } from '@tanstack/react-query';
 import { createBooking } from '@/services/bookingService';
-import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/toast';
 
 export const useCreateBooking = () => {
-  const router = useRouter();
   const { addToast } = useToast();
 
   return useMutation({
@@ -17,7 +15,6 @@ export const useCreateBooking = () => {
         'success',
         5000
       );
-      router.push(`/success?ref=${data.bookingReference}`);
     },
     onError: (error: unknown) => {
       const message =

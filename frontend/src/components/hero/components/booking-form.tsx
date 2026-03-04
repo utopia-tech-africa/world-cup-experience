@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useBookingStore } from "@/stores/booking-store";
 import { getBasePackagePrice } from "@/lib/booking-pricing";
+import { usePackages } from "@/hooks/queries/usePackages";
 
 /** Dates per PROJECT_SCOPE: Single Game June 25–29, Double Game June 22–29 */
 const PACKAGE_DATES = {
@@ -24,11 +25,13 @@ export function BookingForm() {
   const setTripSummary = useBookingStore((s) => s.setTripSummary);
   const setBookingForm = useBookingStore((s) => s.setBookingForm);
   const [tripType, setTripType] = useState<"single" | "double">("single");
+  const { data: packages = [] } = usePackages();
 
   const dates = PACKAGE_DATES[tripType];
   const packagePrice = getBasePackagePrice(
     tripType === "single" ? "One Game" : "Double Game",
-    "hotel"
+    "hotel",
+    packages
   );
 
   useEffect(() => {

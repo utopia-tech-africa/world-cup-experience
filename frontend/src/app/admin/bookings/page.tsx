@@ -177,18 +177,13 @@ export default function AdminBookingsPage() {
   const hasPrev = page > 1;
 
   return (
-    <div className="min-h-svh bg-muted/30">
-      <header className="border-b bg-background">
-        <div className="flex h-14 items-center gap-4 px-4 md:px-6">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/admin/dashboard">
-              <ArrowLeft className="size-4" aria-label="Back to dashboard" />
-            </Link>
-          </Button>
-          <h1 className="text-lg font-semibold">Bookings</h1>
+    <div className="p-4 md:p-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold tracking-tight">Bookings</h1>
+          <p className="text-muted-foreground">
+            Search and filter by status, then open a booking to confirm or reject.
+          </p>
         </div>
-      </header>
-      <main className="p-4 md:p-6">
         <Card>
           <CardHeader className="space-y-4">
             <div>
@@ -258,7 +253,6 @@ export default function AdminBookingsPage() {
             )}
           </CardContent>
         </Card>
-      </main>
     </div>
   );
 }
