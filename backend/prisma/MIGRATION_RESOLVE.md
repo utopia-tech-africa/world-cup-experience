@@ -1,3 +1,24 @@
+# Full DB reset (no data to keep)
+
+To wipe the database and apply all migrations from scratch:
+
+1. **Point your env to the production DB** (e.g. in `backend/.env`).
+
+2. **Wipe the schema:**
+   ```bash
+   cd backend
+   pnpm prisma db execute --file prisma/reset-schema.sql
+   ```
+
+3. **Apply all migrations:**
+   ```bash
+   pnpm prisma migrate deploy
+   ```
+
+If `reset-schema.sql` fails (e.g. permission denied on `DROP SCHEMA`), use your DB provider’s UI to drop and recreate the database (or drop all tables), then run `pnpm prisma migrate deploy`.
+
+---
+
 # Production build and migrations
 
 **Recommended:** Run migrations **separately** from the image build so a bad DB state (e.g. P3009) doesn’t break the build.
