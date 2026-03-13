@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import ComponentLayout from "../component-layout";
 import { BookImg } from "@/assets";
 
@@ -22,9 +23,11 @@ const Book = () => {
               Fly with Altair today and create lasting Memories
             </h2>
 
-            <button className="bg-primary-400 hover:bg-primary-300 transition-colors cursor-pointer sm:py-3 px-4 sm:px-6 rounded-[52px] sm:text-base font-semibold text-white py-3 text-base md:text-lg font-sans">
-              Book an experience
-            </button>
+            <Link href="#hero">
+              <button type="button" className="bg-primary-400 hover:bg-primary-300 transition-colors cursor-pointer sm:py-3 px-4 sm:px-6 rounded-[52px] sm:text-base font-semibold text-white py-3 text-base md:text-lg font-sans">
+                Book an experience
+              </button>
+            </Link>
           </div>
         </div>
       </div>

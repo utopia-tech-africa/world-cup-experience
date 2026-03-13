@@ -6,6 +6,7 @@ import { NavbarWrapper } from "@/components/navbar-wrapper";
 import "./globals.css";
 import Footer from "@/components/footer/footer";
 
+/** General Sans variable font (weight 200–700) from app/fonts. */
 const generalSans = localFont({
   src: [
     {
@@ -70,6 +71,7 @@ const generalSans = localFont({
     },
   ],
   variable: "--font-general",
+  weight: "200 700",
   display: "swap",
 });
 

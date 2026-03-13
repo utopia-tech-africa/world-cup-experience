@@ -1,6 +1,7 @@
 import { create } from "zustand";
-import { PACKAGE_PRICES } from "@/lib/booking-pricing";
-import type { AddOn } from "@/types/booking";
+import { persist } from "zustand/middleware";
+import { getBasePackagePrice } from "@/lib/booking-pricing";
+import type { AddOn, BookingPackage } from "@/types/booking";
 
 export type AccommodationType = "hostel" | "hotel";
 
@@ -40,13 +41,15 @@ const defaultTripSummary: TripSummaryState = {
   duration: "4 nights",
 };
 
-/** Compute total from accommodation + selected addon IDs and API addons list. */
+/** Compute total from package, accommodation, and selected addons. Uses API packages when provided. */
 export function computeBookingTotal(
   accommodation: AccommodationType,
   addonIds: string[],
-  apiAddons: AddOn[]
+  apiAddons: AddOn[],
+  packageName: string,
+  packages?: BookingPackage[]
 ): number {
-  const packagePrice = PACKAGE_PRICES[accommodation];
+  const packagePrice = getBasePackagePrice(packageName, accommodation, packages);
   const addOnsTotal = addonIds.reduce(
     (sum, id) => sum + (Number(apiAddons.find((a) => a.id === id)?.price) || 0),
     0
@@ -56,22 +59,61 @@ export function computeBookingTotal(
 
 type BookingStore = BookingFormState &
   TripSummaryState & {
+    hasHydrated: boolean;
     setBookingForm: (values: Partial<BookingFormState>) => void;
     setTripSummary: (values: Partial<TripSummaryState>) => void;
     reset: () => void;
   };
 
-export const useBookingStore = create<BookingStore>((set) => ({
-  ...defaultFormState,
-  ...defaultTripSummary,
+const PERSIST_KEYS: (keyof BookingFormState | keyof TripSummaryState)[] = [
+  "accommodation",
+  "addOns",
+  "firstName",
+  "lastName",
+  "email",
+  "phoneNumber",
+  "passportNumber",
+  "passportExpiryDate",
+  "specialRequests",
+  "route",
+  "packageName",
+  "duration",
+];
 
-  setBookingForm: (values) => set((state) => ({ ...state, ...values })),
-
-  setTripSummary: (values) => set((state) => ({ ...state, ...values })),
-
-  reset: () =>
-    set({
+export const useBookingStore = create<BookingStore>()(
+  persist(
+    (set) => ({
       ...defaultFormState,
       ...defaultTripSummary,
+      hasHydrated: false,
+
+      setBookingForm: (values) => set((state) => ({ ...state, ...values })),
+
+      setTripSummary: (values) => set((state) => ({ ...state, ...values })),
+
+      reset: () =>
+        set({
+          ...defaultFormState,
+          ...defaultTripSummary,
+          hasHydrated: true,
+        }),
     }),
-}));
+    {
+      name: "world-cup-booking",
+      partialize: (state) =>
+        PERSIST_KEYS.reduce(
+          (acc, key) => {
+            acc[key] = state[key];
+            return acc;
+          },
+          {} as Record<string, unknown>,
+        ),
+      onRehydrateStorage: () => (state, err) => {
+        // Run after persist merge completes so our flag isn't overwritten
+        setTimeout(() => {
+          useBookingStore.setState({ hasHydrated: true });
+        }, 0);
+      },
+    },
+  ),
+);

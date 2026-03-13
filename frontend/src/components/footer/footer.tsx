@@ -5,7 +5,7 @@ import { FooterLinks } from "./components";
 
 export default function Footer() {
   return (
-    <footer className="relative w-full bg-linear-to-t from-primary-300 to-primary-200  pt-4 md:pt-20 pb-10 overflow-hidden text-neutral-100">
+    <footer className="relative w-full bg-linear-to-t from-primary-300 to-primary-200  pt-4 md:pt-20 pb-10 overflow-hidden text-neutral-100 mt-12 md:mt-16  lg:mt-24">
       <ComponentLayout className="relative pt-10 md:pt-0">
         {/* Background Pattern - Now inside layout and fully visible */}
         <div className="absolute inset-0 z-0">

@@ -1,6 +1,6 @@
-import type { BookingFormData } from "@/types/booking";
+import type { BookingFormData, BookingPackage } from "@/types/booking";
 import type { AddOn } from "@/types/booking";
-import { PACKAGE_PRICES } from "@/lib/booking-pricing";
+import { getBasePackagePrice, packageNameToType } from "@/lib/booking-pricing";
 
 /**
  * Convert DD/MM/YYYY or similar to YYYY-MM-DD for backend.
@@ -24,7 +24,7 @@ export function toBackendDateString(value: string): string {
  */
 export function resolveAddonsForPayload(
   addonIds: string[],
-  apiAddons: AddOn[]
+  apiAddons: AddOn[],
 ): Array<{ id: string; quantity: number; price: number }> {
   const result: Array<{ id: string; quantity: number; price: number }> = [];
   for (const id of addonIds) {
@@ -49,10 +49,11 @@ export type BuildBookingPayloadParams = {
   paymentAccountType: "local" | "international";
   paymentProofUrl: string;
   apiAddons: AddOn[];
+  packages?: BookingPackage[];
 };
 
 export function buildBookingPayload(
-  params: BuildBookingPayloadParams
+  params: BuildBookingPayloadParams,
 ): BookingFormData {
   const {
     fullName,
@@ -67,11 +68,15 @@ export function buildBookingPayload(
     paymentAccountType,
     paymentProofUrl,
     apiAddons,
+    packages,
   } = params;
 
-  const packageType =
-    packageName.toLowerCase().includes("double") ? "double_game" : "single_game";
-  const basePackagePrice = PACKAGE_PRICES[accommodationType];
+  const packageType = packageNameToType(packageName);
+  const basePackagePrice = getBasePackagePrice(
+    packageName,
+    accommodationType,
+    packages
+  );
   const addons = resolveAddonsForPayload(addOnIds, apiAddons);
   const addonsTotalPrice = addons.reduce((sum, a) => sum + a.price, 0);
   const totalAmount = basePackagePrice + addonsTotalPrice;

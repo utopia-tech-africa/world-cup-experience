@@ -1,12 +1,41 @@
-import Image from "next/image";
+"use client";
+
+import Image, { type StaticImageData } from "next/image";
+import { useRouter } from "next/navigation";
 import { PlaneTakeoff } from "lucide-react";
 import { gameCardBg } from "@/assets/img";
+import { useBookingStore } from "@/stores/booking-store";
 import { GameOffer } from "../data/games-data";
 
 export function GameCard({ offer }: { offer: GameOffer }) {
-  const isDouble = offer.type === "Double game";
+  const router = useRouter();
+  const setTripSummary = useBookingStore((s) => s.setTripSummary);
+  const setBookingForm = useBookingStore((s) => s.setBookingForm);
+  const accommodation =
+    offer.accommodation.toLowerCase().includes("hostel") ? "hostel" : "hotel";
+  const isDouble = offer.matches.length > 1;
+  const packageName = offer.packageName ?? (isDouble ? "Double Game" : "One Game");
+  const duration =
+    offer.duration ?? (isDouble ? "7 nights (June 22-29)" : "4 nights (June 25-29)");
+
+  const handleBookSeat = () => {
+    setTripSummary({ packageName, duration });
+    setBookingForm({ accommodation });
+    router.push("/booking");
+  };
   return (
-    <div className="relative group overflow-hidden rounded-lg aspect-4/5 md:aspect-auto md:h-[480px] flex flex-col p-3 text-white bg-neutral-400">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={handleBookSeat}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleBookSeat();
+        }
+      }}
+      aria-label={`${offer.type}, ${offer.accommodation} – Book seat`}
+      className="relative group overflow-hidden rounded-lg aspect-4/5 md:aspect-auto md:h-[480px] flex flex-col p-3 text-white bg-neutral-400 cursor-pointer">
       {/* Background Image */}
       <Image
         src={gameCardBg}
@@ -44,7 +73,7 @@ export function GameCard({ offer }: { offer: GameOffer }) {
                     className={`relative ${isDouble ? "w-20 h-10" : "w-24 h-16"} overflow-hidden rounded-sm transition-all`}
                   >
                     <Image
-                      src={match.team1.flag}
+                      src={match.team1.flag as StaticImageData}
                       alt={match.team1.name}
                       fill
                       className="object-cover"
@@ -72,7 +101,7 @@ export function GameCard({ offer }: { offer: GameOffer }) {
                     className={`relative ${isDouble ? "w-20 h-10" : "w-24 h-16"} overflow-hidden rounded-sm transition-all`}
                   >
                     <Image
-                      src={match.team2.flag}
+                      src={match.team2.flag as StaticImageData}
                       alt={match.team2.name}
                       fill
                       className="object-cover"
@@ -112,7 +141,13 @@ export function GameCard({ offer }: { offer: GameOffer }) {
             </span>
           </div>
 
-          <button className="flex items-center gap-2 px-2 py-1 rounded-full border border-white/80 bg-white/10 backdrop-blur-lg hover:bg-white/20 transition-all font-sans font-semibold text-[16px] group/btn shadow-xl">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleBookSeat();
+            }}
+            className="flex items-center gap-2 px-2 py-1 rounded-full border border-white/80 bg-white/10 backdrop-blur-lg hover:bg-white/20 transition-all font-sans font-semibold text-[16px] group/btn shadow-xl">
             Book Seat
             <PlaneTakeoff
               size={18}

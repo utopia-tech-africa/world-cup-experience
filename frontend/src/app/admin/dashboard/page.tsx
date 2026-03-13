@@ -12,15 +12,12 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
-  LayoutDashboard,
   Calendar,
-  LogOut,
   Clock,
   CheckCircle,
   DollarSign,
   ChevronRight,
   Loader2,
-  Package,
 } from 'lucide-react';
 import { useDashboardStats } from '@/hooks/queries/useDashboardStats';
 import { useBookings } from '@/hooks/queries/useBookings';
@@ -148,44 +145,10 @@ export default function AdminDashboardPage() {
     }
   }, [router]);
 
-  const handleLogout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-    }
-    router.push('/admin/login');
-    router.refresh();
-  };
-
   const bookings = bookingsData?.bookings ?? [];
 
   return (
-    <div className="min-h-svh bg-muted/30">
-      <header className="border-b bg-background">
-        <div className="flex h-14 items-center justify-between px-4 md:px-6">
-          <nav className="flex items-center gap-4">
-            <Link
-              href="/admin/dashboard"
-              className="flex items-center gap-2 font-semibold"
-            >
-              <LayoutDashboard className="size-5" />
-              <span className="hidden sm:inline">Admin Dashboard</span>
-            </Link>
-            <Link
-              href="/admin/addons"
-              className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm font-medium"
-            >
-              <Package className="size-4" />
-              Add-ons
-            </Link>
-          </nav>
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
-            <LogOut className="mr-2 size-4" />
-            Log out
-          </Button>
-        </div>
-      </header>
-      <main className="flex-1 space-y-6 p-4 md:p-6">
+    <div className="space-y-6 p-4 md:p-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">
@@ -275,7 +238,6 @@ export default function AdminDashboardPage() {
             </CardContent>
           </Card>
         </section>
-      </main>
     </div>
   );
 }

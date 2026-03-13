@@ -5,7 +5,7 @@ import { FifaFinfestImg } from "@/assets";
 
 export const FifaFanfest = () => {
   return (
-    <ComponentLayout>
+    <ComponentLayout className="mb:10 md:mb-22 lg:mb-30">
       <div className="relative overflow-hidden rounded-lg py-6">
         <Image
           src={FifaFinfestImg}
@@ -25,8 +25,8 @@ export const FifaFanfest = () => {
             coverage.
           </p>
 
-          <Link href={"#"}>
-            <button className="w-fit flex gap-3 bg-primary-400 hover:bg-primary-300 transition-colors cursor-pointer py-3 sm:py-3 px-4 sm:px-6 rounded-[52px] text-sm sm:text-base font-semibold font-sans">
+          <Link href="#hero">
+            <button type="button" className="w-fit flex gap-3 bg-primary-400 hover:bg-primary-300 transition-colors cursor-pointer py-3 sm:py-3 px-4 sm:px-6 rounded-[52px] text-sm sm:text-base font-semibold font-sans">
               Select a package
             </button>
           </Link>

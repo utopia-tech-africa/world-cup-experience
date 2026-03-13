@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export type BookingSummaryBarProps = {
   /** Route (e.g. from landing page): "Accra (ACC) ✈ USA (US)" */
@@ -11,8 +12,10 @@ export type BookingSummaryBarProps = {
   packageName: string;
   /** Duration (e.g. "4 nights") */
   duration: string;
-  /** Cost in dollars (number or formatted string) */
-  cost: number | string;
+  /** Cost in dollars (number or formatted string). Omit or use with costLoading when store not yet rehydrated. */
+  cost?: number | string;
+  /** Show skeleton for cost until store has rehydrated (avoids flash of wrong price). */
+  costLoading?: boolean;
   /** Back link – e.g. "/" for landing when on /booking, "/booking" when on /booking/summary */
   backHref?: string;
   /** Optional: callback when back is clicked (if not using backHref) */
@@ -50,13 +53,15 @@ export function BookingSummaryBar({
   route,
   packageName,
   duration,
-  cost,
+  cost = 0,
+  costLoading = false,
   backHref,
   onBack,
   className,
 }: BookingSummaryBarProps) {
   const { dollars, cents } = formatCost(cost);
   const hasBackAction = backHref != null || onBack != null;
+  const showCostSkeleton = costLoading;
 
   const backIcon = (
     <span
@@ -115,16 +120,20 @@ export function BookingSummaryBar({
 
         <div className="flex shrink-0 flex-col items-end gap-0.5 sm:items-start">
           <span className="text-[#303030] text-sm font-normal">Cost</span>
-          <p
-            className="font-bold leading-none text-[#354998]"
-            aria-label={`Cost ${dollars}.${cents}`}>
-            <span className="text-2xl sm:text-[32px]">{dollars}.</span>
-            {cents ? (
-              <span className="text-base align-super font-normal sm:text-lg">
-                {cents}
-              </span>
-            ) : null}
-          </p>
+          {showCostSkeleton ? (
+            <Skeleton className="h-8 w-24 sm:h-9 sm:w-28" aria-hidden />
+          ) : (
+            <p
+              className="font-bold leading-none text-[#354998]"
+              aria-label={`Cost ${dollars}.${cents}`}>
+              <span className="text-2xl sm:text-[32px]">{dollars}.</span>
+              {cents ? (
+                <span className="text-base align-super font-normal sm:text-lg">
+                  {cents}
+                </span>
+              ) : null}
+            </p>
+          )}
         </div>
       </div>
     </aside>
