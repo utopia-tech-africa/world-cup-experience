@@ -4,20 +4,24 @@
 
 @theme {
   /* Primary Colors */
-  --color-primary-100: #eef1ff;
-  --color-primary-200: #003377;
-  --color-primary-300: #00193a;
-  --color-primary-400: #354998;
+  --color-primary-100: #d14b21;
+  --color-primary-200: #b73737;
+  --color-primary-300: #053370;
+  --color-primary-400: #00193a;
+  --color-primary-500: #354998;
 
   /* Neutral Colors */
   --color-neutral-100: #ffffff;
-  --color-neutral-200: #303030;
-  --color-neutral-300: #1a1a1a;
-  --color-neutral-400: #000000;
+  --color-neutral-200: #dbdbdb;
+  --color-neutral-300: #838384;
+  --color-neutral-400: #3d3d3d;
+  --color-neutral-500: #2a2a2a;
+  --color-neutral-600: #000000;
 
   /* Font Mapping */
   --font-sans: var(--font-general);
   --font-clash: var(--font-clash);
+  --font-helvetica: var(--font-helvetica);
 }
 
 @theme inline {

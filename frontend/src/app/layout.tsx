@@ -9,62 +9,62 @@ import Footer from "@/components/footer/footer";
 const generalSans = localFont({
   src: [
     {
-      path: "../public/fonts/GeneralSans-Extralight.otf",
+      path: "../../public/fonts/general-sans/GeneralSans-Extralight.otf",
       weight: "200",
       style: "normal",
     },
     {
-      path: "../public/fonts/GeneralSans-ExtralightItalic.otf",
+      path: "../../public/fonts/general-sans/GeneralSans-ExtralightItalic.otf",
       weight: "200",
       style: "italic",
     },
     {
-      path: "../public/fonts/GeneralSans-Light.otf",
+      path: "../../public/fonts/general-sans/GeneralSans-Light.otf",
       weight: "300",
       style: "normal",
     },
     {
-      path: "../public/fonts/GeneralSans-LightItalic.otf",
+      path: "../../public/fonts/general-sans/GeneralSans-LightItalic.otf",
       weight: "300",
       style: "italic",
     },
     {
-      path: "../public/fonts/GeneralSans-Regular.otf",
+      path: "../../public/fonts/general-sans/GeneralSans-Regular.otf",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../public/fonts/GeneralSans-Italic.otf",
+      path: "../../public/fonts/general-sans/GeneralSans-Italic.otf",
       weight: "400",
       style: "italic",
     },
     {
-      path: "../public/fonts/GeneralSans-Medium.otf",
+      path: "../../public/fonts/general-sans/GeneralSans-Medium.otf",
       weight: "500",
       style: "normal",
     },
     {
-      path: "../public/fonts/GeneralSans-MediumItalic.otf",
+      path: "../../public/fonts/general-sans/GeneralSans-MediumItalic.otf",
       weight: "500",
       style: "italic",
     },
     {
-      path: "../public/fonts/GeneralSans-Semibold.otf",
+      path: "../../public/fonts/general-sans/GeneralSans-Semibold.otf",
       weight: "600",
       style: "normal",
     },
     {
-      path: "../public/fonts/GeneralSans-SemiboldItalic.otf",
+      path: "../../public/fonts/general-sans/GeneralSans-SemiboldItalic.otf",
       weight: "600",
       style: "italic",
     },
     {
-      path: "../public/fonts/GeneralSans-Bold.otf",
+      path: "../../public/fonts/general-sans/GeneralSans-Bold.otf",
       weight: "700",
       style: "normal",
     },
     {
-      path: "../public/fonts/GeneralSans-BoldItalic.otf",
+      path: "../../public/fonts/general-sans/GeneralSans-BoldItalic.otf",
       weight: "700",
       style: "italic",
     },
@@ -76,22 +76,109 @@ const generalSans = localFont({
 const clashDisplay = localFont({
   src: [
     {
-      path: "../public/fonts/ClashDisplay-Medium.otf",
+      path: "../../public/fonts/clash-display/ClashDisplay-Medium.otf",
       weight: "500",
       style: "normal",
     },
     {
-      path: "../public/fonts/ClashDisplay-Semibold.otf",
+      path: "../../public/fonts/clash-display/ClashDisplay-Semibold.otf",
       weight: "600",
       style: "normal",
     },
     {
-      path: "../public/fonts/ClashDisplay-Bold.otf",
+      path: "../../public/fonts/clash-display/ClashDisplay-Bold.otf",
       weight: "700",
       style: "normal",
     },
   ],
   variable: "--font-clash",
+  display: "swap",
+});
+
+const helveticaNeue = localFont({
+  src: [
+    {
+      path: "../../public/fonts/helvetica-neue/HelveticaNeueUltraLight.otf",
+      weight: "100",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/helvetica-neue/HelveticaNeueUltraLightItalic.otf",
+      weight: "100",
+      style: "italic",
+    },
+    {
+      path: "../../public/fonts/helvetica-neue/HelveticaNeueThin.otf",
+      weight: "200",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/helvetica-neue/HelveticaNeueThinItalic.otf",
+      weight: "200",
+      style: "italic",
+    },
+    {
+      path: "../../public/fonts/helvetica-neue/HelveticaNeueLight.otf",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/helvetica-neue/HelveticaNeueLightItalic.otf",
+      weight: "300",
+      style: "italic",
+    },
+    {
+      path: "../../public/fonts/helvetica-neue/HelveticaNeueRoman.otf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/helvetica-neue/HelveticaNeueItalic.ttf",
+      weight: "400",
+      style: "italic",
+    },
+    {
+      path: "../../public/fonts/helvetica-neue/HelveticaNeueMedium.otf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/helvetica-neue/HelveticaNeueMediumItalic.otf",
+      weight: "500",
+      style: "italic",
+    },
+    {
+      path: "../../public/fonts/helvetica-neue/HelveticaNeueBold.otf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/helvetica-neue/HelveticaNeueBoldItalic.otf",
+      weight: "700",
+      style: "italic",
+    },
+    {
+      path: "../../public/fonts/helvetica-neue/HelveticaNeueHeavy.otf",
+      weight: "800",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/helvetica-neue/HelveticaNeueHeavyItalic.otf",
+      weight: "800",
+      style: "italic",
+    },
+    {
+      path: "../../public/fonts/helvetica-neue/HelveticaNeueBlack.otf",
+      weight: "900",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/helvetica-neue/HelveticaNeueBlackItalic.otf",
+      weight: "900",
+      style: "italic",
+    },
+  ],
+  variable: "--font-helvetica",
   display: "swap",
 });
 
@@ -108,7 +195,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${generalSans.variable} ${clashDisplay.variable} font-sans antialiased`}
+        className={`${generalSans.variable} ${clashDisplay.variable} ${helveticaNeue.variable} font-sans antialiased`}
       >
         <QueryProvider>
           <ToastProvider>

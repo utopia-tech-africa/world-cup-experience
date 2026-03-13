@@ -1,17 +1,21 @@
 import { Hero } from "@/components/hero";
 import { Games } from "@/components/games";
-import FifaFanfest from "@/components/fifa-fanfest/fifa-fanfest";
-import Experiences from "@/components/experiences/experiences";
 import Book from "@/components/book/book";
+import { AboutAltair } from "@/components/about-altair";
+import { FifaFanfest } from "@/components/fifa-fanfest";
+import { Packages } from "@/components/packages";
+import { Explore } from "@/components/explore";
+import { FAQ } from "@/components/faq";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col space-y-16">
+    <main className="space-y-4">
       <Hero />
-      <Games />
+      <AboutAltair />
       <FifaFanfest />
-      <Experiences />
-      <Book />
+      <Packages />
+      <Explore />
+      <FAQ />
     </main>
   );
 }

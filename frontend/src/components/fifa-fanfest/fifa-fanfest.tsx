@@ -3,7 +3,7 @@ import Link from "next/link";
 import ComponentLayout from "../component-layout";
 import { FifaFinfestImg } from "@/assets";
 
-const FifaFanfest = () => {
+export const FifaFanfest = () => {
   return (
     <ComponentLayout>
       <div className="relative overflow-hidden rounded-lg py-6">
@@ -35,5 +35,3 @@ const FifaFanfest = () => {
     </ComponentLayout>
   );
 };
-
-export default FifaFanfest;
