@@ -146,7 +146,7 @@ export function GameCard({ offer }: { offer: GameOffer }) {
         {/* Footer: Price and Book Button */}
         <div className="flex items-end justify-between pt-4">
           <div className="flex flex-col">
-            <h4 className="text-[24px] font-bold font-sans leading-none tracking-tight">
+            <h4 className="font-helvetica text-[24px] font-bold leading-none tracking-tight">
               {offer.price.split(".")[0]}
               <span className="text-[14px] font-medium opacity-90 leading-none">
                 .{offer.price.split(".")[1]}

@@ -200,18 +200,18 @@ export default function AdminBookingsPage() {
               </CardDescription>
             </div>
             <div className="flex w-full flex-col gap-4 md:flex-row md:items-end md:gap-3">
-              <form onSubmit={handleSearchSubmit} className="relative flex-1">
+              <form onSubmit={handleSearchSubmit} className="relative w-full md:w-[70%] min-w-0">
                 <Search className="text-muted-foreground absolute left-3 top-1/2 size-4 -translate-y-1/2" />
                 <Input
                   type="search"
                   placeholder="Reference, name, email..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
-                  className="w-full md:w-full pl-9"
+                  className="w-full pl-9"
                   aria-label="Search bookings"
                 />
               </form>
-              <div className="w-full md:w-full">
+              <div className="w-full md:w-[30%] min-w-0">
                 <label htmlFor="status-filter" className="mb-1.5 block text-sm font-medium">
                   Status
                 </label>

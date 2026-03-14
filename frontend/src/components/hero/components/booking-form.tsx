@@ -154,7 +154,7 @@ export function BookingForm() {
             type="button"
             onClick={handleBookSeat}
             className="w-full md:w-fit bg-primary-400 text-neutral-100 rounded-full py-6 px-8 text-[16px] font-semibold hover:bg-primary-300 transition-colors shadow-md shadow-primary-100 lg:ml-auto">
-            Book Seat · ${packagePrice.toLocaleString()}
+            Book Seat · <span className="font-helvetica">${packagePrice.toLocaleString()}</span>
           </Button>
         </div>
       </div>

@@ -5,9 +5,12 @@ import type { AddOn, BookingPackage, ExtraTraveler } from "@/types/booking";
 
 export type AccommodationType = "hostel" | "hotel";
 
+/** Add-on id -> quantity (0 = not selected). */
+export type AddOnQuantities = Record<string, number>;
+
 export type BookingFormState = {
   accommodation: AccommodationType;
-  addOns: string[];
+  addOns: AddOnQuantities;
   firstName: string;
   lastName: string;
   email: string;
@@ -26,7 +29,7 @@ export type TripSummaryState = {
 
 const defaultFormState: BookingFormState = {
   accommodation: "hotel",
-  addOns: [],
+  addOns: {},
   firstName: "",
   lastName: "",
   email: "",
@@ -43,20 +46,24 @@ const defaultTripSummary: TripSummaryState = {
   duration: "4 nights",
 };
 
-/** Compute total from package, accommodation, and selected addons. Uses API packages when provided. */
+/** Compute total from package × passengers, accommodation, and addon quantities. Uses API packages when provided. */
 export function computeBookingTotal(
   accommodation: AccommodationType,
-  addonIds: string[],
+  addOns: AddOnQuantities,
   apiAddons: AddOn[],
   packageName: string,
-  packages?: BookingPackage[]
+  packages?: BookingPackage[],
+  extraTravelers?: ExtraTraveler[]
 ): number {
-  const packagePrice = getBasePackagePrice(packageName, accommodation, packages);
-  const addOnsTotal = addonIds.reduce(
-    (sum, id) => sum + (Number(apiAddons.find((a) => a.id === id)?.price) || 0),
-    0
-  );
-  return packagePrice + addOnsTotal;
+  const packagePricePerPerson = getBasePackagePrice(packageName, accommodation, packages);
+  const passengerCount = 1 + (extraTravelers?.length ?? 0);
+  const packageTotal = packagePricePerPerson * passengerCount;
+  const addOnsTotal = Object.entries(addOns ?? {}).reduce((sum, [id, qty]) => {
+    if (qty <= 0) return sum;
+    const addon = apiAddons.find((a) => a.id === id);
+    return sum + (Number(addon?.price) ?? 0) * qty;
+  }, 0);
+  return packageTotal + addOnsTotal;
 }
 
 type BookingStore = BookingFormState &
@@ -111,9 +118,16 @@ export const useBookingStore = create<BookingStore>()(
           },
           {} as Record<string, unknown>,
         ),
-      onRehydrateStorage: () => (state, err) => {
-        // Run after persist merge completes so our flag isn't overwritten
+      onRehydrateStorage: () => () => {
         setTimeout(() => {
+          const s = useBookingStore.getState();
+          if (Array.isArray(s.addOns)) {
+            useBookingStore.setState({
+              addOns: Object.fromEntries(
+                (s.addOns as unknown as string[]).map((id) => [id, 1]),
+              ),
+            });
+          }
           useBookingStore.setState({ hasHydrated: true });
         }, 0);
       },

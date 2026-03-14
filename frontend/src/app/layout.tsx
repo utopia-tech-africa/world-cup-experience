@@ -197,7 +197,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${generalSans.variable} ${clashDisplay.variable} ${helveticaNeue.variable} font-sans antialiased`}
+        className={`${generalSans.variable} ${clashDisplay.variable} ${helveticaNeue.variable} font-helvetica antialiased`}
       >
         <QueryProvider>
           <ToastProvider>
