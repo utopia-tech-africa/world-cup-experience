@@ -4,7 +4,7 @@ import {
   ExperiencesImg3,
   ExperiencesImg4,
 } from "@/assets";
-import ExperiencesCard from "./experiences-card";
+// import ExperiencesCard from "./experiences-card";
 import ComponentLayout from "../component-layout";
 
 const experiencesData = [
@@ -57,12 +57,12 @@ const Experiences = () => {
         <div className="flex gap-3 overflow-x-auto pb-4 lg:overflow-visible lg:pb-0 lg:col-span-4 lg:grid lg:grid-cols-4 lg:gap-6 scrollbar-hide">
           {experiencesData.map((experience) => (
             <div key={experience.id} className="min-w-[320px] lg:min-w-0">
-              <ExperiencesCard
+              {/* <ExperiencesCard
                 title={experience.title}
                 description={experience.description}
                 imageSrc={experience.imageSrc}
                 imageAlt={experience.imageAlt}
-              />
+              /> */}
             </div>
           ))}
         </div>
