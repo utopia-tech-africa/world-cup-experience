@@ -41,3 +41,42 @@ export const uploadToCloudinary = async (
     stream.pipe(uploadStream);
   });
 };
+
+/** Upload a team flag image to Cloudinary (images only, stored in flags folder). */
+export const uploadFlagToCloudinary = async (
+  file: Express.Multer.File
+): Promise<string> => {
+  if (
+    !process.env.CLOUDINARY_CLOUD_NAME ||
+    !process.env.CLOUDINARY_API_KEY ||
+    !process.env.CLOUDINARY_API_SECRET
+  ) {
+    throw new Error('Cloudinary configuration is missing');
+  }
+
+  const stream = Readable.from(file.buffer);
+
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: 'world-cup-bookings/flags',
+        resource_type: 'image',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+        transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+      },
+      (error, result) => {
+        if (error) {
+          reject(new Error(`Cloudinary upload failed: ${error.message}`));
+          return;
+        }
+        if (!result?.secure_url) {
+          reject(new Error('Cloudinary upload failed: No URL returned'));
+          return;
+        }
+        resolve(result.secure_url);
+      }
+    );
+
+    stream.pipe(uploadStream);
+  });
+};

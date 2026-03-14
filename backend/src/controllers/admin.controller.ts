@@ -68,6 +68,7 @@ export const getBookings = async (req: Request, res: Response) => {
               addOn: true,
             },
           },
+          bookingTravelers: true,
         },
         orderBy: { submittedAt: 'desc' },
         skip: (pageNum - 1) * limitNum,
@@ -109,6 +110,7 @@ export const getBookingById = async (req: Request, res: Response) => {
             addOn: true,
           },
         },
+        bookingTravelers: true,
       },
     });
 

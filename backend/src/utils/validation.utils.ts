@@ -1,5 +1,15 @@
 import { z } from 'zod';
 
+const extraTravelerSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  passportNumber: z.string().min(5, 'Passport number is required (at least 5 characters)'),
+  passportExpiry: z.string().refine(
+    (date) => new Date(date) > new Date(),
+    'Passport expiry must be a future date'
+  ),
+});
+
 export const bookingSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
@@ -12,6 +22,7 @@ export const bookingSchema = z.object({
   packageType: z.string().min(1, 'Package type is required'),
   accommodationType: z.enum(['hotel', 'hostel']),
   numberOfTravelers: z.number().int().min(1).max(10),
+  extraTravelers: z.array(extraTravelerSchema).optional().default([]),
   specialRequests: z.string().optional(),
   paymentAccountType: z.enum(['local', 'international']),
   basePackagePrice: z.number().positive(),

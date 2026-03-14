@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { getBasePackagePrice } from "@/lib/booking-pricing";
-import type { AddOn, BookingPackage } from "@/types/booking";
+import type { AddOn, BookingPackage, ExtraTraveler } from "@/types/booking";
 
 export type AccommodationType = "hostel" | "hotel";
 
@@ -15,6 +15,7 @@ export type BookingFormState = {
   passportNumber: string;
   passportExpiryDate: string;
   specialRequests: string;
+  extraTravelers: ExtraTraveler[];
 };
 
 export type TripSummaryState = {
@@ -33,6 +34,7 @@ const defaultFormState: BookingFormState = {
   passportNumber: "",
   passportExpiryDate: "",
   specialRequests: "",
+  extraTravelers: [],
 };
 
 const defaultTripSummary: TripSummaryState = {
@@ -75,6 +77,7 @@ const PERSIST_KEYS: (keyof BookingFormState | keyof TripSummaryState)[] = [
   "passportNumber",
   "passportExpiryDate",
   "specialRequests",
+  "extraTravelers",
   "route",
   "packageName",
   "duration",

@@ -12,7 +12,13 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ArrowLeft, ChevronRight, Loader2, Search } from "lucide-react";
 import { useBookings } from "@/hooks/queries/useBookings";
 import { StatusBadge } from "@/components/admin/status-badge";
@@ -205,17 +211,29 @@ export default function AdminBookingsPage() {
                   aria-label="Search bookings"
                 />
               </form>
-              <Select
-                label="Status"
-                options={STATUS_OPTIONS}
-                value={status}
-                onChange={(e) => {
-                  setStatus(e.target.value);
-                  setPage(1);
-                }}
-                aria-label="Filter by status"
-                className="w-full md:w-full"
-              />
+              <div className="w-full md:w-full">
+                <label htmlFor="status-filter" className="mb-1.5 block text-sm font-medium">
+                  Status
+                </label>
+                <Select
+                  value={status}
+                  onValueChange={(v) => {
+                    setStatus(v ?? "");
+                    setPage(1);
+                  }}
+                >
+                  <SelectTrigger id="status-filter" className="w-full" aria-label="Filter by status">
+                    <SelectValue placeholder="All statuses" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STATUS_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value || "all"} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardHeader>
           <CardContent>

@@ -50,6 +50,12 @@ export type BuildBookingPayloadParams = {
   paymentProofUrl: string;
   apiAddons: AddOn[];
   packages?: BookingPackage[];
+  extraTravelers?: Array<{
+    firstName: string;
+    lastName: string;
+    passportNumber: string;
+    passportExpiryDate: string;
+  }>;
 };
 
 export function buildBookingPayload(
@@ -69,6 +75,7 @@ export function buildBookingPayload(
     paymentProofUrl,
     apiAddons,
     packages,
+    extraTravelers = [],
   } = params;
 
   const packageType = packageNameToType(packageName);
@@ -86,6 +93,22 @@ export function buildBookingPayload(
     throw new Error("Passport expiry date is required");
   }
 
+  const extraTravelersPayload: Array<{
+    firstName: string;
+    lastName: string;
+    passportNumber: string;
+    passportExpiry: string;
+  }> = extraTravelers.map((t) => {
+    const expiry = toBackendDateString(t.passportExpiryDate);
+    if (!expiry) throw new Error("Passport expiry is required for all travelers");
+    return {
+      firstName: t.firstName.trim(),
+      lastName: t.lastName.trim(),
+      passportNumber: t.passportNumber.trim(),
+      passportExpiry: expiry,
+    };
+  });
+
   return {
     fullName: fullName.trim(),
     email: email.trim(),
@@ -94,7 +117,8 @@ export function buildBookingPayload(
     passportExpiry,
     packageType,
     accommodationType,
-    numberOfTravelers: 1,
+    numberOfTravelers: 1 + extraTravelersPayload.length,
+    extraTravelers: extraTravelersPayload,
     specialRequests: specialRequests.trim() || undefined,
     paymentAccountType,
     basePackagePrice,

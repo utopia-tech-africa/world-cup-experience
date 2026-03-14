@@ -10,14 +10,24 @@ export interface GamePackageType {
   displayOrder: number;
 }
 
-/** Match/fixture (admin-managed); not tied to a package type — link games to packages when editing the package */
+/** Team (admin-managed); create teams with flags, then select them when creating games */
+export interface Team {
+  id: string;
+  name: string;
+  flagUrl?: string | null;
+  displayOrder: number;
+}
+
+/** Match/fixture (admin-managed); team1 and team2 are selected from Teams */
 export interface AdminGame {
   id: string;
   typeId?: string | null;
   type?: { id: string; name: string; code: string } | null;
   stadium: string;
-  team1Name: string;
-  team2Name: string;
+  team1Id: string;
+  team2Id: string;
+  team1: Team;
+  team2: Team;
   matchDate: string;
   displayOrder: number;
 }
@@ -27,8 +37,8 @@ export interface PublicGame {
   id: string;
   typeCode: string;
   stadium: string;
-  team1Name: string;
-  team2Name: string;
+  team1: { id: string; name: string; flagUrl?: string | null };
+  team2: { id: string; name: string; flagUrl?: string | null };
   matchDate: string;
   displayOrder: number;
 }
@@ -80,6 +90,22 @@ export interface AddOn {
   displayOrder: number;
 }
 
+/** Extra traveler in form/store (uses passportExpiryDate for the input field). */
+export interface ExtraTraveler {
+  firstName: string;
+  lastName: string;
+  passportNumber: string;
+  passportExpiryDate: string;
+}
+
+/** Extra traveler as sent to the API (passportExpiry is YYYY-MM-DD). */
+export interface ExtraTravelerPayload {
+  firstName: string;
+  lastName: string;
+  passportNumber: string;
+  passportExpiry: string;
+}
+
 export interface BookingFormData {
   fullName: string;
   email: string;
@@ -89,6 +115,7 @@ export interface BookingFormData {
   packageType: string;
   accommodationType: AccommodationType;
   numberOfTravelers: number;
+  extraTravelers?: ExtraTravelerPayload[];
   specialRequests?: string;
   paymentAccountType: PaymentAccountType;
   basePackagePrice: number;
@@ -100,6 +127,14 @@ export interface BookingFormData {
     quantity?: number;
     price: number;
   }>;
+}
+
+export interface BookingTraveler {
+  id: string;
+  firstName: string;
+  lastName: string;
+  passportNumber: string;
+  passportExpiry: string;
 }
 
 export interface Booking {
@@ -129,4 +164,5 @@ export interface Booking {
     priceAtBooking: number;
     addOn: AddOn;
   }>;
+  bookingTravelers?: BookingTraveler[];
 }

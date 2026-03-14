@@ -67,6 +67,7 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
       passportNumber: s.passportNumber,
       passportExpiryDate: s.passportExpiryDate,
       specialRequests: s.specialRequests,
+      extraTravelers: s.extraTravelers,
     })),
   );
   const accommodation = data?.accommodation ?? store.accommodation;
@@ -136,6 +137,14 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
         paymentProofUrl: url,
         apiAddons,
         packages,
+        extraTravelers: store.extraTravelers?.length
+          ? store.extraTravelers.map((t) => ({
+              firstName: t.firstName.trim(),
+              lastName: t.lastName.trim(),
+              passportNumber: t.passportNumber.trim(),
+              passportExpiryDate: t.passportExpiryDate.trim(),
+            }))
+          : undefined,
       });
       const result = await createBookingMutation.mutateAsync(payload);
       setSuccessBookingRef(result.bookingReference);
@@ -203,6 +212,17 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
               </span>
             </div>
           </div>
+
+          {(() => {
+            const count = 1 + (store.extraTravelers?.length ?? 0);
+            const primaryName = [store.firstName, store.lastName].filter(Boolean).join(" ").trim() || "Primary";
+            return (
+              <p className="text-muted-foreground text-sm">
+                Travelers: {count} {count === 1 ? "person" : "people"}
+                {count > 1 ? ` (${primaryName}${store.extraTravelers?.length ? ` + ${store.extraTravelers.length} more` : ""})` : ""}
+              </p>
+            );
+          })()}
 
           {/* Add-ons as subset of chosen package — smaller text */}
           <div className="flex flex-col gap-2 pt-2">

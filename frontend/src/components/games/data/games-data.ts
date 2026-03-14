@@ -6,7 +6,8 @@ import type { BookingPackage, PublicGame } from "@/types/booking";
 
 export interface TeamInfo {
   name: string;
-  flag: StaticImageData;
+  /** Static asset or URL string from API */
+  flag: StaticImageData | string;
 }
 
 export interface Match {
@@ -39,12 +40,12 @@ function apiGameToMatch(g: PublicGame): Match {
   return {
     stadium: g.stadium ?? "Venue TBC",
     team1: {
-      name: g.team1Name ?? "TBD",
-      flag: TEAM_FLAGS[g.team1Name ?? ""] ?? DEFAULT_FLAG,
+      name: g.team1?.name ?? "TBD",
+      flag: g.team1?.flagUrl ?? TEAM_FLAGS[g.team1?.name ?? ""] ?? DEFAULT_FLAG,
     },
     team2: {
-      name: g.team2Name ?? "TBD",
-      flag: TEAM_FLAGS[g.team2Name ?? ""] ?? DEFAULT_FLAG,
+      name: g.team2?.name ?? "TBD",
+      flag: g.team2?.flagUrl ?? TEAM_FLAGS[g.team2?.name ?? ""] ?? DEFAULT_FLAG,
     },
     date: g.matchDate ?? "Date TBC",
   };

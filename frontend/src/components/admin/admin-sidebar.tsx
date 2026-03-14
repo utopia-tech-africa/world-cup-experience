@@ -9,6 +9,7 @@ import {
   Tags,
   Package,
   Trophy,
+  Users,
   LogOut,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ const navItems = [
   { href: '/admin/addons', label: 'Add-ons', icon: Box },
   { href: '/admin/package-types', label: 'Game types', icon: Tags },
   { href: '/admin/packages', label: 'Packages', icon: Package },
+  { href: '/admin/teams', label: 'Teams', icon: Users },
   { href: '/admin/games', label: 'Games', icon: Trophy },
 ] as const;
 

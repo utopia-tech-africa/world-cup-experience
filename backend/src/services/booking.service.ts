@@ -4,6 +4,8 @@ import { generateBookingReference } from '../utils/response.utils';
 
 export const createBookingService = async (data: BookingFormData) => {
   const bookingReference = generateBookingReference();
+  const extraTravelers = data.extraTravelers ?? [];
+  const numberOfTravelers = 1 + extraTravelers.length;
 
   const booking = await prisma.booking.create({
     data: {
@@ -15,7 +17,7 @@ export const createBookingService = async (data: BookingFormData) => {
       passportExpiry: new Date(data.passportExpiry),
       packageType: data.packageType,
       accommodationType: data.accommodationType,
-      numberOfTravelers: data.numberOfTravelers,
+      numberOfTravelers,
       specialRequests: data.specialRequests,
       paymentAccountType: data.paymentAccountType,
       basePackagePrice: data.basePackagePrice,
@@ -29,6 +31,14 @@ export const createBookingService = async (data: BookingFormData) => {
           priceAtBooking: addon.price,
         })),
       },
+      bookingTravelers: {
+        create: extraTravelers.map((t) => ({
+          firstName: t.firstName.trim(),
+          lastName: t.lastName.trim(),
+          passportNumber: t.passportNumber.trim(),
+          passportExpiry: new Date(t.passportExpiry),
+        })),
+      },
     },
     include: {
       bookingAddOns: {
@@ -36,6 +46,7 @@ export const createBookingService = async (data: BookingFormData) => {
           addOn: true,
         },
       },
+      bookingTravelers: true,
     },
   });
 
