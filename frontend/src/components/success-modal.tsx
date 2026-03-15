@@ -40,7 +40,7 @@ export function SuccessModal({
         showCloseButton={false}
         className={cn(
           "max-w-[480px] overflow-hidden border-0 bg-[#101010] p-0 text-white",
-          "sm:rounded-xl"
+          "sm:rounded-xl",
         )}
         aria-describedby="success-modal-description"
       >

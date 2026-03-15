@@ -9,6 +9,7 @@ import ExperiencesImg2 from "./experiences-img-2.webp";
 import ExperiencesImg3 from "./experiences-img-3.webp";
 import ExperiencesImg4 from "./experiences-img-4.webp";
 import BookImg from "./book-img.webp";
+import footerBgImg from "./footer-bg-img.webp";
 
 export {
   heroBgImg,
@@ -22,4 +23,5 @@ export {
   ExperiencesImg3,
   ExperiencesImg4,
   BookImg,
+  footerBgImg,
 };
