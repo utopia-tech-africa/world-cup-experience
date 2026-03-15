@@ -208,7 +208,9 @@ export function BookingForm() {
                 />
                 {label} –{" "}
                 {hasHydrated && !packagesLoading ? (
-                  <span className="font-helvetica">${price.toLocaleString()}</span>
+                  <span className="font-helvetica">
+                    ${price.toLocaleString()}
+                  </span>
                 ) : (
                   <Skeleton className="ml-1 inline-block h-4 w-12" />
                 )}
@@ -216,6 +218,25 @@ export function BookingForm() {
             );
           })}
         </div>
+      </section>
+
+      <hr className="border-0 border-t border-[#BFBFBF]/80" />
+
+      {/* Package details — Figma 608-3033: above optional addons */}
+      <section className="flex flex-col gap-2">
+        <h2 className="text-foreground font-clash text-lg font-medium md:text-2xl">
+          Package details
+        </h2>
+        <ul className="font-helvetica text-muted-foreground list-disc space-y-1 pl-5 text-base md:text-lg">
+          <li>All packages require that you have a visa</li>
+          <li>Plane tickets are not included in package</li>
+          <li>Transportation to matches included</li>
+          <li>All tours are included (You will have to purchase tickets)</li>
+          <li>
+            Match tickets are not included (Assistance to acquire them are
+            available)
+          </li>
+        </ul>
       </section>
 
       <hr className="border-0 border-t border-[#BFBFBF]/80" />
@@ -432,9 +453,13 @@ export function BookingForm() {
             <div className="flex flex-col gap-2">
               {fields.map((field, index) => {
                 if (!savedExtraIds.has(field.id)) return null;
-                const firstName = form.watch(`extraTravelers.${index}.firstName`);
+                const firstName = form.watch(
+                  `extraTravelers.${index}.firstName`,
+                );
                 const lastName = form.watch(`extraTravelers.${index}.lastName`);
-                const fullName = [firstName, lastName].filter(Boolean).join(" ") || "Passenger";
+                const fullName =
+                  [firstName, lastName].filter(Boolean).join(" ") ||
+                  "Passenger";
                 return (
                   <div
                     key={field.id}
@@ -556,7 +581,9 @@ export function BookingForm() {
                                     placeholder="DD-MM-YYYY"
                                     value={f.value}
                                     onChange={(e) =>
-                                      f.onChange(formatDateInput(e.target.value))
+                                      f.onChange(
+                                        formatDateInput(e.target.value),
+                                      )
                                     }
                                     className="h-10 rounded-[4px] border-input bg-muted pl-10"
                                     aria-invalid={!!fs.error}
@@ -579,10 +606,12 @@ export function BookingForm() {
                         onClick={async () => {
                           const valid = await form.trigger(
                             `extraTravelers.${index}` as const,
-                            { shouldFocus: true }
+                            { shouldFocus: true },
                           );
                           if (valid) {
-                            setSavedExtraIds((prev) => new Set(prev).add(field.id));
+                            setSavedExtraIds((prev) =>
+                              new Set(prev).add(field.id),
+                            );
                           }
                         }}
                         className="h-10 rounded-[4px] bg-[#053370] px-4 font-clash text-base font-semibold text-white hover:bg-[#053370]/90">
