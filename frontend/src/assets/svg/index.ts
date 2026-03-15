@@ -1,5 +1,5 @@
-import heroBgPattern from "./hero-bg-pattern.svg";
-import { Logo } from "./logo";
+import { AltairLogo } from "./AltairLogo";
 import footerBgPattern from "./footer-bg-pattern.svg";
+import WTWCLogoWhite from "./WTWC-logo-white.svg";
 
-export { heroBgPattern, Logo, footerBgPattern };
+export { AltairLogo, footerBgPattern, WTWCLogoWhite };
