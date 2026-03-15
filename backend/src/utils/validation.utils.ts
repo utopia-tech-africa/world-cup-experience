@@ -37,3 +37,13 @@ export const bookingSchema = z.object({
     })
   ),
 });
+
+/** One row for bulk import: same as booking but paymentProofUrl optional (uses default if omitted). */
+export const bulkBookingRowSchema = bookingSchema.omit({ paymentProofUrl: true }).extend({
+  paymentProofUrl: z.string().url().optional(),
+});
+
+export const bulkBookingSchema = z.object({
+  bookings: z.array(bulkBookingRowSchema),
+  defaultPaymentProofUrl: z.string().url().optional(),
+});

@@ -37,6 +37,42 @@ export const getBookingById = async (id: string) => {
   return data.booking;
 };
 
+export type BulkBookingRow = {
+  fullName: string;
+  email: string;
+  phone: string;
+  passportNumber: string;
+  passportExpiry: string;
+  packageType: string;
+  accommodationType: 'hotel' | 'hostel';
+  numberOfTravelers: number;
+  extraTravelers?: Array<{
+    firstName: string;
+    lastName: string;
+    passportNumber: string;
+    passportExpiry: string;
+  }>;
+  specialRequests?: string;
+  paymentAccountType: 'local' | 'international';
+  basePackagePrice: number;
+  addonsTotalPrice: number;
+  totalAmount: number;
+  paymentProofUrl?: string;
+  addons: Array<{ id: string; quantity?: number; price: number }>;
+};
+
+export const createBulkBookings = async (
+  payload: { bookings: BulkBookingRow[]; defaultPaymentProofUrl?: string }
+) => {
+  const { data } = await axios.post<{
+    success: boolean;
+    created: number;
+    failed: number;
+    results: Array<{ index: number; bookingReference?: string; error?: string }>;
+  }>('/admin/bookings/bulk', payload);
+  return data;
+};
+
 export const confirmBooking = async (id: string, flightDetails?: string) => {
   const { data } = await axios.patch(`/admin/bookings/${id}/confirm`, {
     flightDetails,
