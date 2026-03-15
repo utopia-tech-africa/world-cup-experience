@@ -47,6 +47,10 @@ export const Packages = () => {
         </div>
 
         <div className="flex flex-col gap-10 md:gap-20">
+          {/* Total Package Banner Section */}
+          <TotalPackageBanner />
+
+          <div className="w-full h-px bg-neutral-300/50" />
           {/* Grid of Standard Packages */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 ">
             {offers.map((offer, idx) => (
@@ -60,11 +64,6 @@ export const Packages = () => {
               />
             ))}
           </div>
-
-          <div className="w-full h-px bg-neutral-300/50" />
-
-          {/* Total Package Banner Section */}
-          <TotalPackageBanner />
         </div>
       </ComponentLayout>
     </section>

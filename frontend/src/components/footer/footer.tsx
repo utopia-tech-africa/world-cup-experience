@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { WTWCLogoWhite, footerBgImg } from "@/assets";
+import { WTWCLogoWhite, FooterBgImg } from "@/assets";
 import { ArrowUpRight, Facebook, Instagram, Youtube } from "lucide-react";
 import ComponentLayout from "../component-layout";
 import { cn } from "@/lib/utils";
@@ -31,7 +31,7 @@ export default function Footer() {
       {/* Background Image / Glow */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <Image
-          src={footerBgImg}
+          src={FooterBgImg}
           alt="footer background"
           fill
           className="object-cover object-bottom"
