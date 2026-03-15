@@ -1,5 +1,11 @@
 import axios from '@/lib/axios';
-import type { AddOn, AdminGame, BookingPackage, GamePackageType } from '@/types/booking';
+import type {
+  AddOn,
+  AdminGame,
+  BookingPackage,
+  GamePackageType,
+  Team,
+} from '@/types/booking';
 
 export type DashboardStats = {
   totalBookings: number;
@@ -29,6 +35,42 @@ export const getBookings = async (params: GetBookingsParams) => {
 export const getBookingById = async (id: string) => {
   const { data } = await axios.get(`/admin/bookings/${id}`);
   return data.booking;
+};
+
+export type BulkBookingRow = {
+  fullName: string;
+  email: string;
+  phone: string;
+  passportNumber: string;
+  passportExpiry: string;
+  packageType: string;
+  accommodationType: 'hotel' | 'hostel';
+  numberOfTravelers: number;
+  extraTravelers?: Array<{
+    firstName: string;
+    lastName: string;
+    passportNumber: string;
+    passportExpiry: string;
+  }>;
+  specialRequests?: string;
+  paymentAccountType: 'local' | 'international';
+  basePackagePrice: number;
+  addonsTotalPrice: number;
+  totalAmount: number;
+  paymentProofUrl?: string;
+  addons: Array<{ id: string; quantity?: number; price: number }>;
+};
+
+export const createBulkBookings = async (
+  payload: { bookings: BulkBookingRow[]; defaultPaymentProofUrl?: string }
+) => {
+  const { data } = await axios.post<{
+    success: boolean;
+    created: number;
+    failed: number;
+    results: Array<{ index: number; bookingReference?: string; error?: string }>;
+  }>('/admin/bookings/bulk', payload);
+  return data;
 };
 
 export const confirmBooking = async (id: string, flightDetails?: string) => {
@@ -161,6 +203,54 @@ export const deletePackage = async (id: string): Promise<void> => {
   await axios.delete(`/admin/packages/${id}`);
 };
 
+export const getAdminTeams = async (): Promise<Team[]> => {
+  const { data } = await axios.get<{ teams: Team[] }>('/admin/teams');
+  return data.teams;
+};
+
+export type CreateTeamInput = {
+  name: string;
+  displayOrder?: number;
+};
+
+export const createTeam = async (input: CreateTeamInput): Promise<Team> => {
+  const { data } = await axios.post<{ team: Team }>('/admin/teams', {
+    ...input,
+    displayOrder: input.displayOrder ?? 0,
+  });
+  return data.team;
+};
+
+export type UpdateTeamInput = CreateTeamInput;
+
+export const updateTeam = async (id: string, input: UpdateTeamInput): Promise<Team> => {
+  const { data } = await axios.patch<{ team: Team }>(`/admin/teams/${id}`, {
+    ...input,
+    displayOrder: input.displayOrder ?? 0,
+  });
+  return data.team;
+};
+
+/** Upload team flag (multipart, field name "flag"). */
+export const uploadTeamFlag = async (teamId: string, file: File): Promise<Team> => {
+  const formData = new FormData();
+  formData.append('flag', file);
+  const { data } = await axios.post<{ team: Team }>(
+    `/admin/teams/${teamId}/flag`,
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  );
+  return data.team;
+};
+
+export const deleteTeam = async (id: string): Promise<void> => {
+  await axios.delete(`/admin/teams/${id}`);
+};
+
 export const getAdminGames = async (): Promise<AdminGame[]> => {
   const { data } = await axios.get<{ games: AdminGame[] }>('/admin/games');
   return data.games;
@@ -169,8 +259,8 @@ export const getAdminGames = async (): Promise<AdminGame[]> => {
 export type CreateGameInput = {
   typeId?: string | null;
   stadium: string;
-  team1Name: string;
-  team2Name: string;
+  team1Id: string;
+  team2Id: string;
   matchDate: string;
   displayOrder?: number;
 };

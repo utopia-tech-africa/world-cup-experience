@@ -5,30 +5,57 @@ import { z } from "zod";
 const createGameSchema = z.object({
   typeId: z.string().uuid("Invalid type ID").optional().nullable(),
   stadium: z.string().min(1, "Stadium is required"),
-  team1Name: z.string().min(1, "Team 1 name is required"),
-  team2Name: z.string().min(1, "Team 2 name is required"),
+  team1Id: z.string().uuid("Team 1 is required"),
+  team2Id: z.string().uuid("Team 2 is required"),
   matchDate: z.string().min(1, "Match date is required"),
   displayOrder: z.number().int().min(0).default(0),
 });
 
-/** GET /api/admin/games — list all games (with type) */
+function gameToJson(g: {
+  id: string;
+  typeId: string | null;
+  stadium: string;
+  team1Id: string;
+  team2Id: string;
+  matchDate: string;
+  displayOrder: number;
+  type?: { id: string; name: string; code: string } | null;
+  team1: { id: string; name: string; flagUrl: string | null; displayOrder: number };
+  team2: { id: string; name: string; flagUrl: string | null; displayOrder: number };
+}) {
+  return {
+    id: g.id,
+    typeId: g.typeId,
+    type: g.type ? { id: g.type.id, name: g.type.name, code: g.type.code } : undefined,
+    stadium: g.stadium,
+    team1Id: g.team1Id,
+    team2Id: g.team2Id,
+    team1: {
+      id: g.team1.id,
+      name: g.team1.name,
+      flagUrl: g.team1.flagUrl ?? undefined,
+      displayOrder: g.team1.displayOrder,
+    },
+    team2: {
+      id: g.team2.id,
+      name: g.team2.name,
+      flagUrl: g.team2.flagUrl ?? undefined,
+      displayOrder: g.team2.displayOrder,
+    },
+    matchDate: g.matchDate,
+    displayOrder: g.displayOrder,
+  };
+}
+
+/** GET /api/admin/games — list all games (with type and teams) */
 export const getAdminGames = async (_req: Request, res: Response) => {
   try {
     const games = await prisma.game.findMany({
-      include: { type: true },
+      include: { type: true, team1: true, team2: true },
       orderBy: [{ displayOrder: "asc" }, { matchDate: "asc" }],
     });
     res.json({
-      games: games.map((g) => ({
-        id: g.id,
-        typeId: g.typeId,
-        type: g.type ? { id: g.type.id, name: g.type.name, code: g.type.code } : undefined,
-        stadium: g.stadium,
-        team1Name: g.team1Name,
-        team2Name: g.team2Name,
-        matchDate: g.matchDate,
-        displayOrder: g.displayOrder,
-      })),
+      games: games.map((g) => gameToJson(g)),
     });
   } catch (error: unknown) {
     const message =
@@ -48,7 +75,7 @@ export const createGame = async (req: Request, res: Response) => {
       res.status(400).json({ error: msg });
       return;
     }
-    const { typeId, stadium, team1Name, team2Name, matchDate, displayOrder } = parsed.data;
+    const { typeId, stadium, team1Id, team2Id, matchDate, displayOrder } = parsed.data;
     const typeIdToSet = typeId && typeId.trim() ? typeId : null;
     if (typeIdToSet) {
       const typeExists = await prisma.packageType.findUnique({ where: { id: typeIdToSet } });
@@ -57,22 +84,30 @@ export const createGame = async (req: Request, res: Response) => {
         return;
       }
     }
+    const [team1Exists, team2Exists] = await Promise.all([
+      prisma.team.findUnique({ where: { id: team1Id } }),
+      prisma.team.findUnique({ where: { id: team2Id } }),
+    ]);
+    if (!team1Exists) {
+      res.status(400).json({ error: "Invalid team 1" });
+      return;
+    }
+    if (!team2Exists) {
+      res.status(400).json({ error: "Invalid team 2" });
+      return;
+    }
     const game = await prisma.game.create({
-      data: { typeId: typeIdToSet, stadium, team1Name, team2Name, matchDate, displayOrder },
-      include: { type: true },
-    });
-    res.status(201).json({
-      game: {
-        id: game.id,
-        typeId: game.typeId,
-        type: game.type ? { id: game.type.id, name: game.type.name, code: game.type.code } : undefined,
-        stadium: game.stadium,
-        team1Name: game.team1Name,
-        team2Name: game.team2Name,
-        matchDate: game.matchDate,
-        displayOrder: game.displayOrder,
+      data: {
+        typeId: typeIdToSet,
+        stadium,
+        team1Id,
+        team2Id,
+        matchDate,
+        displayOrder,
       },
+      include: { type: true, team1: true, team2: true },
     });
+    res.status(201).json({ game: gameToJson(game) });
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : "Failed to create game";
@@ -96,7 +131,7 @@ export const updateGame = async (req: Request, res: Response) => {
       res.status(400).json({ error: msg });
       return;
     }
-    const { typeId, stadium, team1Name, team2Name, matchDate, displayOrder } = parsed.data;
+    const { typeId, stadium, team1Id, team2Id, matchDate, displayOrder } = parsed.data;
     const typeIdToSet = typeId && typeId.trim() ? typeId : null;
     if (typeIdToSet) {
       const typeExists = await prisma.packageType.findUnique({ where: { id: typeIdToSet } });
@@ -105,23 +140,31 @@ export const updateGame = async (req: Request, res: Response) => {
         return;
       }
     }
+    const [team1Exists, team2Exists] = await Promise.all([
+      prisma.team.findUnique({ where: { id: team1Id } }),
+      prisma.team.findUnique({ where: { id: team2Id } }),
+    ]);
+    if (!team1Exists) {
+      res.status(400).json({ error: "Invalid team 1" });
+      return;
+    }
+    if (!team2Exists) {
+      res.status(400).json({ error: "Invalid team 2" });
+      return;
+    }
     const game = await prisma.game.update({
       where: { id },
-      data: { typeId: typeIdToSet, stadium, team1Name, team2Name, matchDate, displayOrder },
-      include: { type: true },
-    });
-    res.json({
-      game: {
-        id: game.id,
-        typeId: game.typeId,
-        type: game.type ? { id: game.type.id, name: game.type.name, code: game.type.code } : undefined,
-        stadium: game.stadium,
-        team1Name: game.team1Name,
-        team2Name: game.team2Name,
-        matchDate: game.matchDate,
-        displayOrder: game.displayOrder,
+      data: {
+        typeId: typeIdToSet,
+        stadium,
+        team1Id,
+        team2Id,
+        matchDate,
+        displayOrder,
       },
+      include: { type: true, team1: true, team2: true },
     });
+    res.json({ game: gameToJson(game) });
   } catch (error: unknown) {
     if (
       error &&

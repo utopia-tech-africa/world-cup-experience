@@ -35,7 +35,7 @@ export function BookingPageView() {
     apiAddons,
     packageName,
     packages,
-    extraTravelers,
+    extraTravelers
   );
 
   return (

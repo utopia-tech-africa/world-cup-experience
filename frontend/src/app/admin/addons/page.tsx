@@ -21,6 +21,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Loader2, Pencil } from 'lucide-react';
 import { useAdminAddons } from '@/hooks/queries/useAdminAddons';
 import { useCreateAddon } from '@/hooks/mutations/useCreateAddon';
@@ -237,18 +244,21 @@ export default function AdminAddonsPage() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="addon-category">Category</Label>
-                  <select
-                    id="addon-category"
+                  <Select
                     value={category}
-                    onChange={(e) => setCategory(e.target.value as AddOn['category'])}
-                    className="border-input bg-background h-10 rounded-md border px-3 text-sm"
+                    onValueChange={(v) => v && setCategory(v as AddOn['category'])}
                   >
-                    {CATEGORIES.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger id="addon-category" className="w-full">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map((c) => (
+                        <SelectItem key={c} value={c}>
+                          {c}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="addon-order">Display order (lower = first)</Label>
@@ -317,18 +327,21 @@ export default function AdminAddonsPage() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="edit-addon-category">Category</Label>
-                <select
-                  id="edit-addon-category"
+                <Select
                   value={editCategory}
-                  onChange={(e) => setEditCategory(e.target.value as AddOn['category'])}
-                  className="border-input bg-background h-10 rounded-md border px-3 text-sm"
+                  onValueChange={(v) => v && setEditCategory(v as AddOn['category'])}
                 >
-                  {CATEGORIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger id="edit-addon-category" className="w-full">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="edit-addon-order">Display order (lower = first)</Label>

@@ -33,7 +33,7 @@ export function BookingSummaryView() {
     apiAddons,
     packageName,
     packages,
-    extraTravelers,
+    extraTravelers
   );
 
   return (

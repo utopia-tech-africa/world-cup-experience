@@ -298,6 +298,44 @@ export default function AdminBookingDetailPage() {
           </CardContent>
         </Card>
 
+        {/* Other travelers (booked for additional people) */}
+        {booking.bookingTravelers && booking.bookingTravelers.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Other travelers</CardTitle>
+              <CardDescription>
+                Additional people included in this booking
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-3">
+                {booking.bookingTravelers.map(
+                  (t: {
+                    id: string;
+                    firstName: string;
+                    lastName: string;
+                    passportNumber: string;
+                    passportExpiry: string;
+                  }) => (
+                    <li
+                      key={t.id}
+                      className="flex flex-col gap-1 rounded-md border px-3 py-2 text-sm"
+                    >
+                      <span className="font-medium">
+                        {t.firstName} {t.lastName}
+                      </span>
+                      <span className="text-muted-foreground text-xs">
+                        Passport: {t.passportNumber} · Expiry:{" "}
+                        {formatDate(t.passportExpiry)}
+                      </span>
+                    </li>
+                  )
+                )}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Add-ons */}
         {booking.bookingAddOns?.length > 0 && (
           <Card>

@@ -53,9 +53,7 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
   const [paymentType, setPaymentType] = useState<PaymentAccountType>("local");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
-  const [successBookingRef, setSuccessBookingRef] = useState<string | null>(
-    null,
-  );
+  const [successBookingRef, setSuccessBookingRef] = useState<string | null>(null);
 
   const store = useBookingStore(
     useShallow((s) => ({
@@ -87,11 +85,7 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
   const createBookingMutation = useCreateBooking();
   const { addToast } = useToast();
 
-  const packagePricePerPerson = getBasePackagePrice(
-    packageName,
-    accommodation,
-    packages,
-  );
+  const packagePricePerPerson = getBasePackagePrice(packageName, accommodation, packages);
   const passengerCount = 1 + (store.extraTravelers?.length ?? 0);
   const packagePriceTotal = packagePricePerPerson * passengerCount;
   const accommodationLabel = accommodation === "hotel" ? "Hotel" : "Hostel";
@@ -224,17 +218,11 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
 
           {(() => {
             const count = 1 + (store.extraTravelers?.length ?? 0);
-            const primaryName =
-              [store.firstName, store.lastName]
-                .filter(Boolean)
-                .join(" ")
-                .trim() || "Primary";
+            const primaryName = [store.firstName, store.lastName].filter(Boolean).join(" ").trim() || "Primary";
             return (
               <p className="text-muted-foreground text-sm">
                 Travelers: {count} {count === 1 ? "person" : "people"}
-                {count > 1
-                  ? ` (${primaryName}${store.extraTravelers?.length ? ` + ${store.extraTravelers.length} more` : ""})`
-                  : ""}
+                {count > 1 ? ` (${primaryName}${store.extraTravelers?.length ? ` + ${store.extraTravelers.length} more` : ""})` : ""}
               </p>
             );
           })()}
@@ -248,12 +236,13 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
               {addOnItems.map(({ id, label, quantity, lineTotal }) => (
                 <li
                   key={id}
-                  className="text-muted-foreground flex items-center justify-between gap-4 text-xs sm:text-sm"
-                >
+                  className="text-muted-foreground flex items-center justify-between gap-4 text-xs sm:text-sm">
                   <span>
                     {label}
                     {quantity > 1 ? (
-                      <span className="ml-1">× {quantity}</span>
+                      <span className="ml-1">
+                        × {quantity}
+                      </span>
                     ) : null}
                   </span>
                   <span className="font-clash shrink-0 font-medium text-foreground">
@@ -321,8 +310,7 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => refetchAddons()}
-          >
+            onClick={() => refetchAddons()}>
             Retry loading add-ons
           </Button>
         </div>
@@ -333,16 +321,14 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
         <Button
           variant="outline"
           asChild
-          className="border-[#354998] text-[#354998] hover:bg-[#354998]/10"
-        >
+          className="border-[#354998] text-[#354998] hover:bg-[#354998]/10">
           <Link href="/booking">Go back</Link>
         </Button>
         <Button
           type="button"
           className="w-full bg-[#354998] text-white hover:bg-[#354998]/90"
           disabled={isSubmitting || !canSubmit}
-          onClick={handleSubmit}
-        >
+          onClick={handleSubmit}>
           {isSubmitting ? "Confirming…" : "Confirm Reservation"}
         </Button>
       </div>
@@ -410,8 +396,7 @@ function BankAccountCard({
           : "border-[0.8px] border-[#bfbfbf] rounded-[10px]",
       )}
       aria-pressed={selected}
-      aria-label={`${buttonLabel} – ${title}`}
-    >
+      aria-label={`${buttonLabel} – ${title}`}>
       {/* Button at top — Figma 422-2529 / 422-2557 */}
       <div className="flex h-12 w-full items-center justify-center">
         <span
@@ -420,8 +405,7 @@ function BankAccountCard({
             selected
               ? "bg-[#053370] text-white border border-[rgba(131,131,132,0.3)]"
               : "border border-[rgba(131,131,132,0.3)] text-[#2a2a2a]",
-          )}
-        >
+          )}>
           {buttonLabel}
         </span>
       </div>

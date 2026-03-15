@@ -20,17 +20,22 @@ export function toBackendDateString(value: string): string {
 }
 
 /**
- * Resolve selected addon IDs (from API) to payload shape. Uses API addons for id and price.
+ * Resolve addon quantities to payload shape. Uses API addons for id and price.
  */
 export function resolveAddonsForPayload(
-  addonIds: string[],
+  addOnQuantities: Record<string, number>,
   apiAddons: AddOn[],
 ): Array<{ id: string; quantity: number; price: number }> {
   const result: Array<{ id: string; quantity: number; price: number }> = [];
-  for (const id of addonIds) {
+  for (const [id, quantity] of Object.entries(addOnQuantities)) {
+    if (quantity <= 0) continue;
     const addon = apiAddons.find((a) => a.id === id);
     if (addon) {
-      result.push({ id: addon.id, quantity: 1, price: Number(addon.price) });
+      result.push({
+        id: addon.id,
+        quantity,
+        price: Number(addon.price),
+      });
     }
   }
   return result;
@@ -45,11 +50,17 @@ export type BuildBookingPayloadParams = {
   specialRequests: string;
   packageName: string;
   accommodationType: "hotel" | "hostel";
-  addOnIds: string[];
+  addOnQuantities: Record<string, number>;
   paymentAccountType: "local" | "international";
   paymentProofUrl: string;
   apiAddons: AddOn[];
   packages?: BookingPackage[];
+  extraTravelers?: Array<{
+    firstName: string;
+    lastName: string;
+    passportNumber: string;
+    passportExpiryDate: string;
+  }>;
 };
 
 export function buildBookingPayload(
@@ -64,27 +75,49 @@ export function buildBookingPayload(
     specialRequests,
     packageName,
     accommodationType,
-    addOnIds,
+    addOnQuantities,
     paymentAccountType,
     paymentProofUrl,
     apiAddons,
     packages,
+    extraTravelers = [],
   } = params;
 
   const packageType = packageNameToType(packageName);
-  const basePackagePrice = getBasePackagePrice(
+  const basePackagePricePerPerson = getBasePackagePrice(
     packageName,
     accommodationType,
     packages
   );
-  const addons = resolveAddonsForPayload(addOnIds, apiAddons);
-  const addonsTotalPrice = addons.reduce((sum, a) => sum + a.price, 0);
-  const totalAmount = basePackagePrice + addonsTotalPrice;
+  const numberOfTravelers = 1 + extraTravelers.length;
+  const addons = resolveAddonsForPayload(addOnQuantities, apiAddons);
+  const addonsTotalPrice = addons.reduce(
+    (sum, a) => sum + a.price * a.quantity,
+    0,
+  );
+  const totalAmount =
+    basePackagePricePerPerson * numberOfTravelers + addonsTotalPrice;
 
   const passportExpiry = toBackendDateString(passportExpiryDate);
   if (!passportExpiry) {
     throw new Error("Passport expiry date is required");
   }
+
+  const extraTravelersPayload: Array<{
+    firstName: string;
+    lastName: string;
+    passportNumber: string;
+    passportExpiry: string;
+  }> = extraTravelers.map((t) => {
+    const expiry = toBackendDateString(t.passportExpiryDate);
+    if (!expiry) throw new Error("Passport expiry is required for all travelers");
+    return {
+      firstName: t.firstName.trim(),
+      lastName: t.lastName.trim(),
+      passportNumber: t.passportNumber.trim(),
+      passportExpiry: expiry,
+    };
+  });
 
   return {
     fullName: fullName.trim(),
@@ -94,10 +127,11 @@ export function buildBookingPayload(
     passportExpiry,
     packageType,
     accommodationType,
-    numberOfTravelers: 1,
+    numberOfTravelers: 1 + extraTravelersPayload.length,
+    extraTravelers: extraTravelersPayload,
     specialRequests: specialRequests.trim() || undefined,
     paymentAccountType,
-    basePackagePrice,
+    basePackagePrice: basePackagePricePerPerson,
     addonsTotalPrice,
     totalAmount,
     paymentProofUrl,

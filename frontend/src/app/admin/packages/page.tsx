@@ -19,6 +19,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Loader2, Pencil, Trash2 } from 'lucide-react';
 import { useAdminPackages } from '@/hooks/queries/useAdminPackages';
 import { useAdminPackageTypes } from '@/hooks/queries/useAdminPackageTypes';
@@ -294,22 +301,23 @@ export default function AdminPackagesPage() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="pkg-type">Type</Label>
-                  <select
-                    id="pkg-type"
-                    value={typeId}
-                    onChange={(e) => setTypeId(e.target.value)}
-                    className="border-input bg-background h-10 rounded-md border px-3 text-sm"
+                  <Select
+                    value={typeId || null}
+                    onValueChange={(v) => setTypeId(v ?? "")}
                     disabled={typesLoading}
+                    items={types.map((t) => ({ value: t.id, label: `${t.name} (${t.code})` }))}
                   >
-                    {types.length === 0 && !typesLoading && (
-                      <option value="">Create a game type first</option>
-                    )}
-                    {types.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.name} ({t.code})
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger id="pkg-type" className="w-full">
+                      <SelectValue placeholder={types.length === 0 && !typesLoading ? "Create a game type first" : "Select type"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {types.map((t) => (
+                        <SelectItem key={t.id} value={t.id}>
+                          {t.name} ({t.code})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="grid gap-2">
                   <Label>Games in this package</Label>
@@ -338,7 +346,7 @@ export default function AdminPackagesPage() {
                               className="border-input h-4 w-4 rounded"
                             />
                             <span>
-                              {g.team1Name} vs {g.team2Name} · {g.matchDate}
+                              {g.team1.name} vs {g.team2.name} · {g.matchDate}
                             </span>
                           </label>
                         ))}
@@ -441,19 +449,23 @@ export default function AdminPackagesPage() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="edit-pkg-type">Type</Label>
-                <select
-                  id="edit-pkg-type"
-                  value={editTypeId}
-                  onChange={(e) => setEditTypeId(e.target.value)}
-                  className="border-input bg-background h-10 rounded-md border px-3 text-sm"
+                <Select
+                  value={editTypeId || null}
+                  onValueChange={(v) => setEditTypeId(v ?? "")}
                   disabled={typesLoading}
+                  items={types.map((t) => ({ value: t.id, label: `${t.name} (${t.code})` }))}
                 >
-                  {types.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name} ({t.code})
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger id="edit-pkg-type" className="w-full">
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {types.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {t.name} ({t.code})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid gap-2">
                 <Label>Games in this package</Label>
@@ -482,7 +494,7 @@ export default function AdminPackagesPage() {
                             className="border-input h-4 w-4 rounded"
                           />
                           <span>
-                            {g.team1Name} vs {g.team2Name} · {g.matchDate}
+                            {g.team1.name} vs {g.team2.name} · {g.matchDate}
                           </span>
                         </label>
                       ))}

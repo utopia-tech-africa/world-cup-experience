@@ -169,8 +169,7 @@ export function BookingForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-10 rounded-lg border-[0.5px] border-[#BFBFBF]/80 p-4 sm:p-[30px]"
-    >
+      className="flex flex-col gap-10 rounded-lg border-[0.5px] border-[#BFBFBF]/80 p-4 sm:p-[30px]">
       {/* Choose accommodation — Figma 112-1472 */}
       <section className="flex flex-col gap-3">
         <h2 className="text-foreground font-clash text-center font-medium text-lg md:text-2xl">
@@ -199,8 +198,7 @@ export function BookingForm() {
                 variant={selected ? "default" : "outline"}
                 size="default"
                 className="w-full text-xs sm:text-sm"
-                onClick={() => form.setValue("accommodation", value)}
-              >
+                onClick={() => form.setValue("accommodation", value)}>
                 <Icon
                   className={cn(
                     "size-4 shrink-0",
@@ -210,9 +208,7 @@ export function BookingForm() {
                 />
                 {label} –{" "}
                 {hasHydrated && !packagesLoading ? (
-                  <span className="font-helvetica">
-                    ${price.toLocaleString()}
-                  </span>
+                  <span className="font-helvetica">${price.toLocaleString()}</span>
                 ) : (
                   <Skeleton className="ml-1 inline-block h-4 w-12" />
                 )}
@@ -234,8 +230,7 @@ export function BookingForm() {
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3"
-              >
+                className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3">
                 <Skeleton className="h-4 w-4 shrink-0 rounded" />
                 <div className="flex flex-1 flex-col gap-2">
                   <Skeleton className="h-4 w-32" />
@@ -258,8 +253,7 @@ export function BookingForm() {
                   className={cn(
                     "flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3",
                     qty > 0 && "border-[#354998] bg-[#354998]/5",
-                  )}
-                >
+                  )}>
                   <div className="min-w-0 flex-1">
                     <p className="text-foreground text-sm font-medium truncate">
                       {addon.name}
@@ -281,14 +275,12 @@ export function BookingForm() {
                         else prev[addon.id] = next;
                         form.setValue("addOns", prev);
                       }}
-                      aria-label={`Decrease ${addon.name}`}
-                    >
+                      aria-label={`Decrease ${addon.name}`}>
                       <Minus className="size-4" />
                     </Button>
                     <span
                       className="font-helvetica w-6 text-center text-sm tabular-nums"
-                      aria-live="polite"
-                    >
+                      aria-live="polite">
                       {qty}
                     </span>
                     <Button
@@ -301,8 +293,7 @@ export function BookingForm() {
                         prev[addon.id] = (prev[addon.id] ?? 0) + 1;
                         form.setValue("addOns", prev);
                       }}
-                      aria-label={`Increase ${addon.name}`}
-                    >
+                      aria-label={`Increase ${addon.name}`}>
                       <Plus className="size-4" />
                     </Button>
                   </div>
@@ -360,8 +351,7 @@ export function BookingForm() {
           <div className="flex w-full flex-col gap-2">
             <Label
               htmlFor="passportExpiryDate"
-              className="text-foreground text-sm font-medium leading-none"
-            >
+              className="text-foreground text-sm font-medium leading-none">
               Passport expiry date <span className="text-destructive">*</span>
             </Label>
             <Controller
@@ -406,8 +396,7 @@ export function BookingForm() {
         <div className="flex flex-col gap-2">
           <Label
             htmlFor="specialRequests"
-            className="text-foreground text-sm font-medium leading-none"
-          >
+            className="text-foreground text-sm font-medium leading-none">
             Any special requests?
           </Label>
           <Controller
@@ -443,18 +432,13 @@ export function BookingForm() {
             <div className="flex flex-col gap-2">
               {fields.map((field, index) => {
                 if (!savedExtraIds.has(field.id)) return null;
-                const firstName = form.watch(
-                  `extraTravelers.${index}.firstName`,
-                );
+                const firstName = form.watch(`extraTravelers.${index}.firstName`);
                 const lastName = form.watch(`extraTravelers.${index}.lastName`);
-                const fullName =
-                  [firstName, lastName].filter(Boolean).join(" ") ||
-                  "Passenger";
+                const fullName = [firstName, lastName].filter(Boolean).join(" ") || "Passenger";
                 return (
                   <div
                     key={field.id}
-                    className="flex h-12 w-full items-center gap-2 rounded-[4px] bg-black/8 px-3 py-3"
-                  >
+                    className="flex h-12 w-full items-center gap-2 rounded-[4px] bg-black/8 px-3 py-3">
                     <UserCheck
                       className="size-6 shrink-0 text-[#053370]"
                       aria-hidden
@@ -474,8 +458,7 @@ export function BookingForm() {
                           return next;
                         })
                       }
-                      aria-label={`Edit ${fullName}`}
-                    >
+                      aria-label={`Edit ${fullName}`}>
                       <Pencil className="size-4" />
                     </Button>
                     <Button
@@ -491,8 +474,7 @@ export function BookingForm() {
                         });
                         remove(index);
                       }}
-                      aria-label={`Remove ${fullName}`}
-                    >
+                      aria-label={`Remove ${fullName}`}>
                       <Trash2 className="size-4" />
                     </Button>
                   </div>
@@ -509,8 +491,7 @@ export function BookingForm() {
                 return (
                   <div
                     key={field.id}
-                    className="flex flex-col gap-3 rounded-md border border-gray-200/80 bg-muted/30 p-3 sm:p-4"
-                  >
+                    className="flex flex-col gap-3 rounded-md border border-gray-200/80 bg-muted/30 p-3 sm:p-4">
                     <div className="flex items-center justify-between">
                       <span className="text-foreground text-sm font-medium">
                         Person {index + 2}
@@ -521,8 +502,7 @@ export function BookingForm() {
                         size="sm"
                         className="text-destructive hover:text-destructive"
                         onClick={() => remove(index)}
-                        aria-label={`Remove person ${index + 2}`}
-                      >
+                        aria-label={`Remove person ${index + 2}`}>
                         <Trash2 className="size-4" />
                       </Button>
                     </div>
@@ -551,8 +531,7 @@ export function BookingForm() {
                       <div className="flex w-full flex-col gap-2">
                         <Label
                           htmlFor={`extraTravelers.${index}.passportExpiryDate`}
-                          className="text-foreground text-sm font-medium leading-none"
-                        >
+                          className="text-foreground text-sm font-medium leading-none">
                           Passport expiry date{" "}
                           <span className="text-destructive">*</span>
                         </Label>
@@ -577,9 +556,7 @@ export function BookingForm() {
                                     placeholder="DD-MM-YYYY"
                                     value={f.value}
                                     onChange={(e) =>
-                                      f.onChange(
-                                        formatDateInput(e.target.value),
-                                      )
+                                      f.onChange(formatDateInput(e.target.value))
                                     }
                                     className="h-10 rounded-[4px] border-input bg-muted pl-10"
                                     aria-invalid={!!fs.error}
@@ -602,16 +579,13 @@ export function BookingForm() {
                         onClick={async () => {
                           const valid = await form.trigger(
                             `extraTravelers.${index}` as const,
-                            { shouldFocus: true },
+                            { shouldFocus: true }
                           );
                           if (valid) {
-                            setSavedExtraIds((prev) =>
-                              new Set(prev).add(field.id),
-                            );
+                            setSavedExtraIds((prev) => new Set(prev).add(field.id));
                           }
                         }}
-                        className="h-10 rounded-[4px] bg-[#053370] px-4 font-clash text-base font-semibold text-white hover:bg-[#053370]/90"
-                      >
+                        className="h-10 rounded-[4px] bg-[#053370] px-4 font-clash text-base font-semibold text-white hover:bg-[#053370]/90">
                         Save & Continue
                       </Button>
                     </div>
@@ -632,8 +606,7 @@ export function BookingForm() {
                 passportExpiryDate: "",
               })
             }
-            className="flex h-12 w-full cursor-pointer items-center gap-2 rounded-[4px] bg-black/8 px-3 py-3 text-left transition-opacity hover:opacity-90"
-          >
+            className="flex h-12 w-full cursor-pointer items-center gap-2 rounded-[4px] bg-black/8 px-3 py-3 text-left transition-opacity hover:opacity-90">
             <UserPlus className="size-6 shrink-0 text-[#053370]" aria-hidden />
             <span className="font-clash text-lg font-semibold leading-6 text-[#053370]">
               Add passenger
@@ -648,15 +621,13 @@ export function BookingForm() {
           variant="outline"
           type="button"
           asChild
-          className="w-full border-[#354998] text-[#354998] hover:bg-[#354998]/10"
-        >
+          className="w-full border-[#354998] text-[#354998] hover:bg-[#354998]/10">
           <Link href="/">Go back</Link>
         </Button>
         <Button
           type="submit"
           className="w-full bg-[#354998] text-white hover:bg-[#354998]/90"
-          disabled={form.formState.isSubmitting}
-        >
+          disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? "Booking…" : "Proceed to payment"}
         </Button>
       </div>

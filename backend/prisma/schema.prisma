@@ -53,8 +53,23 @@ model Booking {
 
   confirmedByUser User?            @relation("ConfirmedBy", fields: [confirmedBy], references: [id])
   bookingAddOns   BookingAddOn[]
+  bookingTravelers BookingTraveler[]
 
   @@map("bookings")
+}
+
+model BookingTraveler {
+  id              String   @id @default(uuid())
+  bookingId       String   @map("booking_id")
+  firstName       String   @map("first_name")
+  lastName        String   @map("last_name")
+  passportNumber String   @map("passport_number")
+  passportExpiry  DateTime @map("passport_expiry")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("booking_travelers")
 }
 
 model PackageType {
@@ -71,18 +86,34 @@ model PackageType {
   @@map("package_types")
 }
 
-model Game {
-  id          String      @id @default(uuid())
-  typeId      String?     @map("type_id")
-  stadium     String      @db.Text
-  team1Name   String      @map("team1_name")
-  team2Name   String      @map("team2_name")
-  matchDate   String      @map("match_date") @db.Text
-  displayOrder Int        @default(0) @map("display_order")
-  createdAt   DateTime    @default(now()) @map("created_at")
-  updatedAt   DateTime    @updatedAt @map("updated_at")
+model Team {
+  id           String   @id @default(uuid())
+  name         String
+  flagUrl      String?  @map("flag_url") @db.Text
+  displayOrder Int      @default(0) @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
-  type PackageType? @relation(fields: [typeId], references: [id], onDelete: Cascade)
+  gamesAsTeam1 Game[] @relation("GameTeam1")
+  gamesAsTeam2 Game[] @relation("GameTeam2")
+
+  @@map("teams")
+}
+
+model Game {
+  id          String   @id @default(uuid())
+  typeId      String?  @map("type_id")
+  stadium     String   @db.Text
+  team1Id     String   @map("team1_id")
+  team2Id     String   @map("team2_id")
+  matchDate   String   @map("match_date") @db.Text
+  displayOrder Int     @default(0) @map("display_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  type   PackageType? @relation(fields: [typeId], references: [id], onDelete: Cascade)
+  team1  Team         @relation("GameTeam1", fields: [team1Id], references: [id], onDelete: Restrict)
+  team2  Team         @relation("GameTeam2", fields: [team2Id], references: [id], onDelete: Restrict)
   packageGames BookingPackageGame[]
 
   @@map("games")
