@@ -2,7 +2,17 @@ import { prisma } from '../config/database.config';
 import { BookingFormData } from '../types/booking.types';
 import { generateBookingReference } from '../utils/response.utils';
 
-export const createBookingService = async (data: BookingFormData) => {
+const BULK_PLACEHOLDER_URL = 'https://admin-bulk-import.placeholder';
+
+export type CreateBookingOptions = {
+  /** When set, booking is created with status confirmed and this user as confirmedBy */
+  confirmedBy: string;
+};
+
+export const createBookingService = async (
+  data: BookingFormData,
+  options?: CreateBookingOptions
+) => {
   const bookingReference = generateBookingReference();
   const extraTravelers = data.extraTravelers ?? [];
   const numberOfTravelers = 1 + extraTravelers.length;
@@ -24,6 +34,11 @@ export const createBookingService = async (data: BookingFormData) => {
       addonsTotalPrice: data.addonsTotalPrice,
       totalAmount: data.totalAmount,
       paymentProofUrl: data.paymentProofUrl,
+      ...(options?.confirmedBy && {
+        bookingStatus: 'confirmed',
+        confirmedAt: new Date(),
+        confirmedBy: options.confirmedBy,
+      }),
       bookingAddOns: {
         create: data.addons.map((addon) => ({
           addonId: addon.id,
@@ -51,6 +66,40 @@ export const createBookingService = async (data: BookingFormData) => {
   });
 
   return booking;
+};
+
+export type BulkBookingRow = Omit<BookingFormData, 'paymentProofUrl'> & {
+  paymentProofUrl?: string;
+};
+
+export const createBulkBookingsService = async (params: {
+  bookings: BulkBookingRow[];
+  defaultPaymentProofUrl?: string;
+  /** Admin user id; when set, each booking is created with status confirmed */
+  confirmedBy?: string;
+}) => {
+  const { bookings, defaultPaymentProofUrl, confirmedBy } = params;
+  const results: { index: number; bookingReference?: string; error?: string }[] = [];
+
+  const createOptions = confirmedBy ? { confirmedBy } : undefined;
+
+  for (let i = 0; i < bookings.length; i++) {
+    const row = bookings[i];
+    const paymentProofUrl =
+      row.paymentProofUrl ?? defaultPaymentProofUrl ?? BULK_PLACEHOLDER_URL;
+    const data: BookingFormData = { ...row, paymentProofUrl };
+    try {
+      const booking = await createBookingService(data, createOptions);
+      results.push({ index: i + 1, bookingReference: booking.bookingReference });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      results.push({ index: i + 1, error: message });
+    }
+  }
+
+  const created = results.filter((r) => r.bookingReference).length;
+  const failed = results.filter((r) => r.error);
+  return { created, failed, results };
 };
 
 export const confirmBookingService = async (
