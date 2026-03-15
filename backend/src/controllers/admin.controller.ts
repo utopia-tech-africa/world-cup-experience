@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import { prisma } from '../config/database.config';
-import { confirmBookingService, rejectBookingService } from '../services/booking.service';
+import { confirmBookingService, rejectBookingService, createBulkBookingsService } from '../services/booking.service';
 import { sendConfirmationEmail, sendRejectionEmail } from '../services/email.service';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { bulkBookingSchema } from '../utils/validation.utils';
 
 export const getDashboardStats = async (_req: Request, res: Response) => {
   try {
@@ -68,6 +69,7 @@ export const getBookings = async (req: Request, res: Response) => {
               addOn: true,
             },
           },
+          bookingTravelers: true,
         },
         orderBy: { submittedAt: 'desc' },
         skip: (pageNum - 1) * limitNum,
@@ -109,6 +111,7 @@ export const getBookingById = async (req: Request, res: Response) => {
             addOn: true,
           },
         },
+        bookingTravelers: true,
       },
     });
 
@@ -185,5 +188,33 @@ export const rejectBooking = async (req: Request, res: Response) => {
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Failed to reject booking';
     res.status(500).json({ error: message });
+  }
+};
+
+export const createBulkBookings = async (req: AuthRequest, res: Response) => {
+  try {
+    const parsed = bulkBookingSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        success: false,
+        error: parsed.error.message ?? 'Invalid bulk booking payload',
+      });
+    }
+    const { bookings, defaultPaymentProofUrl } = parsed.data;
+    const confirmedBy = req.user?.userId;
+    const result = await createBulkBookingsService({
+      bookings,
+      defaultPaymentProofUrl,
+      confirmedBy: confirmedBy ?? undefined,
+    });
+    res.status(201).json({
+      success: true,
+      created: result.created,
+      failed: result.failed.length,
+      results: result.results,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Bulk booking failed';
+    res.status(500).json({ success: false, error: message });
   }
 };

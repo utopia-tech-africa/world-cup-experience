@@ -58,7 +58,7 @@ export function SuccessModal({
         </div>
 
         <div className="flex flex-col gap-4 px-6 pb-6 pt-2">
-          <DialogTitle className="text-center text-xl font-bold text-white sm:text-2xl">
+          <DialogTitle className="text-center font-clash text-xl font-bold text-white sm:text-2xl">
             Booking Submitted Successfully!
           </DialogTitle>
           <DialogDescription
@@ -77,7 +77,7 @@ export function SuccessModal({
           <div className="bg-white/20 h-px w-full" aria-hidden />
 
           <div className="flex flex-col gap-2">
-            <h3 className="text-left text-sm font-bold text-white">
+            <h3 className="text-left font-clash text-sm font-bold text-white">
               Next Steps:
             </h3>
             <ul className="flex list-disc flex-col gap-1 pl-4 text-left text-sm text-white/90">
@@ -90,7 +90,7 @@ export function SuccessModal({
           <DialogClose asChild>
             <Button
               asChild
-              className="mt-2 w-full rounded-full bg-[#354998] font-bold text-white hover:bg-[#354998]/90"
+              className="mt-2 w-full rounded-md bg-[#354998] font-bold text-white hover:bg-[#354998]/90"
             >
               <Link href="/">Go Home</Link>
             </Button>

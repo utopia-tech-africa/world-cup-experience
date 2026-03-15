@@ -109,7 +109,7 @@ export function BookingSummaryBar({
             <p className="text-foreground  text-sm font-medium leading-normal">
               {route}
             </p>
-            <h2 className="text-foreground text-2xl font-medium leading-tight">
+            <h2 className="text-foreground font-clash text-2xl font-medium leading-tight">
               {packageName}
             </h2>
             <p className="text-foreground text-sm font-medium leading-normal">
@@ -124,7 +124,7 @@ export function BookingSummaryBar({
             <Skeleton className="h-8 w-24 sm:h-9 sm:w-28" aria-hidden />
           ) : (
             <p
-              className="font-bold leading-none text-[#354998]"
+              className="font-clash font-bold leading-none text-[#354998]"
               aria-label={`Cost ${dollars}.${cents}`}>
               <span className="text-2xl sm:text-[32px]">{dollars}.</span>
               {cents ? (

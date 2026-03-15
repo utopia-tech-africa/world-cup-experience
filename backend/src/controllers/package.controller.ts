@@ -17,16 +17,29 @@ type PackageWithType = {
   updatedAt: Date;
   type: { id: string; name: string; code: string; displayOrder: number };
   packageGames?: Array<{
-    game: { id: string; stadium: string; team1Name: string; team2Name: string; matchDate: string; displayOrder: number };
+    game: {
+      id: string;
+      stadium: string;
+      matchDate: string;
+      displayOrder: number;
+      team1: { id: string; name: string; flagUrl: string | null };
+      team2: { id: string; name: string; flagUrl: string | null };
+    };
   }>;
+};
+
+type GameWithTeams = {
+  id: string;
+  stadium: string;
+  matchDate: string;
+  displayOrder: number;
+  team1: { id: string; name: string; flagUrl: string | null };
+  team2: { id: string; name: string; flagUrl: string | null };
 };
 
 function serializePackage(
   pkg: PackageWithType,
-  gamesByTypeId: Record<
-    string,
-    Array<{ id: string; stadium: string; team1Name: string; team2Name: string; matchDate: string; displayOrder: number }>
-  >
+  gamesByTypeId: Record<string, GameWithTeams[]>
 ) {
   const packageGames = pkg.packageGames ?? [];
   const games =
@@ -35,8 +48,16 @@ function serializePackage(
           id: pg.game.id,
           typeCode: pkg.type.code,
           stadium: pg.game.stadium ?? "",
-          team1Name: pg.game.team1Name ?? "",
-          team2Name: pg.game.team2Name ?? "",
+          team1: {
+            id: pg.game.team1.id,
+            name: pg.game.team1.name,
+            flagUrl: pg.game.team1.flagUrl ?? undefined,
+          },
+          team2: {
+            id: pg.game.team2.id,
+            name: pg.game.team2.name,
+            flagUrl: pg.game.team2.flagUrl ?? undefined,
+          },
           matchDate: pg.game.matchDate ?? "",
           displayOrder: pg.game.displayOrder ?? 0,
         }))
@@ -44,8 +65,16 @@ function serializePackage(
           id: g.id,
           typeCode: pkg.type.code,
           stadium: g.stadium ?? "",
-          team1Name: g.team1Name ?? "",
-          team2Name: g.team2Name ?? "",
+          team1: {
+            id: g.team1.id,
+            name: g.team1.name,
+            flagUrl: g.team1.flagUrl ?? undefined,
+          },
+          team2: {
+            id: g.team2.id,
+            name: g.team2.name,
+            flagUrl: g.team2.flagUrl ?? undefined,
+          },
           matchDate: g.matchDate ?? "",
           displayOrder: g.displayOrder ?? 0,
         }));
@@ -73,33 +102,41 @@ export const getPackages = async (_req: Request, res: Response) => {
     const [packages, allGames] = await Promise.all([
       prisma.bookingPackage.findMany({
         where: { isActive: true },
-        include: { type: true, packageGames: { include: { game: true } } },
+        include: {
+          type: true,
+          packageGames: {
+            include: {
+              game: {
+                include: { team1: true, team2: true },
+              },
+            },
+          },
+        },
         orderBy: [{ displayOrder: "asc" }, { name: "asc" }],
       }),
       prisma.game.findMany({
+        include: { team1: true, team2: true },
         orderBy: [{ displayOrder: "asc" }, { matchDate: "asc" }],
       }),
     ]);
 
-    const gamesByTypeId = allGames.reduce<
-      Record<
-        string,
-        Array<{ id: string; stadium: string; team1Name: string; team2Name: string; matchDate: string; displayOrder: number }>
-      >
-    >((acc, g) => {
-      if (!g.typeId) return acc;
-      const list = acc[g.typeId] ?? [];
-      list.push({
-        id: g.id,
-        stadium: g.stadium,
-        team1Name: g.team1Name,
-        team2Name: g.team2Name,
-        matchDate: g.matchDate,
-        displayOrder: g.displayOrder,
-      });
-      acc[g.typeId] = list;
-      return acc;
-    }, {});
+    const gamesByTypeId = allGames.reduce<Record<string, GameWithTeams[]>>(
+      (acc, g) => {
+        if (!g.typeId) return acc;
+        const list = acc[g.typeId] ?? [];
+        list.push({
+          id: g.id,
+          stadium: g.stadium,
+          team1: g.team1,
+          team2: g.team2,
+          matchDate: g.matchDate,
+          displayOrder: g.displayOrder,
+        });
+        acc[g.typeId] = list;
+        return acc;
+      },
+      {}
+    );
 
     res.json({
       packages: packages.map((pkg) => serializePackage(pkg as PackageWithType, gamesByTypeId)),

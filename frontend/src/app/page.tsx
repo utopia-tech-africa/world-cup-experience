@@ -8,7 +8,7 @@ import { FAQ } from "@/components/faq";
 export default function Home() {
   return (
     <main className="space-y-4">
-      <Hero />
+      {/* <Hero /> */}
       <AboutAltair />
       <FifaFanfest />
       <Packages />

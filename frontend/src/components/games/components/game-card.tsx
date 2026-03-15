@@ -72,12 +72,20 @@ export function GameCard({ offer }: { offer: GameOffer }) {
                   <div
                     className={`relative ${isDouble ? "w-20 h-10" : "w-24 h-16"} overflow-hidden rounded-sm transition-all`}
                   >
-                    <Image
-                      src={match.team1.flag as StaticImageData}
-                      alt={match.team1.name}
-                      fill
-                      className="object-cover"
-                    />
+                    {typeof match.team1.flag === "string" ? (
+                      <img
+                        src={match.team1.flag}
+                        alt={match.team1.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <Image
+                        src={match.team1.flag as StaticImageData}
+                        alt={match.team1.name}
+                        fill
+                        className="object-cover"
+                      />
+                    )}
                   </div>
                   <span
                     className={`font-bold font-sans tracking-tight transition-all ${isDouble ? "text-lg" : "text-[24px]"}`}
@@ -100,12 +108,20 @@ export function GameCard({ offer }: { offer: GameOffer }) {
                   <div
                     className={`relative ${isDouble ? "w-20 h-10" : "w-24 h-16"} overflow-hidden rounded-sm transition-all`}
                   >
-                    <Image
-                      src={match.team2.flag as StaticImageData}
-                      alt={match.team2.name}
-                      fill
-                      className="object-cover"
-                    />
+                    {typeof match.team2.flag === "string" ? (
+                      <img
+                        src={match.team2.flag}
+                        alt={match.team2.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <Image
+                        src={match.team2.flag as StaticImageData}
+                        alt={match.team2.name}
+                        fill
+                        className="object-cover"
+                      />
+                    )}
                   </div>
                   <span
                     className={`font-bold font-sans tracking-tight transition-all ${isDouble ? "text-lg" : "text-[24px]"}`}
@@ -130,7 +146,7 @@ export function GameCard({ offer }: { offer: GameOffer }) {
         {/* Footer: Price and Book Button */}
         <div className="flex items-end justify-between pt-4">
           <div className="flex flex-col">
-            <h4 className="text-[24px] font-bold font-sans leading-none tracking-tight">
+            <h4 className="font-helvetica text-[24px] font-bold leading-none tracking-tight">
               {offer.price.split(".")[0]}
               <span className="text-[14px] font-medium opacity-90 leading-none">
                 .{offer.price.split(".")[1]}
