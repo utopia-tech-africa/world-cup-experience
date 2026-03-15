@@ -21,7 +21,7 @@ export type PaymentAccountType = "local" | "international";
 
 export type BookingSummaryData = {
   accommodation: "hostel" | "hotel";
-  addOns: string[];
+  addOns: Record<string, number>;
   packageName?: string;
   duration?: string;
 };
@@ -53,7 +53,9 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
   const [paymentType, setPaymentType] = useState<PaymentAccountType>("local");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
-  const [successBookingRef, setSuccessBookingRef] = useState<string | null>(null);
+  const [successBookingRef, setSuccessBookingRef] = useState<string | null>(
+    null,
+  );
 
   const store = useBookingStore(
     useShallow((s) => ({
@@ -67,6 +69,7 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
       passportNumber: s.passportNumber,
       passportExpiryDate: s.passportExpiryDate,
       specialRequests: s.specialRequests,
+      extraTravelers: s.extraTravelers,
     })),
   );
   const accommodation = data?.accommodation ?? store.accommodation;
@@ -84,20 +87,33 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
   const createBookingMutation = useCreateBooking();
   const { addToast } = useToast();
 
-  const packagePrice = getBasePackagePrice(packageName, accommodation, packages);
+  const packagePricePerPerson = getBasePackagePrice(
+    packageName,
+    accommodation,
+    packages,
+  );
+  const passengerCount = 1 + (store.extraTravelers?.length ?? 0);
+  const packagePriceTotal = packagePricePerPerson * passengerCount;
   const accommodationLabel = accommodation === "hotel" ? "Hotel" : "Hostel";
 
-  const addOnItems = addOns
-    .map((id) => apiAddons.find((a: AddOn) => a.id === id))
-    .filter((a): a is AddOn => a != null)
-    .map((addon) => ({
-      id: addon.id,
-      label: addon.name,
-      price: Number(addon.price),
-    }));
+  const addOnQuantities =
+    typeof addOns === "object" && !Array.isArray(addOns) ? addOns : {};
+  const addOnItems = apiAddons
+    .filter((a: AddOn) => (addOnQuantities[a.id] ?? 0) > 0)
+    .map((addon) => {
+      const quantity = addOnQuantities[addon.id] ?? 0;
+      const unitPrice = Number(addon.price);
+      return {
+        id: addon.id,
+        label: addon.name,
+        quantity,
+        unitPrice,
+        lineTotal: unitPrice * quantity,
+      };
+    });
 
-  const addOnsTotal = addOnItems.reduce((sum, item) => sum + item.price, 0);
-  const totalAmount = packagePrice + addOnsTotal;
+  const addOnsTotal = addOnItems.reduce((sum, item) => sum + item.lineTotal, 0);
+  const totalAmount = packagePriceTotal + addOnsTotal;
 
   const isSubmitting =
     uploadFileMutation.isPending || createBookingMutation.isPending;
@@ -131,11 +147,19 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
         specialRequests: store.specialRequests?.trim() ?? "",
         packageName,
         accommodationType: accommodation,
-        addOnIds: addOns,
+        addOnQuantities: addOnQuantities,
         paymentAccountType: paymentType,
         paymentProofUrl: url,
         apiAddons,
         packages,
+        extraTravelers: store.extraTravelers?.length
+          ? store.extraTravelers.map((t) => ({
+              firstName: t.firstName.trim(),
+              lastName: t.lastName.trim(),
+              passportNumber: t.passportNumber.trim(),
+              passportExpiryDate: t.passportExpiryDate.trim(),
+            }))
+          : undefined,
       });
       const result = await createBookingMutation.mutateAsync(payload);
       setSuccessBookingRef(result.bookingReference);
@@ -153,30 +177,24 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
         onOpenChange={setSuccessModalOpen}
         bookingReference={successBookingRef}
       />
+      {/* Payment details card — Figma 422-2646: buttons inside cards, one bordered container */}
       <div className="flex flex-col gap-6 rounded-lg border-[0.5px] border-[#BFBFBF]/80 p-4 sm:gap-8 sm:p-[30px]">
-      {/* Payment account type toggle — Figma 121-5495 mobile */}
-      <section className="flex flex-col gap-3">
-        <h2 className="text-foreground text-center text-lg font-bold">
-          Choose payment account
-        </h2>
-        <PaymentAccountToggle value={paymentType} onChange={setPaymentType} />
-      </section>
-
-      {/* Main bordered container — border ends before file upload */}
-      <div className="flex flex-col gap-6 rounded-lg border-[0.5px] border-[#BFBFBF]/80 p-4 sm:gap-8 sm:p-[30px]">
-        {/* Bank account details — stacked on mobile, centered heading */}
         <section>
-          <h3 className="text-foreground mb-4 text-center text-lg font-bold sm:text-left">
+          <h3 className="text-foreground font-clash mb-4 text-center text-lg font-bold sm:text-left">
             Payment details
           </h3>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-[24px]">
             <BankAccountCard
               {...LOCAL_ACCOUNT}
-              highlighted={paymentType === "local"}
+              type="local"
+              selected={paymentType === "local"}
+              onSelect={() => setPaymentType("local")}
             />
             <BankAccountCard
               {...INTERNATIONAL_ACCOUNT}
-              highlighted={paymentType === "international"}
+              type="international"
+              selected={paymentType === "international"}
+              onSelect={() => setPaymentType("international")}
             />
           </div>
         </section>
@@ -189,14 +207,14 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
               <span className="text-muted-foreground text-sm">
                 Chosen package
               </span>
-              <span className="text-foreground text-lg font-bold">
+              <span className="text-foreground font-clash text-lg font-bold">
                 {packageName}
               </span>
             </div>
             {/* Right: price on top, accommodation beneath */}
             <div className="flex flex-col gap-1 sm:items-end">
-              <span className="text-foreground text-2xl font-bold">
-                ${packagePrice.toLocaleString()}
+              <span className="font-clash text-foreground text-2xl font-bold">
+                ${packagePriceTotal.toLocaleString()}
               </span>
               <span className="text-muted-foreground text-sm">
                 {accommodationLabel}
@@ -204,19 +222,42 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
             </div>
           </div>
 
+          {(() => {
+            const count = 1 + (store.extraTravelers?.length ?? 0);
+            const primaryName =
+              [store.firstName, store.lastName]
+                .filter(Boolean)
+                .join(" ")
+                .trim() || "Primary";
+            return (
+              <p className="text-muted-foreground text-sm">
+                Travelers: {count} {count === 1 ? "person" : "people"}
+                {count > 1
+                  ? ` (${primaryName}${store.extraTravelers?.length ? ` + ${store.extraTravelers.length} more` : ""})`
+                  : ""}
+              </p>
+            );
+          })()}
+
           {/* Add-ons as subset of chosen package — smaller text */}
           <div className="flex flex-col gap-2 pt-2">
-            <h4 className="text-[#1A1A1A] text-sm font-bold">
+            <h4 className="text-[#1A1A1A] font-clash text-sm font-bold">
               Add-Ons ({addOnItems.length})
             </h4>
             <ul className="flex flex-col gap-1">
-              {addOnItems.map(({ id, label, price }) => (
+              {addOnItems.map(({ id, label, quantity, lineTotal }) => (
                 <li
                   key={id}
-                  className="text-muted-foreground flex items-center justify-between gap-4 text-xs sm:text-sm">
-                  <span>{label}</span>
-                  <span className="shrink-0 font-medium text-foreground">
-                    ${price.toLocaleString()}
+                  className="text-muted-foreground flex items-center justify-between gap-4 text-xs sm:text-sm"
+                >
+                  <span>
+                    {label}
+                    {quantity > 1 ? (
+                      <span className="ml-1">× {quantity}</span>
+                    ) : null}
+                  </span>
+                  <span className="font-clash shrink-0 font-medium text-foreground">
+                    ${lineTotal.toLocaleString()}
                   </span>
                 </li>
               ))}
@@ -225,7 +266,7 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
               <span className="text-muted-foreground text-sm font-medium">
                 Add-ons Total
               </span>
-              <span className="text-foreground font-bold">
+              <span className="font-clash text-foreground font-bold">
                 ${addOnsTotal.toLocaleString()}
               </span>
             </div>
@@ -234,24 +275,24 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
 
         {/* Total amount — Figma 117-2013: light gray bar, label muted, price bold dark */}
         <section className="flex items-center justify-between rounded-lg bg-gray-100 px-4 py-4 sm:px-5 sm:py-5">
-          <span className="text-muted-foreground text-base font-medium sm:text-lg">
+          <span className="text-muted-foreground font-clash text-base font-medium sm:text-lg">
             Total Amount
           </span>
-          <span className="text-foreground text-2xl font-bold sm:text-3xl">
+          <span className="font-clash text-foreground text-2xl font-bold sm:text-3xl">
             ${totalAmount.toLocaleString()}
           </span>
         </section>
       </div>
 
       {/* Upload proof of payment — outside bordered container, Figma 121-5495 mobile */}
-      <section className="flex flex-col gap-3">
-        <h3 className="text-foreground text-center text-lg font-bold sm:text-left">
+      <section className="mt-10 flex flex-col gap-3 sm:mt-12">
+        <h3 className="text-foreground font-clash text-center text-lg font-bold sm:text-left">
           Upload proof of payment (e.g. bank transfer receipt)
         </h3>
         <FileUploadInput file={selectedFile} onFileChange={setSelectedFile} />
         <p className="text-muted-foreground text-sm">{ACCEPTED_FORMATS}</p>
         <div className="rounded-lg bg-amber-50 p-4">
-          <p className="text-foreground mb-2 text-sm font-semibold">
+          <p className="text-foreground font-clash mb-2 text-sm font-semibold">
             Important:
           </p>
           <ul className="text-muted-foreground list-inside list-disc space-y-1 text-sm">
@@ -265,7 +306,7 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
       {/* Add-ons failed to load — common in production when API URL is wrong or CORS */}
       {!addonsLoading && (addonsError || apiAddons.length === 0) && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-          <p className="text-foreground mb-2 text-sm font-semibold">
+          <p className="text-foreground font-clash mb-2 text-sm font-semibold">
             Add-ons could not be loaded
           </p>
           <p className="text-muted-foreground mb-3 text-sm">
@@ -280,73 +321,49 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => refetchAddons()}>
+            onClick={() => refetchAddons()}
+          >
             Retry loading add-ons
           </Button>
         </div>
       )}
 
-      {/* Bottom actions — 50/50 on mobile, 30/70 from sm up */}
-      <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-[30%_1fr]">
+      {/* Bottom actions — last on screen, way down */}
+      <div className="mt-12 grid w-full grid-cols-2 gap-3 sm:grid-cols-[30%_1fr]">
         <Button
           variant="outline"
           asChild
-          className="border-[#354998] text-[#354998] hover:bg-[#354998]/10">
+          className="border-[#354998] text-[#354998] hover:bg-[#354998]/10"
+        >
           <Link href="/booking">Go back</Link>
         </Button>
         <Button
           type="button"
           className="w-full bg-[#354998] text-white hover:bg-[#354998]/90"
           disabled={isSubmitting || !canSubmit}
-          onClick={handleSubmit}>
-          {isSubmitting
-            ? "Submitting…"
-            : `Submit · $${totalAmount.toLocaleString()}`}
+          onClick={handleSubmit}
+        >
+          {isSubmitting ? "Confirming…" : "Confirm Reservation"}
         </Button>
       </div>
-    </div>
     </>
-  );
-}
-
-function PaymentAccountToggle({
-  value,
-  onChange,
-}: {
-  value: PaymentAccountType;
-  onChange: (v: PaymentAccountType) => void;
-}) {
-  return (
-    <div className="grid grid-cols-2 gap-3">
-      <Button
-        type="button"
-        variant={value === "local" ? "default" : "outline"}
-        size="default"
-        className="w-full text-xs sm:text-sm"
-        onClick={() => onChange("local")}>
-        Local Transfer
-      </Button>
-      <Button
-        type="button"
-        variant={value === "international" ? "default" : "outline"}
-        size="default"
-        className="w-full text-xs sm:text-sm"
-        onClick={() => onChange("international")}>
-        International Transfer
-      </Button>
-    </div>
   );
 }
 
 function DetailRow({ label, value }: { label: string; value?: string }) {
   return (
-    <div className="flex items-center justify-between gap-4">
-      <dt className="font-medium text-foreground shrink-0">{label}</dt>
-      <dd className="text-foreground text-right">{value}</dd>
+    <div className="flex items-start justify-between gap-4">
+      <dt className="font-helvetica text-[#2a2a2a] shrink-0 text-sm font-medium">
+        {label}
+      </dt>
+      <dd className="font-helvetica text-[#2a2a2a] text-right text-sm">
+        {value}
+      </dd>
     </div>
   );
 }
 
+/** Payment details card per Figma 422-2646: button at top, then account details. */
 function BankAccountCard({
   title,
   bank,
@@ -355,7 +372,9 @@ function BankAccountCard({
   accountName,
   swiftCode,
   iban,
-  highlighted,
+  type,
+  selected,
+  onSelect,
 }: {
   title: string;
   bank: string;
@@ -364,33 +383,67 @@ function BankAccountCard({
   accountName: string;
   swiftCode?: string;
   iban?: string;
-  highlighted?: boolean;
+  type: "local" | "international";
+  selected: boolean;
+  onSelect: () => void;
 }) {
   const isInternational = swiftCode != null && iban != null;
+  const buttonLabel =
+    type === "local" ? "Local Transfer" : "International Transfer";
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      onClick={onSelect}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSelect();
+        }
+      }}
       className={cn(
-        "rounded-lg border bg-white p-4",
-        highlighted
-          ? "border-[#354998] ring-2 ring-[#354998]/20"
-          : "border-gray-200",
-      )}>
-      <h4 className="text-foreground mb-3 font-semibold">{title}</h4>
-      <dl className="text-muted-foreground space-y-2 text-sm">
-        <DetailRow label="Bank" value={bank} />
+        "flex flex-col gap-2.5 rounded-lg bg-white p-6 transition-shadow",
+        "cursor-pointer",
+        selected
+          ? "border-[0.8px] border-[#354998] rounded-[8px] shadow-[0px_0px_8px_0px_#354998]"
+          : "border-[0.8px] border-[#bfbfbf] rounded-[10px]",
+      )}
+      aria-pressed={selected}
+      aria-label={`${buttonLabel} – ${title}`}
+    >
+      {/* Button at top — Figma 422-2529 / 422-2557 */}
+      <div className="flex h-12 w-full items-center justify-center">
+        <span
+          className={cn(
+            "flex h-full w-full items-center justify-center rounded-[4px] font-clash text-base font-semibold",
+            selected
+              ? "bg-[#053370] text-white border border-[rgba(131,131,132,0.3)]"
+              : "border border-[rgba(131,131,132,0.3)] text-[#2a2a2a]",
+          )}
+        >
+          {buttonLabel}
+        </span>
+      </div>
+      {/* Account title — centered, Helvetica 14px */}
+      <p className="font-helvetica text-center text-sm font-medium leading-tight text-[#2a2a2a]">
+        {title}
+      </p>
+      {/* Details — gap-2 (8px), Helvetica 14px #2a2a2a */}
+      <dl className="flex flex-col gap-2">
+        <DetailRow label="Bank:" value={bank} />
         {isInternational ? (
           <>
-            <DetailRow label="Swift Code" value={swiftCode} />
-            <DetailRow label="IBAN" value={iban} />
+            <DetailRow label="Swift Code:" value={swiftCode} />
+            <DetailRow label="IBAN:" value={iban} />
           </>
         ) : (
           <>
-            <DetailRow label="Account Number" value={accountNumber} />
-            <DetailRow label="Routing Number" value={routingNumber} />
+            <DetailRow label="Account Number:" value={accountNumber} />
+            <DetailRow label="Routing Number:" value={routingNumber} />
           </>
         )}
-        <DetailRow label="Account Name" value={accountName} />
+        <DetailRow label="Account Name:" value={accountName} />
       </dl>
     </div>
   );

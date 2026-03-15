@@ -17,8 +17,9 @@ export function BookingPageContent({
     <div
       className={cn(
         "mx-auto w-full max-w-[1512px] px-4 py-8 sm:px-8 lg:px-[200px]",
-        className
-      )}>
+        className,
+      )}
+    >
       {children}
     </div>
   );

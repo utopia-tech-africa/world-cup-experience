@@ -70,7 +70,8 @@ export function BookingSummaryBar({
         hasBackAction && "cursor-pointer hover:opacity-90",
       )}
       style={{ borderColor: BRAND_BLUE, color: BRAND_BLUE }}
-      aria-hidden>
+      aria-hidden
+    >
       <ArrowLeft className="h-6 w-6" strokeWidth={2.5} />
     </span>
   );
@@ -81,7 +82,8 @@ export function BookingSummaryBar({
       className={cn(
         "w-full border-b border-gray-200 font-general-sans",
         className,
-      )}>
+      )}
+    >
       <div className="mx-auto flex w-full max-w-[1512px] items-start justify-between gap-4 px-4 pt-[8px] pb-[12px] sm:gap-6 sm:px-8 md:gap-8 md:px-16 lg:px-[200px]">
         <div className="flex min-w-0 flex-1 items-center gap-4 sm:gap-5">
           {hasBackAction ? (
@@ -89,7 +91,8 @@ export function BookingSummaryBar({
               <Link
                 href={backHref}
                 className="shrink-0 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#354998] focus-visible:ring-offset-2"
-                aria-label="Back to change selection">
+                aria-label="Back to change selection"
+              >
                 {backIcon}
               </Link>
             ) : (
@@ -97,7 +100,8 @@ export function BookingSummaryBar({
                 type="button"
                 onClick={onBack}
                 className="shrink-0 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#354998] focus-visible:ring-offset-2"
-                aria-label="Back to change selection">
+                aria-label="Back to change selection"
+              >
                 {backIcon}
               </button>
             )
@@ -109,7 +113,7 @@ export function BookingSummaryBar({
             <p className="text-foreground  text-sm font-medium leading-normal">
               {route}
             </p>
-            <h2 className="text-foreground text-2xl font-medium leading-tight">
+            <h2 className="text-foreground font-clash text-2xl font-medium leading-tight">
               {packageName}
             </h2>
             <p className="text-foreground text-sm font-medium leading-normal">
@@ -124,8 +128,9 @@ export function BookingSummaryBar({
             <Skeleton className="h-8 w-24 sm:h-9 sm:w-28" aria-hidden />
           ) : (
             <p
-              className="font-bold leading-none text-[#354998]"
-              aria-label={`Cost ${dollars}.${cents}`}>
+              className="font-clash font-bold leading-none text-[#354998]"
+              aria-label={`Cost ${dollars}.${cents}`}
+            >
               <span className="text-2xl sm:text-[32px]">{dollars}.</span>
               {cents ? (
                 <span className="text-base align-super font-normal sm:text-lg">

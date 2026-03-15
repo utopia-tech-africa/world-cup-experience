@@ -26,6 +26,7 @@ export function BookingPageView() {
   const duration = useBookingStore((s) => s.duration);
   const accommodation = useBookingStore((s) => s.accommodation);
   const addOns = useBookingStore((s) => s.addOns);
+  const extraTravelers = useBookingStore((s) => s.extraTravelers);
   const { data: apiAddons = [] } = useAddons();
   const { data: packages = [], isLoading: packagesLoading } = usePackages();
   const cost = computeBookingTotal(
@@ -33,7 +34,8 @@ export function BookingPageView() {
     addOns,
     apiAddons,
     packageName,
-    packages
+    packages,
+    extraTravelers,
   );
 
   return (

@@ -1,12 +1,22 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Building, Building2, Calendar } from "lucide-react";
+import {
+  Building,
+  Building2,
+  Calendar,
+  Minus,
+  Pencil,
+  Plus,
+  Trash2,
+  UserCheck,
+  UserPlus,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useBookingStore } from "@/stores/booking-store";
@@ -22,9 +32,26 @@ import { useAddons } from "@/hooks/queries/useAddons";
 import { usePackages } from "@/hooks/queries/usePackages";
 import type { AddOn } from "@/types/booking";
 
+const extraTravelerSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  passportNumber: z
+    .string()
+    .min(5, "Passport number is required (at least 5 characters)"),
+  passportExpiryDate: z
+    .string()
+    .min(1, "Passport expiry date is required")
+    .refine((val) => {
+      const parsed = toBackendDateString(val);
+      if (!parsed) return false;
+      const d = new Date(parsed);
+      return !Number.isNaN(d.getTime()) && d > new Date();
+    }, "Passport expiry must be a future date"),
+});
+
 const bookingSchema = z.object({
   accommodation: z.enum(["hostel", "hotel"]),
-  addOns: z.array(z.string()),
+  addOns: z.record(z.string(), z.number().int().min(0)),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().min(1, "Email is required").email("Invalid email"),
@@ -42,13 +69,14 @@ const bookingSchema = z.object({
       return !Number.isNaN(d.getTime()) && d > new Date();
     }, "Passport expiry must be a future date"),
   specialRequests: z.string().optional(),
+  extraTravelers: z.array(extraTravelerSchema),
 });
 
 export type BookingFormValues = z.infer<typeof bookingSchema>;
 
 const defaultValues: BookingFormValues = {
   accommodation: "hotel",
-  addOns: [],
+  addOns: {},
   firstName: "",
   lastName: "",
   email: "",
@@ -56,6 +84,7 @@ const defaultValues: BookingFormValues = {
   passportNumber: "",
   passportExpiryDate: "",
   specialRequests: "",
+  extraTravelers: [],
 };
 
 export function BookingForm() {
@@ -74,20 +103,25 @@ export function BookingForm() {
     defaultValues,
   });
 
+  /** IDs of extra travelers that have been "saved" and shown as a card (per Figma). */
+  const [savedExtraIds, setSavedExtraIds] = useState<Set<string>>(new Set());
+
   const didSyncFormFromStore = useRef(false);
 
   useEffect(() => {
     const state = useBookingStore.getState();
     const hasStoredData =
-      state.firstName !== "" ||
-      state.lastName !== "" ||
-      state.email !== "";
+      state.firstName !== "" || state.lastName !== "" || state.email !== "";
     const hasPackageFromHero = state.packageName?.trim() !== "";
+    const addOns =
+      typeof state.addOns === "object" && !Array.isArray(state.addOns)
+        ? state.addOns
+        : {};
     if (hasStoredData || hasPackageFromHero) {
       didSyncFormFromStore.current = true;
       form.reset({
         accommodation: state.accommodation,
-        addOns: state.addOns,
+        addOns,
         firstName: state.firstName,
         lastName: state.lastName,
         email: state.email,
@@ -95,6 +129,7 @@ export function BookingForm() {
         passportNumber: state.passportNumber ?? "",
         passportExpiryDate: state.passportExpiryDate ?? "",
         specialRequests: state.specialRequests ?? "",
+        extraTravelers: state.extraTravelers ?? [],
       });
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps -- hydrate once from store on mount
@@ -121,18 +156,25 @@ export function BookingForm() {
       passportNumber: values.passportNumber ?? "",
       passportExpiryDate: values.passportExpiryDate ?? "",
       specialRequests: values.specialRequests ?? "",
+      extraTravelers: values.extraTravelers ?? [],
     });
     router.push("/booking/summary");
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "extraTravelers",
   });
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-10 rounded-lg border-[0.5px] border-[#BFBFBF]/80 p-4 sm:p-[30px]">
+      className="flex flex-col gap-10 rounded-lg border-[0.5px] border-[#BFBFBF]/80 p-4 sm:p-[30px]"
+    >
       {/* Choose accommodation — Figma 112-1472 */}
       <section className="flex flex-col gap-3">
-        <h2 className="text-foreground text-center text-lg font-bold">
-          Choose accommodation
+        <h2 className="text-foreground font-clash text-center font-medium text-lg md:text-2xl">
+          Choose accommodation type
         </h2>
         <div className="grid grid-cols-2 gap-3">
           {[
@@ -157,7 +199,8 @@ export function BookingForm() {
                 variant={selected ? "default" : "outline"}
                 size="default"
                 className="w-full text-xs sm:text-sm"
-                onClick={() => form.setValue("accommodation", value)}>
+                onClick={() => form.setValue("accommodation", value)}
+              >
                 <Icon
                   className={cn(
                     "size-4 shrink-0",
@@ -167,7 +210,9 @@ export function BookingForm() {
                 />
                 {label} –{" "}
                 {hasHydrated && !packagesLoading ? (
-                  `$${price.toLocaleString()}`
+                  <span className="font-helvetica">
+                    ${price.toLocaleString()}
+                  </span>
                 ) : (
                   <Skeleton className="ml-1 inline-block h-4 w-12" />
                 )}
@@ -181,13 +226,16 @@ export function BookingForm() {
 
       {/* Optional Add-ons — from API (admin-managed) */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-foreground text-lg font-bold">Optional Add-ons</h2>
+        <h2 className="text-foreground font-clash text-lg font-medium md:text-2xl">
+          Optional Add-ons
+        </h2>
         {addonsLoading ? (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3">
+                className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3"
+              >
                 <Skeleton className="h-4 w-4 shrink-0 rounded" />
                 <div className="flex flex-1 flex-col gap-2">
                   <Skeleton className="h-4 w-32" />
@@ -202,30 +250,65 @@ export function BookingForm() {
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            {apiAddons.map((addon: AddOn) => (
-              <label
-                key={addon.id}
-                className="text-foreground flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 hover:bg-gray-50 has-checked:border-[#354998] has-checked:bg-[#354998]/5">
-                <input
-                  type="checkbox"
-                  className="border-input h-4 w-4 rounded text-[#354998] focus:ring-[#354998]"
-                  checked={form.watch("addOns").includes(addon.id)}
-                  onChange={(e) => {
-                    const prev = form.getValues("addOns");
-                    const next = e.target.checked
-                      ? [...prev, addon.id]
-                      : prev.filter((x) => x !== addon.id);
-                    form.setValue("addOns", next);
-                  }}
-                />
-                <span className="text-sm">
-                  {addon.name}
-                  <span className="text-muted-foreground ml-1">
-                    (${Number(addon.price).toLocaleString()})
-                  </span>
-                </span>
-              </label>
-            ))}
+            {apiAddons.map((addon: AddOn) => {
+              const qty = form.watch("addOns")[addon.id] ?? 0;
+              return (
+                <div
+                  key={addon.id}
+                  className={cn(
+                    "flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3",
+                    qty > 0 && "border-[#354998] bg-[#354998]/5",
+                  )}
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-foreground text-sm font-medium truncate">
+                      {addon.name}
+                    </p>
+                    <p className="font-helvetica text-muted-foreground text-xs">
+                      ${Number(addon.price).toLocaleString()} each
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="size-8 rounded-[4px]"
+                      onClick={() => {
+                        const prev = { ...form.getValues("addOns") };
+                        const next = Math.max(0, (prev[addon.id] ?? 0) - 1);
+                        if (next === 0) delete prev[addon.id];
+                        else prev[addon.id] = next;
+                        form.setValue("addOns", prev);
+                      }}
+                      aria-label={`Decrease ${addon.name}`}
+                    >
+                      <Minus className="size-4" />
+                    </Button>
+                    <span
+                      className="font-helvetica w-6 text-center text-sm tabular-nums"
+                      aria-live="polite"
+                    >
+                      {qty}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="size-8 rounded-[4px]"
+                      onClick={() => {
+                        const prev = { ...form.getValues("addOns") };
+                        prev[addon.id] = (prev[addon.id] ?? 0) + 1;
+                        form.setValue("addOns", prev);
+                      }}
+                      aria-label={`Increase ${addon.name}`}
+                    >
+                      <Plus className="size-4" />
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </section>
@@ -234,7 +317,7 @@ export function BookingForm() {
 
       {/* Passenger Details */}
       <section className="flex flex-col gap-6">
-        <h2 className="text-foreground text-center text-lg font-semibold">
+        <h2 className="text-foreground font-clash text-lg md:text-2xl font-medium">
           Passenger Details
         </h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -277,7 +360,8 @@ export function BookingForm() {
           <div className="flex w-full flex-col gap-2">
             <Label
               htmlFor="passportExpiryDate"
-              className="text-foreground text-sm font-medium leading-none">
+              className="text-foreground text-sm font-medium leading-none"
+            >
               Passport expiry date <span className="text-destructive">*</span>
             </Label>
             <Controller
@@ -318,10 +402,12 @@ export function BookingForm() {
             />
           </div>
         </div>
+
         <div className="flex flex-col gap-2">
           <Label
             htmlFor="specialRequests"
-            className="text-foreground text-sm font-medium leading-none">
+            className="text-foreground text-sm font-medium leading-none"
+          >
             Any special requests?
           </Label>
           <Controller
@@ -345,6 +431,215 @@ export function BookingForm() {
             )}
           />
         </div>
+
+        {/* Book for more people — saved cards above Add passenger, same card style */}
+        <div className="flex flex-col gap-4">
+          <h3 className="text-foreground font-clash text-base font-semibold">
+            Book for more people
+          </h3>
+
+          {/* Saved passenger cards (same style as Add passenger, above the button) */}
+          {fields.length > 0 && (
+            <div className="flex flex-col gap-2">
+              {fields.map((field, index) => {
+                if (!savedExtraIds.has(field.id)) return null;
+                const firstName = form.watch(
+                  `extraTravelers.${index}.firstName`,
+                );
+                const lastName = form.watch(`extraTravelers.${index}.lastName`);
+                const fullName =
+                  [firstName, lastName].filter(Boolean).join(" ") ||
+                  "Passenger";
+                return (
+                  <div
+                    key={field.id}
+                    className="flex h-12 w-full items-center gap-2 rounded-[4px] bg-black/8 px-3 py-3"
+                  >
+                    <UserCheck
+                      className="size-6 shrink-0 text-[#053370]"
+                      aria-hidden
+                    />
+                    <span className="font-clash text-lg font-semibold leading-6 text-[#053370] flex-1 min-w-0 truncate">
+                      {fullName}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 shrink-0 text-[#053370] hover:bg-black/10"
+                      onClick={() =>
+                        setSavedExtraIds((prev) => {
+                          const next = new Set(prev);
+                          next.delete(field.id);
+                          return next;
+                        })
+                      }
+                      aria-label={`Edit ${fullName}`}
+                    >
+                      <Pencil className="size-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 shrink-0 text-destructive hover:text-destructive"
+                      onClick={() => {
+                        setSavedExtraIds((prev) => {
+                          const next = new Set(prev);
+                          next.delete(field.id);
+                          return next;
+                        });
+                        remove(index);
+                      }}
+                      aria-label={`Remove ${fullName}`}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Editing forms (new or after Edit) — above Add passenger */}
+          {fields.some((f) => !savedExtraIds.has(f.id)) && (
+            <div className="flex flex-col gap-4 rounded-lg border border-[#BFBFBF]/80 p-4">
+              {fields.map((field, index) => {
+                if (savedExtraIds.has(field.id)) return null;
+                return (
+                  <div
+                    key={field.id}
+                    className="flex flex-col gap-3 rounded-md border border-gray-200/80 bg-muted/30 p-3 sm:p-4"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-foreground text-sm font-medium">
+                        Person {index + 2}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => remove(index)}
+                        aria-label={`Remove person ${index + 2}`}
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <FormInputField
+                        control={form.control}
+                        name={`extraTravelers.${index}.firstName`}
+                        label="First name"
+                        placeholder="First name"
+                        required
+                      />
+                      <FormInputField
+                        control={form.control}
+                        name={`extraTravelers.${index}.lastName`}
+                        label="Last name"
+                        placeholder="Last name"
+                        required
+                      />
+                      <FormInputField
+                        control={form.control}
+                        name={`extraTravelers.${index}.passportNumber`}
+                        label="Passport number"
+                        placeholder="At least 5 characters"
+                        required
+                      />
+                      <div className="flex w-full flex-col gap-2">
+                        <Label
+                          htmlFor={`extraTravelers.${index}.passportExpiryDate`}
+                          className="text-foreground text-sm font-medium leading-none"
+                        >
+                          Passport expiry date{" "}
+                          <span className="text-destructive">*</span>
+                        </Label>
+                        <Controller
+                          control={form.control}
+                          name={`extraTravelers.${index}.passportExpiryDate`}
+                          render={({ field: f, fieldState: fs }) => {
+                            const formatDateInput = (raw: string) => {
+                              const digits = raw.replace(/\D/g, "").slice(0, 8);
+                              if (digits.length <= 2) return digits;
+                              if (digits.length <= 4)
+                                return `${digits.slice(0, 2)}-${digits.slice(2)}`;
+                              return `${digits.slice(0, 2)}-${digits.slice(2, 4)}-${digits.slice(4)}`;
+                            };
+                            return (
+                              <div className="flex flex-col gap-1">
+                                <div className="relative">
+                                  <Calendar className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+                                  <Input
+                                    {...f}
+                                    id={`extraTravelers.${index}.passportExpiryDate`}
+                                    placeholder="DD-MM-YYYY"
+                                    value={f.value}
+                                    onChange={(e) =>
+                                      f.onChange(
+                                        formatDateInput(e.target.value),
+                                      )
+                                    }
+                                    className="h-10 rounded-[4px] border-input bg-muted pl-10"
+                                    aria-invalid={!!fs.error}
+                                  />
+                                </div>
+                                {fs.error?.message && (
+                                  <p className="text-destructive text-sm">
+                                    {fs.error.message}
+                                  </p>
+                                )}
+                              </div>
+                            );
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <Button
+                        type="button"
+                        onClick={async () => {
+                          const valid = await form.trigger(
+                            `extraTravelers.${index}` as const,
+                            { shouldFocus: true },
+                          );
+                          if (valid) {
+                            setSavedExtraIds((prev) =>
+                              new Set(prev).add(field.id),
+                            );
+                          }
+                        }}
+                        className="h-10 rounded-[4px] bg-[#053370] px-4 font-clash text-base font-semibold text-white hover:bg-[#053370]/90"
+                      >
+                        Save & Continue
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Add passenger — always beneath saved cards and any editing forms */}
+          <button
+            type="button"
+            onClick={() =>
+              append({
+                firstName: "",
+                lastName: "",
+                passportNumber: "",
+                passportExpiryDate: "",
+              })
+            }
+            className="flex h-12 w-full cursor-pointer items-center gap-2 rounded-[4px] bg-black/8 px-3 py-3 text-left transition-opacity hover:opacity-90"
+          >
+            <UserPlus className="size-6 shrink-0 text-[#053370]" aria-hidden />
+            <span className="font-clash text-lg font-semibold leading-6 text-[#053370]">
+              Add passenger
+            </span>
+          </button>
+        </div>
       </section>
 
       {/* Actions — 50/50 on mobile, 30% / 70% from sm up (Figma 121-5168) */}
@@ -353,14 +648,16 @@ export function BookingForm() {
           variant="outline"
           type="button"
           asChild
-          className="w-full border-[#354998] text-[#354998] hover:bg-[#354998]/10">
+          className="w-full border-[#354998] text-[#354998] hover:bg-[#354998]/10"
+        >
           <Link href="/">Go back</Link>
         </Button>
         <Button
           type="submit"
           className="w-full bg-[#354998] text-white hover:bg-[#354998]/90"
-          disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting ? "Booking…" : "Book Seat"}
+          disabled={form.formState.isSubmitting}
+        >
+          {form.formState.isSubmitting ? "Booking…" : "Proceed to payment"}
         </Button>
       </div>
     </form>
