@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Logo } from "@/assets/svg";
+import { AltairLogo } from "@/assets/svg";
 
 export function Navbar() {
   return (
@@ -11,7 +11,7 @@ export function Navbar() {
           href="/"
           className="inline-flex transition-opacity hover:opacity-90"
           aria-label="Altair Logistics - Home">
-          <Logo />
+          <AltairLogo className="h-4 w-[200px] sm:w-[240px]" />
         </Link>
       </div>
     </header>
