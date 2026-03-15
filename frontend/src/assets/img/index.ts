@@ -4,10 +4,11 @@ import ghanaFlag from "./ghana-flag.webp";
 import croatiaFlag from "./croatia-flag.webp";
 import englandFlag from "./england-flag.webp";
 import FifaFinfestImg from "./fifa-finfest-img.webp";
-import ExperiencesImg1 from "./experiences-img-1.webp";
-import ExperiencesImg2 from "./experiences-img-2.webp";
-import ExperiencesImg3 from "./experiences-img-3.webp";
-import ExperiencesImg4 from "./experiences-img-4.webp";
+import ExploreImg1 from "./explore-img-1.webp";
+import ExploreImg2 from "./explore-img-2.webp";
+import ExploreImg3 from "./explore-img-3.webp";
+import ExploreImg4 from "./explore-img-4.webp";
+import ExploreImg5 from "./explore-img-5.webp";
 import BookImg from "./book-img.webp";
 import FooterBgImg from "./footer-bg-img.webp";
 import CupBgImg from "./cup-bg-img.webp";
@@ -19,10 +20,11 @@ export {
   croatiaFlag,
   englandFlag,
   FifaFinfestImg,
-  ExperiencesImg1,
-  ExperiencesImg2,
-  ExperiencesImg3,
-  ExperiencesImg4,
+  ExploreImg1,
+  ExploreImg2,
+  ExploreImg3,
+  ExploreImg4,
+  ExploreImg5,
   BookImg,
   FooterBgImg,
   CupBgImg,
