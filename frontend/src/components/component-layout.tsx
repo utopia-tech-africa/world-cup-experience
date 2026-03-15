@@ -11,10 +11,7 @@ const ComponentLayout = ({ children, className, id }: Props) => {
   return (
     <section
       id={id}
-      className={cn(
-        "max-w-360 w-full px-4 md:px-10 lg:px-20 mx-auto",
-        className,
-      )}
+      className={cn(" w-full px-4 md:px-10 lg:px-20 mx-auto", className)}
     >
       {children}
     </section>
