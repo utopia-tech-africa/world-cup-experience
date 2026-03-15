@@ -11,6 +11,7 @@ import {
   Trophy,
   Users,
   LogOut,
+  Upload,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -18,6 +19,7 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/bookings', label: 'Bookings', icon: CalendarCheck },
+  { href: '/admin/bulk-booking', label: 'Bulk booking', icon: Upload },
   { href: '/admin/addons', label: 'Add-ons', icon: Box },
   { href: '/admin/package-types', label: 'Game types', icon: Tags },
   { href: '/admin/packages', label: 'Packages', icon: Package },
