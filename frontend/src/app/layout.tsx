@@ -201,7 +201,7 @@ export default function RootLayout({
       >
         <QueryProvider>
           <ToastProvider>
-            <NavbarWrapper />
+            {/* <NavbarWrapper /> */}
             {children}
             <Footer />
           </ToastProvider>
