@@ -36,7 +36,7 @@ const INTERNATIONAL_ACCOUNT = {
   accountName: "Altair Logistics LLC",
 };
 
-const ACCEPTED_FORMATS = "JPG, PNG, PDF (Max 10MB)";
+const ACCEPTED_FORMATS = "JPG, PNG, WEBP, PDF (Max 10MB)";
 
 type BookingSummaryContentProps = {
   /** Demo/placeholder data when not passed from booking form */
@@ -525,7 +525,7 @@ function FileUploadInput({
     <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-6 py-8 transition-colors hover:bg-gray-100 has-focus:border-[#354998] has-focus:ring-2 has-focus:ring-[#354998]/20">
       <input
         type="file"
-        accept=".jpg,.jpeg,.png,.pdf"
+        accept=".jpg,.jpeg,.png,.webp,.pdf"
         className="sr-only"
         onChange={(e) => {
           const next = e.target.files?.[0] ?? null;

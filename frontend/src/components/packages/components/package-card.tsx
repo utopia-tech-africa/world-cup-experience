@@ -4,14 +4,15 @@ import Image from "next/image";
 import { PlaneTakeoff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { gameCardBg } from "@/assets/img";
-import { PackageOffer } from "../data/packages-data";
+import type { GameOffer } from "@/components/games/data/games-data";
 
 interface PackageCardProps {
-  offer: PackageOffer;
+  offer: GameOffer;
   className?: string;
+  onBook?: () => void;
 }
 
-export const PackageCard = ({ offer, className }: PackageCardProps) => {
+export const PackageCard = ({ offer, className, onBook }: PackageCardProps) => {
   const isDouble = offer.matches.length > 1;
   const [whole, decimal] = offer.price.split(".");
 
@@ -118,7 +119,11 @@ export const PackageCard = ({ offer, className }: PackageCardProps) => {
             </span>
           </div>
 
-          <button className="flex items-center gap-2 px-4 py-2 rounded bg-white text-primary-300 hover:bg-primary-300 hover:text-white transition-all font-semibold font-clash group/btn shadow-2xl">
+          <button
+            type="button"
+            onClick={onBook}
+            className="flex items-center gap-2 px-4 py-2 rounded bg-white text-primary-300 hover:bg-primary-300 hover:text-white transition-all font-semibold font-clash group/btn shadow-2xl cursor-pointer"
+          >
             Book Seat
             <PlaneTakeoff
               size={18}
