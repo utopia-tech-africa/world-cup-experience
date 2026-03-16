@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { PlaneTakeoff } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { gameCardBg } from "@/assets/img";
+import { singleGameCardBg, doubleGameCardBg } from "@/assets/img";
+import { MaskRevealButton } from "../../mask-reveal-button";
 import { PackageOffer } from "../data/packages-data";
 
 interface PackageCardProps {
@@ -18,19 +19,19 @@ export const PackageCard = ({ offer, className }: PackageCardProps) => {
   return (
     <div
       className={cn(
-        "relative group overflow-hidden  flex flex-col p-5 text-white bg-neutral-900 border border-white/5",
+        "relative  overflow-hidden group/card flex flex-col p-5 text-white bg-neutral-900 border border-white/5",
         className,
       )}
     >
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src={gameCardBg}
+          src={isDouble ? doubleGameCardBg : singleGameCardBg}
           alt="Stadium Background"
           fill
-          className="object-cover transition-transform duration-700 group-hover:scale-105 opacity-50"
+          className="object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-50"
         />
-        <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-black/10" />
+        <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-black/40" />
       </div>
 
       {/* Content */}
@@ -118,13 +119,17 @@ export const PackageCard = ({ offer, className }: PackageCardProps) => {
             </span>
           </div>
 
-          <button className="flex items-center gap-2 px-4 py-2 rounded bg-white text-primary-300 hover:bg-primary-300 hover:text-white transition-all font-semibold font-clash group/btn shadow-2xl">
+          <MaskRevealButton
+            hoverBgClass="bg-primary-300"
+            textClassName="text-primary-300"
+            className="flex items-center gap-2 px-4 py-2 rounded shadow-2xl h-auto"
+          >
             Book Seat
             <PlaneTakeoff
               size={18}
-              className="translate-y-px group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform"
+              className="translate-y-px group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
             />
-          </button>
+          </MaskRevealButton>
         </div>
       </div>
     </div>

@@ -1,5 +1,7 @@
 import heroBgImg from "./hero-bg-img.webp";
-import gameCardBg from "./game-card-bg.webp";
+import singleGameCardBg from "./single-game-card-bg.webp";
+import totalPackageGameCardBg from "./total-package-game-card-bg.webp";
+import doubleGameCardBg from "./double-game-card-bg.webp";
 import ghanaFlag from "./ghana-flag.webp";
 import croatiaFlag from "./croatia-flag.webp";
 import englandFlag from "./england-flag.webp";
@@ -15,7 +17,9 @@ import CupBgImg from "./cup-bg-img.webp";
 
 export {
   heroBgImg,
-  gameCardBg,
+  singleGameCardBg,
+  totalPackageGameCardBg,
+  doubleGameCardBg,
   ghanaFlag,
   croatiaFlag,
   englandFlag,
