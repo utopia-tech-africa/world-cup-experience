@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,8 @@ import { usePackages } from "@/hooks/queries/usePackages";
 import { useUploadFile } from "@/hooks/mutations/useUploadFile";
 import { useCreateBooking } from "@/hooks/mutations/useCreateBooking";
 import { cn } from "@/lib/utils";
+import { useInitPaystack } from "@/hooks/mutations/useInitPaystack";
+import PaystackLogo from "@/assets/svg/paystack-logo.svg";
 
 export type PaymentAccountType = "local" | "international";
 
@@ -24,14 +26,6 @@ export type BookingSummaryData = {
   addOns: Record<string, number>;
   packageName?: string;
   duration?: string;
-};
-
-const LOCAL_ACCOUNT = {
-  title: "Altair Logistics - Local Account",
-  bank: "First National Bank",
-  accountNumber: "1234567890",
-  routingNumber: "021000021",
-  accountName: "Altair Logistics LLC",
 };
 
 const INTERNATIONAL_ACCOUNT = {
@@ -53,7 +47,10 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
   const [paymentType, setPaymentType] = useState<PaymentAccountType>("local");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
-  const [successBookingRef, setSuccessBookingRef] = useState<string | null>(null);
+  const [successBookingRef, setSuccessBookingRef] = useState<string | null>(
+    null,
+  );
+  const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
 
   const store = useBookingStore(
     useShallow((s) => ({
@@ -83,9 +80,21 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
   const { data: packages = [] } = usePackages();
   const uploadFileMutation = useUploadFile();
   const createBookingMutation = useCreateBooking();
+  const initPaystackMutation = useInitPaystack();
   const { addToast } = useToast();
 
-  const packagePricePerPerson = getBasePackagePrice(packageName, accommodation, packages);
+  useEffect(() => {
+    if (!redirectUrl) return;
+    if (typeof window !== "undefined") {
+      window.location.href = redirectUrl;
+    }
+  }, [redirectUrl]);
+
+  const packagePricePerPerson = getBasePackagePrice(
+    packageName,
+    accommodation,
+    packages,
+  );
   const passengerCount = 1 + (store.extraTravelers?.length ?? 0);
   const packagePriceTotal = packagePricePerPerson * passengerCount;
   const accommodationLabel = accommodation === "hotel" ? "Hotel" : "Hostel";
@@ -110,11 +119,11 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
   const totalAmount = packagePriceTotal + addOnsTotal;
 
   const isSubmitting =
-    uploadFileMutation.isPending || createBookingMutation.isPending;
-  const canSubmit =
-    !addonsLoading &&
-    apiAddons.length > 0 &&
-    selectedFile != null &&
+    uploadFileMutation.isPending ||
+    createBookingMutation.isPending ||
+    initPaystackMutation.isPending;
+
+  const hasRequiredTravelerFields =
     store.firstName.trim() !== "" &&
     store.lastName.trim() !== "" &&
     store.email.trim() !== "" &&
@@ -122,16 +131,64 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
     store.passportNumber.trim() !== "" &&
     store.passportExpiryDate.trim() !== "";
 
+  const requiresProofUpload = paymentType === "international";
+
+  const canSubmit =
+    !addonsLoading &&
+    apiAddons.length > 0 &&
+    hasRequiredTravelerFields &&
+    (!requiresProofUpload || selectedFile != null);
+
   const handleSubmit = async () => {
-    if (!selectedFile || !canSubmit) {
-      if (!selectedFile) addToast("Please upload proof of payment.", "error");
-      else if (!store.passportNumber.trim() || !store.passportExpiryDate.trim())
-        addToast("Passport details are required.", "error");
-      else addToast("Please complete all required fields.", "error");
+    if (!canSubmit) {
+      if (requiresProofUpload && !selectedFile) {
+        addToast("Please upload proof of payment.", "error");
+      } else if (!hasRequiredTravelerFields) {
+        addToast("Please complete all required traveler details.", "error");
+      } else {
+        addToast("Please complete all required fields.", "error");
+      }
       return;
     }
+
     try {
-      const url = await uploadFileMutation.mutateAsync(selectedFile);
+      if (paymentType === "international") {
+        if (!selectedFile) {
+          addToast("Please upload proof of payment.", "error");
+          return;
+        }
+        const url = await uploadFileMutation.mutateAsync(selectedFile);
+        const payload = buildBookingPayload({
+          fullName: `${store.firstName.trim()} ${store.lastName.trim()}`,
+          email: store.email.trim(),
+          phone: store.phoneNumber.trim(),
+          passportNumber: store.passportNumber.trim(),
+          passportExpiryDate: store.passportExpiryDate.trim(),
+          specialRequests: store.specialRequests?.trim() ?? "",
+          packageName,
+          accommodationType: accommodation,
+          addOnQuantities: addOnQuantities,
+          paymentAccountType: paymentType,
+          paymentProofUrl: url,
+          apiAddons,
+          packages,
+          extraTravelers: store.extraTravelers?.length
+            ? store.extraTravelers.map((t) => ({
+                firstName: t.firstName.trim(),
+                lastName: t.lastName.trim(),
+                passportNumber: t.passportNumber.trim(),
+                passportExpiryDate: t.passportExpiryDate.trim(),
+              }))
+            : undefined,
+        });
+        const result = await createBookingMutation.mutateAsync(payload);
+        setSuccessBookingRef(result.bookingReference);
+        setSuccessModalOpen(true);
+        return;
+      }
+
+      // Local payment via Paystack:
+      // 1) Create a pending booking to get bookingReference
       const payload = buildBookingPayload({
         fullName: `${store.firstName.trim()} ${store.lastName.trim()}`,
         email: store.email.trim(),
@@ -142,8 +199,9 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
         packageName,
         accommodationType: accommodation,
         addOnQuantities: addOnQuantities,
-        paymentAccountType: paymentType,
-        paymentProofUrl: url,
+        paymentAccountType: "local",
+        // Placeholder until Paystack payment completes
+        paymentProofUrl: "paystack://pending",
         apiAddons,
         packages,
         extraTravelers: store.extraTravelers?.length
@@ -155,12 +213,21 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
             }))
           : undefined,
       });
-      const result = await createBookingMutation.mutateAsync(payload);
-      setSuccessBookingRef(result.bookingReference);
-      setSuccessModalOpen(true);
+
+      const bookingResult = await createBookingMutation.mutateAsync(payload);
+
+      // 2) Initialize Paystack transaction with bookingReference in metadata
+      const initResult = await initPaystackMutation.mutateAsync({
+        email: store.email.trim(),
+        amount: totalAmount,
+        currency: "GHS",
+        bookingReference: bookingResult.bookingReference,
+      });
+
+      // 3) Redirect user to Paystack hosted payment page
+      setRedirectUrl(initResult.authorizationUrl);
     } catch {
-      // Upload errors: useUploadFile onError shows toast
-      // Create errors: useCreateBooking onError shows toast
+      // Errors are surfaced via individual mutations' onError handlers
     }
   };
 
@@ -175,11 +242,13 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
       <div className="flex flex-col gap-6 rounded-lg border-[0.5px] border-[#BFBFBF]/80 p-4 sm:gap-8 sm:p-[30px]">
         <section>
           <h3 className="text-foreground font-clash mb-4 text-center text-lg font-bold sm:text-left">
-            Payment details
+            Payment method
           </h3>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-[24px]">
             <BankAccountCard
-              {...LOCAL_ACCOUNT}
+              title="Pay with Paystack (Local)"
+              bank=""
+              accountName=""
               type="local"
               selected={paymentType === "local"}
               onSelect={() => setPaymentType("local")}
@@ -218,11 +287,17 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
 
           {(() => {
             const count = 1 + (store.extraTravelers?.length ?? 0);
-            const primaryName = [store.firstName, store.lastName].filter(Boolean).join(" ").trim() || "Primary";
+            const primaryName =
+              [store.firstName, store.lastName]
+                .filter(Boolean)
+                .join(" ")
+                .trim() || "Primary";
             return (
               <p className="text-muted-foreground text-sm">
                 Travelers: {count} {count === 1 ? "person" : "people"}
-                {count > 1 ? ` (${primaryName}${store.extraTravelers?.length ? ` + ${store.extraTravelers.length} more` : ""})` : ""}
+                {count > 1
+                  ? ` (${primaryName}${store.extraTravelers?.length ? ` + ${store.extraTravelers.length} more` : ""})`
+                  : ""}
               </p>
             );
           })()}
@@ -240,9 +315,7 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
                   <span>
                     {label}
                     {quantity > 1 ? (
-                      <span className="ml-1">
-                        × {quantity}
-                      </span>
+                      <span className="ml-1">× {quantity}</span>
                     ) : null}
                   </span>
                   <span className="font-clash shrink-0 font-medium text-foreground">
@@ -273,24 +346,26 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
         </section>
       </div>
 
-      {/* Upload proof of payment — outside bordered container, Figma 121-5495 mobile */}
-      <section className="mt-10 flex flex-col gap-3 sm:mt-12">
-        <h3 className="text-foreground font-clash text-center text-lg font-bold sm:text-left">
-          Upload proof of payment (e.g. bank transfer receipt)
-        </h3>
-        <FileUploadInput file={selectedFile} onFileChange={setSelectedFile} />
-        <p className="text-muted-foreground text-sm">{ACCEPTED_FORMATS}</p>
-        <div className="rounded-lg bg-amber-50 p-4">
-          <p className="text-foreground font-clash mb-2 text-sm font-semibold">
-            Important:
-          </p>
-          <ul className="text-muted-foreground list-inside list-disc space-y-1 text-sm">
-            <li>Make sure the payment amount matches your total</li>
-            <li>Upload a clear screenshot or PDF of your payment receipt</li>
-            <li>Our team will verify your payment within 24-48 hours</li>
-          </ul>
-        </div>
-      </section>
+      {/* Upload proof of payment — only for international payments */}
+      {paymentType === "international" && (
+        <section className="mt-10 flex flex-col gap-3 sm:mt-12">
+          <h3 className="text-foreground font-clash text-center text-lg font-bold sm:text-left">
+            Upload proof of payment (e.g. bank transfer receipt)
+          </h3>
+          <FileUploadInput file={selectedFile} onFileChange={setSelectedFile} />
+          <p className="text-muted-foreground text-sm">{ACCEPTED_FORMATS}</p>
+          <div className="rounded-lg bg-amber-50 p-4">
+            <p className="text-foreground font-clash mb-2 text-sm font-semibold">
+              Important:
+            </p>
+            <ul className="text-muted-foreground list-inside list-disc space-y-1 text-sm">
+              <li>Make sure the payment amount matches your total</li>
+              <li>Upload a clear screenshot or PDF of your payment receipt</li>
+              <li>Our team will verify your payment within 24-48 hours</li>
+            </ul>
+          </div>
+        </section>
+      )}
 
       {/* Add-ons failed to load — common in production when API URL is wrong or CORS */}
       {!addonsLoading && (addonsError || apiAddons.length === 0) && (
@@ -353,8 +428,6 @@ function DetailRow({ label, value }: { label: string; value?: string }) {
 function BankAccountCard({
   title,
   bank,
-  accountNumber,
-  routingNumber,
   accountName,
   swiftCode,
   iban,
@@ -363,19 +436,17 @@ function BankAccountCard({
   onSelect,
 }: {
   title: string;
-  bank: string;
-  accountNumber?: string;
-  routingNumber?: string;
-  accountName: string;
+  bank?: string;
+  accountName?: string;
   swiftCode?: string;
   iban?: string;
   type: "local" | "international";
   selected: boolean;
   onSelect: () => void;
 }) {
-  const isInternational = swiftCode != null && iban != null;
+  const isInternational = type === "international";
   const buttonLabel =
-    type === "local" ? "Local Transfer" : "International Transfer";
+    type === "local" ? "Local transfer" : "International Transfer";
 
   return (
     <div
@@ -409,26 +480,36 @@ function BankAccountCard({
           {buttonLabel}
         </span>
       </div>
-      {/* Account title — centered, Helvetica 14px */}
-      <p className="font-helvetica text-center text-sm font-medium leading-tight text-[#2a2a2a]">
-        {title}
-      </p>
-      {/* Details — gap-2 (8px), Helvetica 14px #2a2a2a */}
-      <dl className="flex flex-col gap-2">
-        <DetailRow label="Bank:" value={bank} />
-        {isInternational ? (
-          <>
+      {type === "local" && (
+        <div className="border border-[rgba(131,131,132,0.3)] mt-4 flex h-12 w-full items-center justify-center gap-3 rounded-[4px] px-4">
+          <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-[3px]">
+            {/* Static Paystack logo from local assets, matches Figma size */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={PaystackLogo.src ?? PaystackLogo}
+              alt="Paystack"
+              className="h-full w-full object-cover"
+            />
+          </span>
+          <span className="font-clash text-[16px] font-semibold text-[#2a2a2a]">
+            Click to pay with Paystack
+          </span>
+        </div>
+      )}
+      {/* Account / instructions — only show bank details for international transfers */}
+      {isInternational && (
+        <>
+          <p className="font-helvetica text-center text-sm font-medium leading-tight text-[#2a2a2a]">
+            {title}
+          </p>
+          <dl className="flex flex-col gap-2">
+            <DetailRow label="Bank:" value={bank} />
             <DetailRow label="Swift Code:" value={swiftCode} />
             <DetailRow label="IBAN:" value={iban} />
-          </>
-        ) : (
-          <>
-            <DetailRow label="Account Number:" value={accountNumber} />
-            <DetailRow label="Routing Number:" value={routingNumber} />
-          </>
-        )}
-        <DetailRow label="Account Name:" value={accountName} />
-      </dl>
+            <DetailRow label="Account Name:" value={accountName} />
+          </dl>
+        </>
+      )}
     </div>
   );
 }
