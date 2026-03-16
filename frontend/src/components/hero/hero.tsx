@@ -9,7 +9,21 @@ import { WTWCLogoWhite, ballGif } from "@/assets";
 export function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
-  const [loaderDone, setLoaderDone] = useState(false);
+  const [loaderDone, setLoaderDone] = useState(true);
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    const isDone = sessionStorage.getItem("hero-loader-done");
+    if (isDone !== "true") {
+      setLoaderDone(false);
+    }
+    setHasMounted(true);
+  }, []);
+
+  const handleComplete = () => {
+    sessionStorage.setItem("hero-loader-done", "true");
+    setLoaderDone(true);
+  };
 
   useEffect(() => {
     const html = document.documentElement;
@@ -44,13 +58,17 @@ export function Hero() {
     }
   };
 
+  if (!hasMounted) {
+    return <section className="relative w-full h-dvh bg-black" />;
+  }
+
   return (
     <section className="relative w-full h-dvh overflow-hidden bg-black select-none">
-      <AnimatePresence mode="wait">
-        {!loaderDone && (
-          <HeroLoader key="loader" onComplete={() => setLoaderDone(true)} />
-        )}
-      </AnimatePresence>
+      {!loaderDone && (
+        <AnimatePresence mode="wait">
+          <HeroLoader key="loader" onComplete={handleComplete} />
+        </AnimatePresence>
+      )}
 
       {/* Video Background */}
       <div className="absolute inset-0 z-0">
@@ -79,7 +97,7 @@ export function Hero() {
         </div>
 
         {/* Bottom panel */}
-        <div className="absolute bottom-0 left-0 w-full h-[9%] bg-black/10 backdrop-blur-md flex items-center px-8 md:px-14 lg:px-20">
+        <div className="absolute bottom-0 left-0 w-full h-[9%] bg-black/10 backdrop-blur-md flex justify-between items-center px-8 md:px-14 lg:px-20">
           {/* Scroll Indicator Inside Bottom Panel */}
           <div className="flex items-center gap-4">
             <span className="text-white font-clash text-xl md:text-2xl font-medium tracking-tight">
@@ -94,40 +112,7 @@ export function Hero() {
               />
             </div>
           </div>
-        </div>
 
-        {/* Right panel (Hidden on Mobile) */}
-        <div className="hidden md:block absolute top-[9%] bottom-[9%] right-0 w-[5%] bg-black/10 backdrop-blur-md" />
-
-        {/* Continuous Grid Lines */}
-        <div className="absolute top-[9%] left-0 w-full h-px bg-white/50" />
-        <div className="absolute bottom-[9%] left-0 w-full h-px bg-white/50" />
-        <div className="hidden md:block absolute top-0 right-[5%] w-px h-full bg-white/50" />
-
-        {/* Intersection nodes (Hidden on Mobile) */}
-        <div className="hidden md:block absolute top-[9%] right-[5%] w-[5px] h-[5px] bg-white translate-x-1/2 -translate-y-1/2" />
-        <div className="hidden md:block absolute bottom-[9%] right-[5%] w-[5px] h-[5px] bg-white translate-x-1/2 translate-y-1/2" />
-
-        {/* Top/Bottom masks for cinematic feel */}
-        <div className="absolute top-0 left-0 w-full h-[20%] bg-linear-to-b from-black/80 to-transparent opacity-50" />
-      </div>
-
-      {/* Hero Interactivity Overlay */}
-      <div
-        className="absolute inset-0 z-20 cursor-pointer"
-        onClick={handleToggleAudio}
-      />
-
-      {/* Hero UI Content */}
-      <motion.div
-        className="relative z-30 h-full w-full flex flex-col justify-end p-8 md:p-14 lg:px-20 lg:py-8 pointer-events-none"
-        initial={{ opacity: 0 }}
-        animate={loaderDone ? { opacity: 1 } : {}}
-        transition={{ duration: 1, delay: 1.2 }}
-      >
-        {/* Bottom Section */}
-        <div className="flex items-end justify-between">
-          <div /> {/* Spacer for layout flex-between */}
           {/* Audio Indicator */}
           <motion.div
             className="pointer-events-auto flex items-center gap-3 px-6 py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-xl group transition-all hover:bg-white/10"
@@ -165,7 +150,36 @@ export function Hero() {
             </span>
           </motion.div>
         </div>
-      </motion.div>
+
+        {/* Right panel (Hidden on Mobile) */}
+        <div className="hidden md:block absolute top-[9%] bottom-[9%] right-0 w-[5%] bg-black/10 backdrop-blur-md" />
+
+        {/* Continuous Grid Lines */}
+        <div className="absolute top-[9%] left-0 w-full h-px bg-white/50" />
+        <div className="absolute bottom-[9%] left-0 w-full h-px bg-white/50" />
+        <div className="hidden md:block absolute top-0 right-[5%] w-px h-full bg-white/50" />
+
+        {/* Intersection nodes (Hidden on Mobile) */}
+        <div className="hidden md:block absolute top-[9%] right-[5%] w-[5px] h-[5px] bg-white translate-x-1/2 -translate-y-1/2" />
+        <div className="hidden md:block absolute bottom-[9%] right-[5%] w-[5px] h-[5px] bg-white translate-x-1/2 translate-y-1/2" />
+
+        {/* Top/Bottom masks for cinematic feel */}
+        <div className="absolute top-0 left-0 w-full h-[20%] bg-linear-to-b from-black/80 to-transparent opacity-50" />
+      </div>
+
+      {/* Hero Interactivity Overlay */}
+      <div
+        className="absolute inset-0 z-20 cursor-pointer"
+        onClick={handleToggleAudio}
+      />
+
+      {/* Hero UI Content */}
+      <motion.div
+        className="relative z-30 h-full w-full flex flex-col justify-end p-8 md:p-14 lg:px-20 lg:py-8 pointer-events-none"
+        initial={{ opacity: 0 }}
+        animate={loaderDone ? { opacity: 1 } : {}}
+        transition={{ duration: 1, delay: 1.2 }}
+      ></motion.div>
     </section>
   );
 }

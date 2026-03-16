@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import ComponentLayout from "../component-layout";
 import { FifaFinfestImg } from "@/assets";
-import { Button } from "../ui/button";
+import { MaskRevealButton } from "../mask-reveal-button";
 
 export const FifaFanfest = () => {
   return (
@@ -25,9 +25,13 @@ export const FifaFanfest = () => {
         </p>
 
         <Link href="#">
-          <Button className=" rounded-none rounded-bl-3xl bg-white text-primary-100 px-3 sm:px-6 py-6 text-lg font-helvetica transition-all hover:bg-transparent hover:text-white border hover:border-white ">
+          <MaskRevealButton
+            className="rounded-bl-3xl py-6"
+            hoverBgClass="bg-primary-100"
+            textClassName="text-primary-100"
+          >
             Select a package
-          </Button>
+          </MaskRevealButton>
         </Link>
       </ComponentLayout>
     </div>
