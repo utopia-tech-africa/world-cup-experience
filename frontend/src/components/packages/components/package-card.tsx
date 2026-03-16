@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { PlaneTakeoff } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { gameCardBg } from "@/assets/img";
+import { totalPackageGameCardBg } from "@/assets/img";
 import type { GameOffer } from "@/components/games/data/games-data";
 
 interface PackageCardProps {
@@ -26,7 +26,7 @@ export const PackageCard = ({ offer, className, onBook }: PackageCardProps) => {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src={gameCardBg}
+          src={totalPackageGameCardBg}
           alt="Stadium Background"
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-105 opacity-50"
