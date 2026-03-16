@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { TRIPLE_MATCHES } from "../data/packages-data";
-import { gameCardBg } from "@/assets/img";
+import { totalPackageGameCardBg } from "@/assets/img";
 import { cn } from "@/lib/utils";
 
 export const TotalPackageMatches = () => {
@@ -10,12 +10,12 @@ export const TotalPackageMatches = () => {
     <div className="w-full  relative flex flex-col p-5 overflow-hidden items-center justify-center text-white">
       {/* Stadium background */}
       <Image
-        src={gameCardBg}
+        src={totalPackageGameCardBg}
         alt="Stadium"
         fill
         className="object-cover opacity-80 z-0 scale-110"
       />{" "}
-      <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-black/50" />
+      <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-black/60" />
       {/* Content Overlay */}
       <div className="relative z-20 flex flex-col gap-6 w-full max-w-3xl">
         {/* Badge */}
