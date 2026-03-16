@@ -1,4 +1,15 @@
+import { Suspense } from "react";
 import { PaystackCallbackView } from "./paystack-callback-view";
+
+export const dynamic = "force-dynamic";
+
+function CallbackFallback() {
+  return (
+    <div className="mx-auto flex min-h-screen w-full max-w-[1512px] flex-col items-center justify-center px-4">
+      <p className="text-muted-foreground text-sm">Loading…</p>
+    </div>
+  );
+}
 
 export default function PaystackCallbackPage({
   searchParams,
@@ -10,6 +21,10 @@ export default function PaystackCallbackPage({
     ? referenceParam[0]
     : referenceParam;
 
-  return <PaystackCallbackView reference={reference ?? null} />;
+  return (
+    <Suspense fallback={<CallbackFallback />}>
+      <PaystackCallbackView reference={reference ?? null} />
+    </Suspense>
+  );
 }
 
