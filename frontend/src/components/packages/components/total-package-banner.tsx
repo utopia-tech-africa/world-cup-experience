@@ -3,10 +3,15 @@
 import Image from "next/image";
 import { TotalPackageMatches } from "./total-package-matches";
 import { Button } from "@/components/ui/button";
-import { MaskRevealButton } from "../../mask-reveal-button";
 import { TotalPackageBg } from "@/assets/svg";
+import type { Match } from "@/components/games/data/games-data";
 
-export const TotalPackageBanner = () => {
+type TotalPackageBannerProps = {
+  matches: Match[];
+  onBook?: () => void;
+};
+
+export const TotalPackageBanner = ({ matches, onBook }: TotalPackageBannerProps) => {
   return (
     <div className="flex flex-col-reverse lg:flex-row gap-5">
       {/* Total Package Left info */}
@@ -43,17 +48,21 @@ export const TotalPackageBanner = () => {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-5 mt-14  relative z-10 mx-auto md:mx-0">
-          <MaskRevealButton className="px-3 sm:px-6 rounded-bl-3xl font-bold">
+          <Button
+            type="button"
+            onClick={onBook}
+            className="rounded-none rounded-bl-3xl bg-white text-primary-200 px-3 sm:px-6 py-5  font-bold text-lg font-helvetica transition-all hover:bg-transparent hover:text-white hover:border-white cursor-pointer "
+          >
             Book now
-          </MaskRevealButton>
-          <MaskRevealButton className="px-3 sm:px-6">
+          </Button>
+          <Button className="rounded-none bg-white text-primary-200 px-3 sm:px-6 py-5 text-lg font-helvetica transition-all hover:bg-transparent hover:text-white hover:border-white cursor-pointer ">
             Corporate packages
-          </MaskRevealButton>
+          </Button>
         </div>
       </div>
 
       {/* Matches Right List */}
-      <TotalPackageMatches />
+      <TotalPackageMatches matches={matches} />
     </div>
   );
 };

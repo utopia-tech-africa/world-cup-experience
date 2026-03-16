@@ -61,7 +61,10 @@ export function computeBookingTotal(
   const addOnsTotal = Object.entries(addOns ?? {}).reduce((sum, [id, qty]) => {
     if (qty <= 0) return sum;
     const addon = apiAddons.find((a) => a.id === id);
-    return sum + (Number(addon?.price) ?? 0) * qty;
+    if (!addon) return sum;
+    const priceNumber = Number(addon.price);
+    if (!Number.isFinite(priceNumber) || priceNumber <= 0) return sum;
+    return sum + priceNumber * qty;
   }, 0);
   return packageTotal + addOnsTotal;
 }

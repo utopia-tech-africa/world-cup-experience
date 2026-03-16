@@ -16,6 +16,7 @@ import {
   deleteTeam,
   uploadTeamFlag,
 } from '../controllers/admin-team.controller';
+import { getFxRate, updateFxRate } from '../controllers/admin-settings.controller';
 import { authMiddleware } from '../middleware/auth.middleware';
 import { upload } from '../middleware/upload.middleware';
 
@@ -54,5 +55,8 @@ router.get('/games', getAdminGames);
 router.post('/games', createGame);
 router.patch('/games/:id', updateGame);
 router.delete('/games/:id', deleteGame);
+
+router.get('/settings/fx-rate', getFxRate);
+router.patch('/settings/fx-rate', updateFxRate);
 
 export default router;
