@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { getStoredUsdToGhsRate } from './settings.service';
 
 export const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 export const PAYSTACK_API_BASE_URL =
@@ -17,8 +18,8 @@ if (!PAYSTACK_SECRET_KEY) {
 const initTransactionSchema = z.object({
   email: z.string().email(),
   amount: z.number().positive(),
-  // Default to Ghanaian Cedi for this project
-  currency: z.string().default('GHS'),
+  // Currency of the amount provided by the client (USD or GHS)
+  currency: z.enum(['USD', 'GHS']).default('USD'),
   bookingReference: z.string().optional(),
 });
 
@@ -29,6 +30,70 @@ export type InitPaystackTransactionResult = {
   reference: string;
 };
 
+const DEFAULT_USD_TO_GHS_RATE = 11;
+
+let cachedUsdToGhsRate: number | null = null;
+let cachedRateFetchedAt: number | null = null;
+
+/** Call this when admin updates the rate so the next payment uses the new value. */
+export function invalidateUsdToGhsCache(): void {
+  cachedUsdToGhsRate = null;
+  cachedRateFetchedAt = null;
+}
+
+async function getUsdToGhsRate(): Promise<number> {
+  // 1) Admin-configured rate (database) — highest priority
+  const storedRate = await getStoredUsdToGhsRate();
+  if (storedRate != null) return storedRate;
+
+  // 2) Env override for local/dev or when FX API is unavailable
+  const staticRate = process.env.FX_STATIC_USD_TO_GHS
+    ? Number(process.env.FX_STATIC_USD_TO_GHS)
+    : null;
+  if (staticRate && Number.isFinite(staticRate) && staticRate > 0) {
+    return staticRate;
+  }
+
+  const FX_API_URL =
+    process.env.FX_API_URL ??
+    'https://api.exchangerate.host/latest?base=USD&symbols=GHS';
+
+  const now = Date.now();
+  if (cachedUsdToGhsRate != null && cachedRateFetchedAt != null && now - cachedRateFetchedAt < 60 * 60 * 1000) {
+    return cachedUsdToGhsRate;
+  }
+
+  try {
+    const res = await fetch(FX_API_URL);
+    if (!res.ok) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[fx] Failed to fetch FX rate (status ${res.status}), falling back to ${DEFAULT_USD_TO_GHS_RATE}`
+      );
+      return DEFAULT_USD_TO_GHS_RATE;
+    }
+    const data = (await res.json()) as { rates?: { GHS?: number } };
+    const rate = data.rates?.GHS;
+    if (!rate || !Number.isFinite(rate)) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[fx] Invalid FX rate response for USD→GHS, falling back to ${DEFAULT_USD_TO_GHS_RATE}`
+      );
+      return DEFAULT_USD_TO_GHS_RATE;
+    }
+    cachedUsdToGhsRate = rate;
+    cachedRateFetchedAt = now;
+    return rate;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[fx] Error fetching FX rate, falling back to ${DEFAULT_USD_TO_GHS_RATE}`,
+      error
+    );
+    return DEFAULT_USD_TO_GHS_RATE;
+  }
+}
+
 export const initPaystackTransaction = async (
   input: InitPaystackTransactionInput
 ): Promise<InitPaystackTransactionResult> => {
@@ -38,7 +103,14 @@ export const initPaystackTransaction = async (
     throw new Error('Paystack is not configured on the server');
   }
 
-  const koboAmount = Math.round(parsed.amount * 100);
+  // Convert from USD to GHS if needed before sending to Paystack
+  let amountInGhs = parsed.amount;
+  if (parsed.currency === 'USD') {
+    const rate = await getUsdToGhsRate();
+    amountInGhs = parsed.amount * rate;
+  }
+
+  const koboAmount = Math.round(amountInGhs * 100);
 
   const response = await fetch(
     `${PAYSTACK_API_BASE_URL}/transaction/initialize`,
@@ -51,7 +123,7 @@ export const initPaystackTransaction = async (
       body: JSON.stringify({
         email: parsed.email,
         amount: koboAmount,
-        currency: parsed.currency,
+        currency: 'GHS',
         callback_url: `${process.env.CLIENT_URL ?? 'http://localhost:3000'}/booking/paystack-callback`,
         metadata: {
           bookingReference: parsed.bookingReference,

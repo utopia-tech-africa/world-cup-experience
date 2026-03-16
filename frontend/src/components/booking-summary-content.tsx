@@ -217,10 +217,11 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
       const bookingResult = await createBookingMutation.mutateAsync(payload);
 
       // 2) Initialize Paystack transaction with bookingReference in metadata
+      // Amount is in USD; backend converts to GHS using FX API before sending to Paystack
       const initResult = await initPaystackMutation.mutateAsync({
         email: store.email.trim(),
         amount: totalAmount,
-        currency: "GHS",
+        currency: "USD",
         bookingReference: bookingResult.bookingReference,
       });
 

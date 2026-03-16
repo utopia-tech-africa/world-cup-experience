@@ -1,7 +1,14 @@
 import axios from 'axios';
 
+/** Backend API base; must end with /api so paths like /admin/settings/fx-rate resolve correctly. */
+function getApiBaseUrl(): string {
+  const env = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+  const base = env.trim().replace(/\/+$/, '');
+  return base.endsWith('/api') ? base : `${base}/api`;
+}
+
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
+  baseURL: getApiBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },

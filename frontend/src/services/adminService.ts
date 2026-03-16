@@ -286,3 +286,21 @@ export const updateGame = async (id: string, input: UpdateGameInput): Promise<Ad
 export const deleteGame = async (id: string): Promise<void> => {
   await axios.delete(`/admin/games/${id}`);
 };
+
+/** FX rate (USD → GHS) used for Paystack. null = not set (backend uses env or live API). */
+export const getFxRate = async (): Promise<{ usdToGhsRate: number | null }> => {
+  const { data } = await axios.get<{ usdToGhsRate: number | null }>(
+    '/admin/settings/fx-rate'
+  );
+  return data;
+};
+
+export const updateFxRate = async (
+  usdToGhsRate: number
+): Promise<{ usdToGhsRate: number }> => {
+  const { data } = await axios.patch<{ usdToGhsRate: number }>(
+    '/admin/settings/fx-rate',
+    { usdToGhsRate }
+  );
+  return data;
+};
