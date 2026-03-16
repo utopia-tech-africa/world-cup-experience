@@ -10,9 +10,21 @@ const app = express();
 
 // Security middleware
 app.use(helmet());
+
+// CORS: allow single origin or comma-separated list (e.g. CORS_ORIGIN=http://localhost:3000,https://app.example.com)
+const corsOriginRaw = process.env.CORS_ORIGIN ?? "http://localhost:3000";
+const corsOrigins = corsOriginRaw
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
+const corsOrigin =
+  corsOrigins.length <= 1
+    ? corsOrigins[0] || "http://localhost:3000"
+    : corsOrigins;
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+    origin: corsOrigin,
     credentials: true,
   }),
 );
