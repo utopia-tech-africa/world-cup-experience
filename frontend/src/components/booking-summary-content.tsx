@@ -29,11 +29,10 @@ export type BookingSummaryData = {
 };
 
 const INTERNATIONAL_ACCOUNT = {
-  title: "Altair Logistics - International Account",
-  bank: "Intl. Bank of Commerce",
-  swiftCode: "IBCOUS33XXX",
-  iban: "US12 3456 7890 1234 5678 90",
-  accountName: "Altair Logistics LLC",
+  title: "Altair Logistics, Inc",
+  bank: "Chase Bank",
+  accountNumber: "2907195358",
+  routingNumber: "021000021",
 };
 
 const ACCEPTED_FORMATS = "JPG, PNG, WEBP, PDF (Max 10MB)";
@@ -249,7 +248,8 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
             <BankAccountCard
               title="Pay with Paystack (Local)"
               bank=""
-              accountName=""
+              accountNumber={undefined}
+              routingNumber={undefined}
               type="local"
               selected={paymentType === "local"}
               onSelect={() => setPaymentType("local")}
@@ -433,18 +433,16 @@ function DetailRow({ label, value }: { label: string; value?: string }) {
 function BankAccountCard({
   title,
   bank,
-  accountName,
-  swiftCode,
-  iban,
+  accountNumber,
+  routingNumber,
   type,
   selected,
   onSelect,
 }: {
   title: string;
   bank?: string;
-  accountName?: string;
-  swiftCode?: string;
-  iban?: string;
+  accountNumber?: string;
+  routingNumber?: string;
   type: "local" | "international";
   selected: boolean;
   onSelect: () => void;
@@ -504,14 +502,11 @@ function BankAccountCard({
       {/* Account / instructions — only show bank details for international transfers */}
       {isInternational && (
         <>
-          <p className="font-helvetica text-center text-sm font-medium leading-tight text-[#2a2a2a]">
-            {title}
-          </p>
           <dl className="flex flex-col gap-2">
+            <DetailRow label="Name:" value={title} />
             <DetailRow label="Bank:" value={bank} />
-            <DetailRow label="Swift Code:" value={swiftCode} />
-            <DetailRow label="IBAN:" value={iban} />
-            <DetailRow label="Account Name:" value={accountName} />
+            <DetailRow label="Account number:" value={accountNumber} />
+            <DetailRow label="Routing number:" value={routingNumber} />
           </dl>
         </>
       )}
