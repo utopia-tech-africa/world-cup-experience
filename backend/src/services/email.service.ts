@@ -4,7 +4,7 @@ import { Resend } from "resend";
 import { Booking } from "@prisma/client";
 import { SubmissionEmail } from "../utils/emails/SubmissionEmail";
 import { ConfirmationEmail } from "../utils/emails/ConfirmationEmail";
-import { DelayEmail } from "../utils/emails/DelayEmail";
+import { RejectedEmail } from "../utils/emails/RejectedEmail";
 
 const apiKey = process.env.RESEND_API_KEY;
 const fromEmail = process.env.FROM_EMAIL ?? "onboarding@resend.dev";
@@ -87,7 +87,7 @@ export async function sendRejectionEmail(
   const firstName = booking.fullName.split(" ")[0];
 
   const html = await render(
-    React.createElement(DelayEmail, {
+    React.createElement(RejectedEmail, {
       firstName,
       bookingReference: booking.bookingReference,
     }),
