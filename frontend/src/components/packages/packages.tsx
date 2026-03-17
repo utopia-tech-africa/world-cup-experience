@@ -40,16 +40,21 @@ export const Packages = () => {
   /** Derive packageName and duration from GameOffer.type (e.g. "13 nights (Triple game)"). */
   function getTripSummaryFromOffer(offer: GameOffer) {
     const match = offer.type.match(/^(.+?)\s*\((.+)\)\s*$/);
-    const duration = match?.[1]?.trim() ?? (offer.matches.length >= 3 ? "13 nights" : offer.matches.length > 1 ? "7 nights" : "4 nights");
+    const duration =
+      match?.[1]?.trim() ??
+      (offer.matches.length >= 3
+        ? "13 nights"
+        : offer.matches.length > 1
+          ? "7 nights"
+          : "4 nights");
     const typeLabel = match?.[2]?.trim() ?? "";
-    const packageName =
-      typeLabel.toLowerCase().includes("triple")
-        ? "Triple Game"
-        : typeLabel.toLowerCase().includes("double")
-          ? "Double Game"
-          : typeLabel.toLowerCase().includes("quad")
-            ? "Quad Game"
-            : "One Game";
+    const packageName = typeLabel.toLowerCase().includes("triple")
+      ? "Triple Game"
+      : typeLabel.toLowerCase().includes("double")
+        ? "Double Game"
+        : typeLabel.toLowerCase().includes("quad")
+          ? "Quad Game"
+          : "One Game";
     return { packageName, duration };
   }
 
@@ -98,7 +103,8 @@ export const Packages = () => {
             matches={tripleMatches}
             onBook={() => {
               if (!tripleOffer) return;
-              const { packageName, duration } = getTripSummaryFromOffer(tripleOffer);
+              const { packageName, duration } =
+                getTripSummaryFromOffer(tripleOffer);
               setTripSummary({ packageName, duration });
               setBookingForm({ accommodation: "hotel" });
               router.push("/booking");
@@ -118,7 +124,8 @@ export const Packages = () => {
                   idx === 2 && "md:rounded-bl-[80px] pl-10",
                 )}
                 onBook={() => {
-                  const { packageName, duration } = getTripSummaryFromOffer(offer);
+                  const { packageName, duration } =
+                    getTripSummaryFromOffer(offer);
                   const accommodation = offer.accommodation
                     .toLowerCase()
                     .includes("hostel")

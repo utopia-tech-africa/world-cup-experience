@@ -32,13 +32,17 @@ function mapGamesToMatches(games: PublicGame[] | undefined): Match[] {
   }));
 }
 
-export function buildGameOffersFromPackages(packages: BookingPackage[]): GameOffer[] {
+export function buildGameOffersFromPackages(
+  packages: BookingPackage[],
+): GameOffer[] {
   return packages
     .filter((p) => p.isActive)
     .sort((a, b) => a.displayOrder - b.displayOrder)
     .flatMap((pkg) => {
       const typeName =
-        typeof pkg.type === "string" ? pkg.type : pkg.type?.name ?? pkg.type?.code;
+        typeof pkg.type === "string"
+          ? pkg.type
+          : (pkg.type?.name ?? pkg.type?.code);
 
       const nightsLabel = pkg.nights ? `${pkg.nights} nights` : pkg.duration;
 
@@ -69,4 +73,3 @@ export function buildGameOffersFromPackages(packages: BookingPackage[]): GameOff
       ] satisfies GameOffer[];
     });
 }
-
