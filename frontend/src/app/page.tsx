@@ -9,9 +9,9 @@ export default function Home() {
   return (
     <main className="space-y-4">
       <Hero />
+      <Packages />
       <AboutAltair />
       <FifaFanfest />
-      <Packages />
       <Explore />
       <FAQ />
     </main>

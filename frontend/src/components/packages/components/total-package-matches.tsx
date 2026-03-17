@@ -1,21 +1,21 @@
 "use client";
 
 import Image from "next/image";
-import { TRIPLE_MATCHES } from "../data/packages-data";
-import { totalPackageGameCardBg } from "@/assets/img";
+import { gameCardBg } from "@/assets/img";
 import { cn } from "@/lib/utils";
+import type { Match } from "@/components/games/data/games-data";
 
-export const TotalPackageMatches = () => {
+export const TotalPackageMatches = ({ matches }: { matches: Match[] }) => {
   return (
     <div className="w-full  relative flex flex-col p-5 overflow-hidden items-center justify-center text-white">
       {/* Stadium background */}
       <Image
-        src={totalPackageGameCardBg}
+        src={gameCardBg}
         alt="Stadium"
         fill
         className="object-cover opacity-80 z-0 scale-110"
       />{" "}
-      <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-black/60" />
+      <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-black/50" />
       {/* Content Overlay */}
       <div className="relative z-20 flex flex-col gap-6 w-full max-w-3xl">
         {/* Badge */}
@@ -32,7 +32,7 @@ export const TotalPackageMatches = () => {
 
         {/* Match Details List */}
         <div className="flex flex-col gap-4 ">
-          {TRIPLE_MATCHES.map((match, idx) => (
+        {matches.map((match, idx) => (
             <div key={idx} className="flex flex-col items-center w-full">
               {/* Stadium Name on Top */}
               <p className=" font-helvetica mb-3 tracking-wide text-white/80">
@@ -81,7 +81,7 @@ export const TotalPackageMatches = () => {
                 {match.date}
               </p>
 
-              {idx < TRIPLE_MATCHES.length - 1 && (
+              {idx < matches.length - 1 && (
                 <div className="w-full h-px bg-white/10 mt-4" />
               )}
             </div>

@@ -3,35 +3,35 @@
 import Image from "next/image";
 import { PlaneTakeoff } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { singleGameCardBg, doubleGameCardBg } from "@/assets/img";
-import { MaskRevealButton } from "../../mask-reveal-button";
-import { PackageOffer } from "../data/packages-data";
+import { gameCardBg } from "@/assets/img";
+import type { GameOffer } from "@/components/games/data/games-data";
 
 interface PackageCardProps {
-  offer: PackageOffer;
+  offer: GameOffer;
   className?: string;
+  onBook?: () => void;
 }
 
-export const PackageCard = ({ offer, className }: PackageCardProps) => {
+export const PackageCard = ({ offer, className, onBook }: PackageCardProps) => {
   const isDouble = offer.matches.length > 1;
   const [whole, decimal] = offer.price.split(".");
 
   return (
     <div
       className={cn(
-        "relative  overflow-hidden group/card flex flex-col p-5 text-white bg-neutral-900 border border-white/5",
+        "relative group overflow-hidden  flex flex-col p-5 text-white bg-neutral-900 border border-white/5",
         className,
       )}
     >
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src={isDouble ? doubleGameCardBg : singleGameCardBg}
+          src={gameCardBg}
           alt="Stadium Background"
           fill
-          className="object-cover transition-transform duration-700 group-hover/card:scale-105 opacity-50"
+          className="object-cover transition-transform duration-700 group-hover:scale-105 opacity-50"
         />
-        <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-black/40" />
+        <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-black/10" />
       </div>
 
       {/* Content */}
@@ -119,17 +119,17 @@ export const PackageCard = ({ offer, className }: PackageCardProps) => {
             </span>
           </div>
 
-          <MaskRevealButton
-            hoverBgClass="bg-primary-300"
-            textClassName="text-primary-300"
-            className="flex items-center gap-2 px-4 py-2 rounded shadow-2xl h-auto"
+          <button
+            type="button"
+            onClick={onBook}
+            className="flex items-center gap-2 px-4 py-2 rounded bg-white text-primary-300 hover:bg-primary-300 hover:text-white transition-all font-semibold font-clash group/btn shadow-2xl cursor-pointer"
           >
             Book Seat
             <PlaneTakeoff
               size={18}
-              className="translate-y-px group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+              className="translate-y-px group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform"
             />
-          </MaskRevealButton>
+          </button>
         </div>
       </div>
     </div>

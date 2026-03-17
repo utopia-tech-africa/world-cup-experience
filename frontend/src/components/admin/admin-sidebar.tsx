@@ -12,6 +12,7 @@ import {
   Users,
   LogOut,
   Upload,
+  Settings,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -25,6 +26,7 @@ const navItems = [
   { href: '/admin/packages', label: 'Packages', icon: Package },
   { href: '/admin/teams', label: 'Teams', icon: Users },
   { href: '/admin/games', label: 'Games', icon: Trophy },
+  { href: '/admin/settings', label: 'Settings', icon: Settings },
 ] as const;
 
 type AdminSidebarProps = {

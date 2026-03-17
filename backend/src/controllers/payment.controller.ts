@@ -4,6 +4,7 @@ import {
   InitPaystackTransactionInput,
 } from '../services/paystack.service';
 import { verifyPaystackTransaction } from '../services/paystack-verify.service';
+import { sendConfirmationEmail } from '../services/email.service';
 
 export const initPaystack = async (req: Request, res: Response) => {
   try {
@@ -22,7 +23,7 @@ export const initPaystack = async (req: Request, res: Response) => {
     const result = await initPaystackTransaction({
       email,
       amount,
-      currency: currency ?? 'GHS',
+      currency: currency ?? 'USD',
       bookingReference,
     });
 
@@ -45,6 +46,14 @@ export const verifyPaystack = async (req: Request, res: Response) => {
     }
 
     const booking = await verifyPaystackTransaction(reference);
+
+    // Fire-and-forget confirmation email; errors here should not break payment flow
+    try {
+      await sendConfirmationEmail(booking);
+    } catch (emailError) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to send confirmation email after Paystack verify:', emailError);
+    }
 
     res.json({
       success: true,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { SuccessModal } from "@/components/success-modal";
 import { verifyPaystackPayment } from "@/services/paymentService";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,13 @@ type PaystackCallbackViewProps = {
 
 export function PaystackCallbackView({ reference }: PaystackCallbackViewProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const effectiveReference =
+    reference ??
+    searchParams.get("reference") ??
+    searchParams.get("trxref") ??
+    searchParams.get("ref");
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,13 +27,13 @@ export function PaystackCallbackView({ reference }: PaystackCallbackViewProps) {
 
   useEffect(() => {
     const run = async () => {
-      if (!reference) {
+      if (!effectiveReference) {
         setError("Missing payment reference.");
         setLoading(false);
         return;
       }
       try {
-        const result = await verifyPaystackPayment(reference);
+        const result = await verifyPaystackPayment(effectiveReference);
         if (!result.success || !result.bookingReference) {
           setError("We could not confirm your payment. Please contact support.");
         } else {
@@ -40,7 +47,7 @@ export function PaystackCallbackView({ reference }: PaystackCallbackViewProps) {
       }
     };
     void run();
-  }, [reference]);
+  }, [effectiveReference]);
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-[1512px] flex-col items-center justify-center px-4 sm:px-8 lg:px-[200px]">
