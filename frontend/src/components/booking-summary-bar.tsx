@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, PlaneTakeoff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -63,6 +63,10 @@ export function BookingSummaryBar({
   const hasBackAction = backHref != null || onBack != null;
   const showCostSkeleton = costLoading;
 
+  const [fromLabel, toLabel] = route.includes("✈")
+    ? route.split("✈").map((part) => part.trim())
+    : [route, ""];
+
   const backIcon = (
     <span
       className={cn(
@@ -106,15 +110,20 @@ export function BookingSummaryBar({
           )}
 
           <div className="min-w-0 flex-1">
-            <p className="text-foreground  text-sm font-medium leading-normal">
-              {route}
-            </p>
-            <h2 className="text-foreground font-clash text-2xl font-medium leading-tight">
-              {packageName}
-            </h2>
-            <p className="text-foreground text-sm font-medium leading-normal">
+            {/* Duration (e.g. 4 nights) */}
+            <p className="text-[#D14B21] text-lg font-semibold leading-normal">
               {duration}
             </p>
+            {/* Package name (e.g. One Game) */}
+            <h2 className="text-foreground font-clash text-2xl font-semibold leading-tight sm:text-[28px]">
+              {packageName}
+            </h2>
+            {/* Route row: Accra (ACC)  [plane icon]  USA (US) */}
+            <div className="mt-1 flex items-center gap-3 text-sm font-medium text-foreground">
+              <span className="truncate">{fromLabel}</span>
+              <PlaneTakeoff className="h-4 w-4 shrink-0 text-[#111827]" />
+              {toLabel ? <span className="truncate">{toLabel}</span> : null}
+            </div>
           </div>
         </div>
 
