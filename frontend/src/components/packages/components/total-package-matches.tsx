@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { gameCardBg } from "@/assets/img";
+import { totalPackageGameCardBg } from "@/assets/img";
 import { cn } from "@/lib/utils";
 import type { Match } from "@/components/games/data/games-data";
 
@@ -10,7 +10,7 @@ export const TotalPackageMatches = ({ matches }: { matches: Match[] }) => {
     <div className="w-full  relative flex flex-col p-5 overflow-hidden items-center justify-center text-white">
       {/* Stadium background */}
       <Image
-        src={gameCardBg}
+        src={totalPackageGameCardBg}
         alt="Stadium"
         fill
         className="object-cover opacity-80 z-0 scale-110"
@@ -44,7 +44,7 @@ export const TotalPackageMatches = ({ matches }: { matches: Match[] }) => {
                 <div className="flex flex-col items-center gap-2 ">
                   <div className="relative w-16 h-10 md:w-20 md:h-12 overflow-hidden rounded-sm shadow-xl border border-white/10">
                     <Image
-                      src={match.team1.flag}
+                      src={match.team1.flag ?? ""}
                       alt={match.team1.name}
                       fill
                       className="object-cover"
@@ -66,7 +66,7 @@ export const TotalPackageMatches = ({ matches }: { matches: Match[] }) => {
                 <div className="flex flex-col items-center gap-2 ">
                   <div className="relative w-16 h-10 md:w-20 md:h-12 overflow-hidden rounded-sm shadow-xl border border-white/10">
                     <Image
-                      src={match.team2.flag}
+                      src={match.team2.flag ?? ""}
                       alt={match.team2.name}
                       fill
                       className="object-cover"

@@ -55,6 +55,19 @@ CREATE TABLE "bookings" (
 );
 
 -- CreateTable
+CREATE TABLE "booking_travelers" (
+    "id" TEXT NOT NULL,
+    "booking_id" TEXT NOT NULL,
+    "first_name" TEXT NOT NULL,
+    "last_name" TEXT NOT NULL,
+    "passport_number" TEXT NOT NULL,
+    "passport_expiry" TIMESTAMP(3) NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "booking_travelers_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "package_types" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -67,12 +80,24 @@ CREATE TABLE "package_types" (
 );
 
 -- CreateTable
+CREATE TABLE "teams" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "flag_url" TEXT,
+    "display_order" INTEGER NOT NULL DEFAULT 0,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "teams_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "games" (
     "id" TEXT NOT NULL,
     "type_id" TEXT,
     "stadium" TEXT NOT NULL,
-    "team1_name" TEXT NOT NULL,
-    "team2_name" TEXT NOT NULL,
+    "team1_id" TEXT NOT NULL,
+    "team2_id" TEXT NOT NULL,
     "match_date" TEXT NOT NULL,
     "display_order" INTEGER NOT NULL DEFAULT 0,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -134,6 +159,16 @@ CREATE TABLE "booking_addons" (
     CONSTRAINT "booking_addons_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "settings" (
+    "id" TEXT NOT NULL,
+    "key" TEXT NOT NULL,
+    "value" TEXT NOT NULL,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "settings_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
@@ -146,11 +181,23 @@ CREATE UNIQUE INDEX "package_types_code_key" ON "package_types"("code");
 -- CreateIndex
 CREATE UNIQUE INDEX "booking_addons_booking_id_addon_id_key" ON "booking_addons"("booking_id", "addon_id");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "settings_key_key" ON "settings"("key");
+
 -- AddForeignKey
 ALTER TABLE "bookings" ADD CONSTRAINT "bookings_confirmed_by_fkey" FOREIGN KEY ("confirmed_by") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "booking_travelers" ADD CONSTRAINT "booking_travelers_booking_id_fkey" FOREIGN KEY ("booking_id") REFERENCES "bookings"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "games" ADD CONSTRAINT "games_type_id_fkey" FOREIGN KEY ("type_id") REFERENCES "package_types"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "games" ADD CONSTRAINT "games_team1_id_fkey" FOREIGN KEY ("team1_id") REFERENCES "teams"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "games" ADD CONSTRAINT "games_team2_id_fkey" FOREIGN KEY ("team2_id") REFERENCES "teams"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "packages" ADD CONSTRAINT "packages_type_id_fkey" FOREIGN KEY ("type_id") REFERENCES "package_types"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

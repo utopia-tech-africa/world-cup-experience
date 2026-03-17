@@ -10,9 +10,23 @@ const app = express();
 
 // Security middleware
 app.use(helmet());
+
+// CORS: set CORS_ORIGIN in production to your frontend URL(s), comma-separated (no trailing slashes)
+const corsOriginRaw = process.env.CORS_ORIGIN ?? "http://localhost:3000";
+const corsOrigins = corsOriginRaw
+  .split(",")
+  .map((o) => o.trim().replace(/\/+$/, ""))
+  .filter(Boolean);
+const allowedOrigins = corsOrigins.length > 0 ? corsOrigins : ["http://localhost:3000"];
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+    origin: (requestOrigin, callback) => {
+      if (!requestOrigin) return callback(null, true);
+      const origin = requestOrigin.replace(/\/+$/, "");
+      if (allowedOrigins.includes(origin)) return callback(null, origin);
+      callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   }),
 );
