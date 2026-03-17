@@ -486,7 +486,7 @@ function BankAccountCard({
         </span>
       </div>
       {type === "local" && (
-        <div className="border border-[rgba(131,131,132,0.3)] mt-4 flex h-12 w-full items-center justify-center gap-3 rounded-[4px] px-4">
+        <div className="border border-[rgba(131,131,132,0.3)] mt-4 flex w-full items-center justify-center gap-3 rounded-[4px] p-3">
           <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-[3px]">
             {/* Static Paystack logo from local assets, matches Figma size */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -497,7 +497,7 @@ function BankAccountCard({
             />
           </span>
           <span className="font-clash text-[16px] font-semibold text-[#2a2a2a]">
-            Click to pay with Paystack
+            Local Transfer starts a secure Paystack transaction once you proceed
           </span>
         </div>
       )}
