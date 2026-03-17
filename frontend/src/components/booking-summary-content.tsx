@@ -405,7 +405,11 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
           className="w-full bg-[#354998] text-white hover:bg-[#354998]/90"
           disabled={isSubmitting || !canSubmit}
           onClick={handleSubmit}>
-          {isSubmitting ? "Confirming…" : "Confirm Reservation"}
+          {isSubmitting
+            ? "Confirming…"
+            : paymentType === "local"
+              ? "Make payment"
+              : "Confirm Reservation"}
         </Button>
       </div>
     </>
