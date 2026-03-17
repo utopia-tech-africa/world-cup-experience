@@ -99,7 +99,7 @@ export const HeroLoader: React.FC<HeroLoaderProps> = ({ onComplete }) => {
 
         {/* Percentage */}
         <motion.span
-          className="text-primary-100 text-6xl md:text-8xl lg:text-9xl xl:text-[10rem] font-general-sans font-bold tabular-nums leading-none select-none text-right min-w-[3.5ch]"
+          className="text-primary-100 text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-general-sans font-bold tabular-nums leading-none select-none text-right min-w-[5ch]"
           style={{ opacity: useTransform(mv, [0, 10, 100], [0, 1, 1]) }}
         >
           {percentage}%
