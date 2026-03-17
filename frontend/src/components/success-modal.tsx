@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /** Video path: file must live in `public/success-video.mp4` to be served at /success-video.mp4 */
-const SUCCESS_VIDEO_SRC = "/success-video.mp4";
+const SUCCESS_VIDEO_SRC = "/videos/success-video.mp4";
 
 const NEXT_STEPS = [
   "Our team is currently reviewing your payment",
@@ -42,13 +42,12 @@ export function SuccessModal({
           "max-w-[480px] overflow-hidden border-0 bg-[#101010] p-0 text-white",
           "sm:rounded-xl",
         )}
-        aria-describedby="success-modal-description"
-      >
+        aria-describedby="success-modal-description">
         {/* Video at top — Figma 117-2458 */}
-        <div className="relative aspect-video w-full bg-black">
+        <div className="relative aspect-video flex justify-center items-center w-full bg-black">
           <video
             src={SUCCESS_VIDEO_SRC}
-            className="h-full w-full object-cover"
+            className="h-full w-1/2 object-contain"
             autoPlay
             muted
             loop
@@ -63,8 +62,7 @@ export function SuccessModal({
           </DialogTitle>
           <DialogDescription
             id="success-modal-description"
-            className="text-center text-sm text-white/90"
-          >
+            className="text-center text-sm text-white/90">
             Thank you for booking your World Cup 2026 experience with Altair
             Logistics! We have received your booking and payment information.
             {bookingReference && (
@@ -90,8 +88,7 @@ export function SuccessModal({
           <DialogClose asChild>
             <Button
               asChild
-              className="mt-2 w-full rounded-md bg-[#354998] font-bold text-white hover:bg-[#354998]/90"
-            >
+              className="mt-2 w-full rounded-md bg-[#354998] font-bold text-white hover:bg-[#354998]/90">
               <Link href="/">Go Home</Link>
             </Button>
           </DialogClose>
