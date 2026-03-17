@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import {
   Html,
   Head,
@@ -36,15 +37,29 @@ export const BaseLayout = ({ previewText, children }: BaseLayoutProps) => {
           fontStyle="normal"
         />
         <Font
-          fontFamily="Cal Sans"
+          fontFamily="Syne"
           fallbackFontFamily="Helvetica"
           webFont={{
-            url: "https://fonts.gstatic.com/s/calsans/v1/some-url.woff2", // Note: Cal Sans isn't on Google Fonts, usually self-hosted or provided via CDN. User said "Cal Sans".
+            url: "https://fonts.gstatic.com",
             format: "woff2",
           }}
-          fontWeight={700}
+          fontWeight={800} // Use 700 or 800 for that "Clash" look
           fontStyle="normal"
         />
+        <style>
+          {`
+            @media (max-width: 600px) {
+              .mobile-h1 {
+                font-size: 24px !important;
+                line-height: 1.2em !important;
+              }
+              .mobile-text {
+                font-size: 13px !important;
+                line-height: 20px !important;
+              }
+            }
+          `}
+        </style>
       </Head>
       {previewText && <Preview>{previewText}</Preview>}
       <Tailwind
@@ -62,86 +77,88 @@ export const BaseLayout = ({ previewText, children }: BaseLayoutProps) => {
               },
               fontFamily: {
                 sans: ["Outfit", "sans-serif"],
-                display: ["Cal Sans", "sans-serif"],
+                display: ["Syne", "sans-serif"], // Replace "Cal Sans" with "Syne"
               },
             },
           },
         }}
       >
         <Body className="bg-white my-auto mx-auto font-sans">
-          <Container className="border border-solid border-[#eaeaea] rounded-3xl my-[40px] mx-auto p-0 w-[465px] overflow-hidden">
+          <Container className="border border-solid border-[#eaeaea] rounded-3xl my-[40px] mx-auto p-0 max-w-[700px] overflow-hidden">
             <Section className="m-0 p-0">
               <Img
                 src="https://res.cloudinary.com/dan9camhs/image/upload/v1773677776/e0b39b5f-a57c-4c76-b7f3-b646bdfe6260.webp"
                 alt="World Cup Experience"
-                width="465"
+                width="100%"
                 height="auto"
                 className="block align-middle rounded-t-[22px]"
               />
             </Section>
 
-            <Section className="px-[30px] pt-[32px] pb-[10px]">
-              {children}
-            </Section>
+            <Section className="px-[30px]">{children}</Section>
 
-            <Section className="px-[30px] py-[40px] text-center">
-              <Text className="text-slate-800 text-[16px] font-display mb-[16px]">
+            <Section className="px-[30px]  pb-[20px] text-center">
+              <Text className="text-[#777777] text-[18px] font-display mb-[3px] mobile-text">
                 Follow us
               </Text>
-              <Hr className="border-[#f1f5f9] border-t-3 my-0 mx-auto w-full" />
+              <Section
+                style={{
+                  height: "3px",
+                  width: "100%",
+                  background:
+                    "linear-gradient(to right, transparent, gray, transparent)",
+                }}
+                className="my-0 mx-auto"
+              />
 
-              <Section className="pt-[24px]">
+              <Section className="pt-[10px]">
                 <Row align="center" className="w-fit mx-auto">
                   <Column className="px-[16px]">
-                    <Link href="#">
+                    <Link href="tel:+1234567890">
                       <Img
-                        src="https://img.icons8.com/ios-glyphs/60/64748b/phone.png"
-                        width="22"
-                        height="22"
+                        src="https://img.icons8.com/ios/48/777777/phone.png"
+                        width="24"
+                        height="24"
                         alt="Phone"
-                        className="opacity-70"
+                        className="block"
                       />
                     </Link>
                   </Column>
                   <Column className="px-[16px]">
-                    <Link href="#">
+                    <Link>
                       <Img
-                        src="https://img.icons8.com/ios-glyphs/60/64748b/instagram-new.png"
-                        width="22"
-                        height="22"
+                        src="https://img.icons8.com/ios/48/777777/instagram-new.png"
+                        width="24"
+                        height="24"
                         alt="Instagram"
-                        className="opacity-70"
+                        className="block"
                       />
                     </Link>
                   </Column>
                   <Column className="px-[16px]">
-                    <Link href="#">
+                    <Link>
                       <Img
-                        src="https://img.icons8.com/ios-glyphs/60/64748b/twitterx.png"
-                        width="22"
-                        height="22"
+                        src="https://img.icons8.com/ios/48/777777/twitterx.png"
+                        width="24"
+                        height="24"
                         alt="X"
-                        className="opacity-70"
+                        className="block"
                       />
                     </Link>
                   </Column>
                   <Column className="px-[16px]">
-                    <Link href="#">
+                    <Link>
                       <Img
-                        src="https://img.icons8.com/ios-glyphs/60/64748b/youtube-play--v1.png"
-                        width="22"
-                        height="22"
+                        src="https://img.icons8.com/ios/48/777777/youtube-play.png"
+                        width="24"
+                        height="24"
                         alt="YouTube"
-                        className="opacity-70"
+                        className="block"
                       />
                     </Link>
                   </Column>
                 </Row>
               </Section>
-
-              <Text className="text-[#94a3b8] text-[11px] mt-[32px] leading-[24px]">
-                © {new Date().getFullYear()} Altair Team. All rights reserved.
-              </Text>
             </Section>
           </Container>
         </Body>
@@ -149,3 +166,10 @@ export const BaseLayout = ({ previewText, children }: BaseLayoutProps) => {
     </Html>
   );
 };
+
+BaseLayout.PreviewProps = {
+  previewText: "Your World Cup booking request has been received.",
+  children: <Text>Hello</Text>,
+} as BaseLayoutProps;
+
+export default BaseLayout;
