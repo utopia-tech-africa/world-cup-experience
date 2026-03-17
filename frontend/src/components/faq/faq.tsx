@@ -13,43 +13,43 @@ const faqs = [
   {
     question: "What is included in the World Cup Experience package?",
     answer:
-      "Our packages typically include match tickets, premium accommodation, airport transfers, city tours, and exclusive fan experiences tailored to each host city.",
+      "The World Cup Experience package includes transportation to all scheduled matches as well as access to all organized tours during your stay; however, tickets for specific attractions on these tours must be purchased separately. Match tickets are not included, but assistance will be provided to help you acquire them. Please also note that all travelers are required to have a valid visa to participate in the package.",
   },
   {
     question:
       "What is the difference between the Single Game and Double Game packages?",
     answer:
-      "Single Game packages focus on one specific match and city, while Double Game packages offer a longer stay spanning two matches and potentially multiple host cities with more extensive travel arrangements.",
+      "The difference between the Single Game, Double Game, and Triple Game packages comes down to both the number of matches and the length of your stay: the Single Game package includes access to one match with a 4-night stay, the Double Game package covers two matches with a 7-night stay, and the Triple Game package includes three matches with an extended 13-night stay, all while offering the same transportation, tour access, and support services across each option.",
   },
   {
     question: "Are match tickets included in the package?",
     answer:
-      "Yes, guaranteed official match tickets are a core part of all our World Cup Experience hosting packages.",
+      "Match tickets are not included in the package; however, assistance will be provided to help you acquire them.",
   },
   {
     question: "What accommodation options are available?",
     answer:
-      "We offer a range of options from premium hostels for the budget-conscious fan to luxury 5-star hotels for those seeking ultimate comfort.",
+      "Accommodation options include both hostel and hotel stay: the hotel option offers double occupancy rooms, while the hostel option involves shared accommodation with other attendees.",
   },
   {
     question: "Can I choose between a single room or a shared room?",
     answer:
-      "Yes, we provide both single and shared room options depending on your preference and the specific package selected.",
+      "Room options depend on the type of accommodation selected: hotel stays are based on double occupancy, meaning rooms are shared by two people, while hostel accommodations are shared with multiple attendees; single rooms are not part of the standard package.",
   },
   {
     question: "What activities are included in the experience days?",
     answer:
-      "Experience days include guided city tours, visits to iconic landmarks, fan fest attendance, and curated local dining experiences.",
+      "The experience days feature guided tours of Philadelphia landmarks, excursions to Hershey Park, and shopping trips to the King of Prussia and Premium Outlets. While professional guides and transportation are included in the package, you will have to purchase your own tickets on arrival to any of the tour sites.",
   },
   {
     question: "Are airport transfers included?",
     answer:
-      "Yes, we provide seamless airport transfers to and from your accommodation in all host cities included in your package.",
+      "Yes, airport transfers are included. Each package provides comprehensive ground transportation, which covers your arrival from the airport to your accommodation and your return for departure.",
   },
   {
     question: "Can I upgrade my package?",
     answer:
-      "Absolutely. You can upgrade your accommodation, add more match tickets, or include extra days and activities to your itinerary subject to availability.",
+      "Yes, you can upgrade your package. Altair Logistics & Hospitality offers several tiers, allowing you to move from the Essential (Hostel) package to the Signature (Hotel) packages. Upgrades typically include moving from shared hostel accommodations to private hotel rooms, adding additional match-day experiences, or switching from a single-game to a double-game package. Please contact the team directly to check availability and pay the price difference",
   },
 ];
 
