@@ -115,7 +115,12 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
     });
 
   const addOnsTotal = addOnItems.reduce((sum, item) => sum + item.lineTotal, 0);
-  const totalAmount = packagePriceTotal + addOnsTotal;
+  const baseTotalAmount = packagePriceTotal + addOnsTotal;
+
+  const PAYSTACK_MARKUP_RATE = 0.0195;
+  const paystackMarkup = Math.round(baseTotalAmount * PAYSTACK_MARKUP_RATE * 100) / 100;
+  const paystackChargeAmount = Math.round((baseTotalAmount + paystackMarkup) * 100) / 100;
+  const totalAmount = baseTotalAmount;
 
   const isSubmitting =
     uploadFileMutation.isPending ||
@@ -219,7 +224,7 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
       // Amount is in USD; backend converts to GHS using FX API before sending to Paystack
       const initResult = await initPaystackMutation.mutateAsync({
         email: store.email.trim(),
-        amount: totalAmount,
+        amount: paystackChargeAmount,
         currency: "USD",
         bookingReference: bookingResult.bookingReference,
       });
@@ -338,9 +343,17 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
 
         {/* Total amount — Figma 117-2013: light gray bar, label muted, price bold dark */}
         <section className="flex items-center justify-between rounded-lg bg-gray-100 px-4 py-4 sm:px-5 sm:py-5">
-          <span className="text-muted-foreground font-clash text-base font-medium sm:text-lg">
-            Total Amount
-          </span>
+          <div className="flex flex-col">
+            <span className="text-muted-foreground font-clash text-base font-medium sm:text-lg">
+              Total Amount
+            </span>
+            {paymentType === "local" && paystackMarkup > 0 ? (
+              <span className="text-muted-foreground text-xs">
+                Paystack amount ({(PAYSTACK_MARKUP_RATE * 100).toFixed(2)}% fee): $
+                {paystackChargeAmount.toLocaleString()}
+              </span>
+            ) : null}
+          </div>
           <span className="font-clash text-foreground text-2xl font-bold sm:text-3xl">
             ${totalAmount.toLocaleString()}
           </span>
