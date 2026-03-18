@@ -4,25 +4,38 @@ import { WTWCLogoWhite, FooterBgImg } from "@/assets";
 import { ArrowUpRight, Facebook, Instagram, Youtube } from "lucide-react";
 import ComponentLayout from "../component-layout";
 import { cn } from "@/lib/utils";
+import { PiTiktokLogoLight } from "react-icons/pi";
 
 const leftLinks = [
-  { label: "PACKAGES", href: "#" },
-  { label: "TORONTO", href: "#" },
-  { label: "EXPERIENCE", href: "#" },
-  { label: "CORPORATE", href: "#" },
+  { label: "PACKAGES", href: "#packages" },
+  { label: "TOTAL", href: "#total-package" },
+  { label: "EXPERIENCE", href: "#explore" },
+  { label: "CORPORATE", href: "tel:+233200894547" },
 ];
 
 const rightLinks = [
-  { label: "PHONE", href: "#" },
+  { label: "PHONE", href: "tel:0257554514" },
   { label: "EMAIL", href: "#" },
   { label: "TERMS OF SERVICE", href: "#" },
   { label: "PRIVACY POLICY", href: "#" },
 ];
 
 const socialLinks = [
-  { label: "Facebook", icon: Facebook, href: "#" },
-  { label: "Instagram", icon: Instagram, href: "#" },
-  { label: "Youtube", icon: Youtube, href: "#" },
+  {
+    label: "Facebook",
+    icon: Facebook,
+    href: "https://web.facebook.com/profile.php?id=61585047495195",
+  },
+  {
+    label: "Instagram",
+    icon: Instagram,
+    href: "https://www.instagram.com/watch_theworldcup/",
+  },
+  {
+    label: "Tiktok",
+    icon: PiTiktokLogoLight,
+    href: "https://www.tiktok.com/@watchtheworldcup?_r=1&_t=ZS-94nJbvlzHTM",
+  },
 ];
 
 export default function Footer() {
@@ -135,6 +148,7 @@ const Socials = ({ className }: { className?: string }) => {
               key={social.label}
               href={social.href}
               className="group flex items-center gap-2 transition-colors hover:text-neutral-200"
+              target="_blank"
             >
               <Icon className="w-[18px] h-[18px]" />
               <span className="font-helvetica text-lg">{social.label}</span>

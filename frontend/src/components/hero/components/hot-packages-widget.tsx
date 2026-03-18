@@ -54,9 +54,9 @@ export const HotPackagesWidget = () => {
 
       {/* Button */}
       <Link
-        href="/#packages"
+        href="/#total-package"
         onClick={() => {
-          document.getElementById("packages")?.scrollIntoView({
+          document.getElementById("total-package")?.scrollIntoView({
             behavior: "smooth",
           });
         }}

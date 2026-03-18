@@ -11,11 +11,14 @@ type TotalPackageBannerProps = {
   onBook?: () => void;
 };
 
-export const TotalPackageBanner = ({ matches, onBook }: TotalPackageBannerProps) => {
+export const TotalPackageBanner = ({
+  matches,
+  onBook,
+}: TotalPackageBannerProps) => {
   return (
-    <div className="flex flex-col-reverse lg:flex-row gap-5">
+    <div className="flex flex-col-reverse lg:flex-row gap-5" id="total-package">
       {/* Total Package Left info */}
-      <div className="relative overflow-hidden lg:w-[50%] p-4 sm:p-8 flex flex-col justify-between text-white bg-primary-200 rounded-bl-[60px]">
+      <div className="relative overflow-hidden lg:w-[50%] p-4 sm:p-8 flex flex-col justify-between text-white bg-primary-200 rounded-bl-[40px] sm:rounded-bl-[60px]">
         {/* Background pattern inside the red block */}
         <TotalPackageBg className="absolute size-[1000px]  -top-50 -left-50 pointer-events-none" />
 
@@ -26,7 +29,7 @@ export const TotalPackageBanner = ({ matches, onBook }: TotalPackageBannerProps)
             Package
           </h3>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3 sm:gap-6">
             <div className="flex items-center gap-2  text-base sm:text-lg font-clash tracking-wider text-nowrap">
               <div className="size-1.5 bg-white" /> Three matches
             </div>

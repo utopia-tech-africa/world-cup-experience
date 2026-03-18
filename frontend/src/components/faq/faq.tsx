@@ -57,7 +57,7 @@ export default function FAQ() {
   return (
     <section className="py-20 md:py-32 relative overflow-hidden bg-white">
       {/* Background Decorative Pattern */}
-      <div className="absolute top-1/2 -translate-y-1/2 left-0 w-32 md:w-48 opacity-30 md:opacity-70 pointer-events-none">
+      <div className="absolute top-1/2 -translate-y-1/2 left-0 w-32 md:w-48 opacity-0 md:opacity-70 pointer-events-none">
         <Image src={FaqBgPattern} alt="" className="w-full h-auto" />
       </div>
 
