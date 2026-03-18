@@ -59,7 +59,7 @@ export const Packages = () => {
   }
 
   return (
-    <section className="py-20 md:py-32 relative overflow-hidden">
+    <section className="py-20 md:py-32 relative overflow-hidden" id="packages">
       {/* Decorative Grid Lines and Nodes */}
       <div className="absolute inset-0 pointer-events-none z-0">
         {/* Continuous Grid Lines (framing the content) */}
