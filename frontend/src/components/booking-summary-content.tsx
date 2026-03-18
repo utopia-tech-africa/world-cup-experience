@@ -29,11 +29,10 @@ export type BookingSummaryData = {
 };
 
 const INTERNATIONAL_ACCOUNT = {
-  title: "Altair Logistics - International Account",
-  bank: "Intl. Bank of Commerce",
-  swiftCode: "IBCOUS33XXX",
-  iban: "US12 3456 7890 1234 5678 90",
-  accountName: "Altair Logistics LLC",
+  title: "Altair Logistics, Inc",
+  bank: "Chase Bank",
+  accountNumber: "2907195358",
+  routingNumber: "021000021",
 };
 
 const ACCEPTED_FORMATS = "JPG, PNG, WEBP, PDF (Max 10MB)";
@@ -116,7 +115,12 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
     });
 
   const addOnsTotal = addOnItems.reduce((sum, item) => sum + item.lineTotal, 0);
-  const totalAmount = packagePriceTotal + addOnsTotal;
+  const baseTotalAmount = packagePriceTotal + addOnsTotal;
+
+  const PAYSTACK_MARKUP_RATE = 0.0195;
+  const paystackMarkup = Math.round(baseTotalAmount * PAYSTACK_MARKUP_RATE * 100) / 100;
+  const paystackChargeAmount = Math.round((baseTotalAmount + paystackMarkup) * 100) / 100;
+  const totalAmount = baseTotalAmount;
 
   const isSubmitting =
     uploadFileMutation.isPending ||
@@ -220,7 +224,7 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
       // Amount is in USD; backend converts to GHS using FX API before sending to Paystack
       const initResult = await initPaystackMutation.mutateAsync({
         email: store.email.trim(),
-        amount: totalAmount,
+        amount: paystackChargeAmount,
         currency: "USD",
         bookingReference: bookingResult.bookingReference,
       });
@@ -249,7 +253,8 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
             <BankAccountCard
               title="Pay with Paystack (Local)"
               bank=""
-              accountName=""
+              accountNumber={undefined}
+              routingNumber={undefined}
               type="local"
               selected={paymentType === "local"}
               onSelect={() => setPaymentType("local")}
@@ -338,9 +343,17 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
 
         {/* Total amount — Figma 117-2013: light gray bar, label muted, price bold dark */}
         <section className="flex items-center justify-between rounded-lg bg-gray-100 px-4 py-4 sm:px-5 sm:py-5">
-          <span className="text-muted-foreground font-clash text-base font-medium sm:text-lg">
-            Total Amount
-          </span>
+          <div className="flex flex-col">
+            <span className="text-muted-foreground font-clash text-base font-medium sm:text-lg">
+              Total Amount
+            </span>
+            {paymentType === "local" && paystackMarkup > 0 ? (
+              <span className="text-muted-foreground text-xs">
+                Paystack amount ({(PAYSTACK_MARKUP_RATE * 100).toFixed(2)}% fee): $
+                {paystackChargeAmount.toLocaleString()}
+              </span>
+            ) : null}
+          </div>
           <span className="font-clash text-foreground text-2xl font-bold sm:text-3xl">
             ${totalAmount.toLocaleString()}
           </span>
@@ -405,7 +418,11 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
           className="w-full bg-[#354998] text-white hover:bg-[#354998]/90"
           disabled={isSubmitting || !canSubmit}
           onClick={handleSubmit}>
-          {isSubmitting ? "Confirming…" : "Confirm Reservation"}
+          {isSubmitting
+            ? "Confirming…"
+            : paymentType === "local"
+              ? "Make payment"
+              : "Confirm Reservation"}
         </Button>
       </div>
     </>
@@ -429,18 +446,16 @@ function DetailRow({ label, value }: { label: string; value?: string }) {
 function BankAccountCard({
   title,
   bank,
-  accountName,
-  swiftCode,
-  iban,
+  accountNumber,
+  routingNumber,
   type,
   selected,
   onSelect,
 }: {
   title: string;
   bank?: string;
-  accountName?: string;
-  swiftCode?: string;
-  iban?: string;
+  accountNumber?: string;
+  routingNumber?: string;
   type: "local" | "international";
   selected: boolean;
   onSelect: () => void;
@@ -482,7 +497,7 @@ function BankAccountCard({
         </span>
       </div>
       {type === "local" && (
-        <div className="border border-[rgba(131,131,132,0.3)] mt-4 flex h-12 w-full items-center justify-center gap-3 rounded-[4px] px-4">
+        <div className="border border-[rgba(131,131,132,0.3)] mt-4 flex w-full items-center justify-center gap-3 rounded-[4px] p-3">
           <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-[3px]">
             {/* Static Paystack logo from local assets, matches Figma size */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -493,21 +508,18 @@ function BankAccountCard({
             />
           </span>
           <span className="font-clash text-[16px] font-semibold text-[#2a2a2a]">
-            Click to pay with Paystack
+            Local Transfer starts a secure Paystack transaction once you proceed
           </span>
         </div>
       )}
       {/* Account / instructions — only show bank details for international transfers */}
       {isInternational && (
         <>
-          <p className="font-helvetica text-center text-sm font-medium leading-tight text-[#2a2a2a]">
-            {title}
-          </p>
           <dl className="flex flex-col gap-2">
+            <DetailRow label="Name:" value={title} />
             <DetailRow label="Bank:" value={bank} />
-            <DetailRow label="Swift Code:" value={swiftCode} />
-            <DetailRow label="IBAN:" value={iban} />
-            <DetailRow label="Account Name:" value={accountName} />
+            <DetailRow label="Account number:" value={accountNumber} />
+            <DetailRow label="Routing number:" value={routingNumber} />
           </dl>
         </>
       )}

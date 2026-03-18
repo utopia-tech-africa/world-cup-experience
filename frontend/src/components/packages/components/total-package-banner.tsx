@@ -1,9 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { TotalPackageMatches } from "./total-package-matches";
-import { Button } from "@/components/ui/button";
 import { TotalPackageBg } from "@/assets/svg";
+import { MaskRevealButton } from "../../mask-reveal-button";
 import type { Match } from "@/components/games/data/games-data";
 
 type TotalPackageBannerProps = {
@@ -50,17 +49,22 @@ export const TotalPackageBanner = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-5 mt-14  relative z-10 mx-auto md:mx-0">
-          <Button
-            type="button"
+        <div className="flex items-center gap-2 sm:gap-5 mt-14 relative z-10 mx-auto md:mx-0">
+          <MaskRevealButton
             onClick={onBook}
-            className="rounded-none rounded-bl-3xl bg-white text-primary-200 px-3 sm:px-6 py-5  font-bold text-lg font-helvetica transition-all hover:bg-transparent hover:text-white hover:border-white cursor-pointer "
+            className="rounded-bl-3xl font-bold px-3 sm:px-6 py-5"
+            hoverBgClass="bg-primary-200"
+            textClassName="text-primary-200"
           >
             Book now
-          </Button>
-          <Button className="rounded-none bg-white text-primary-200 px-3 sm:px-6 py-5 text-lg font-helvetica transition-all hover:bg-transparent hover:text-white hover:border-white cursor-pointer ">
+          </MaskRevealButton>
+          <MaskRevealButton
+            className="px-3 sm:px-6 py-5"
+            hoverBgClass="bg-primary-200"
+            textClassName="text-primary-200"
+          >
             Corporate packages
-          </Button>
+          </MaskRevealButton>
         </div>
       </div>
 
