@@ -59,7 +59,7 @@ export const Packages = () => {
   }
 
   return (
-    <section className="py-20 md:py-32 relative overflow-hidden" id="packages">
+    <section className="py-20 md:py-32 relative overflow-hidden">
       {/* Decorative Grid Lines and Nodes */}
       <div className="absolute inset-0 pointer-events-none z-0">
         {/* Continuous Grid Lines (framing the content) */}
@@ -113,7 +113,7 @@ export const Packages = () => {
 
           <div className="w-full h-px bg-neutral-300/50" />
           {/* Grid of Standard Packages */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 ">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4" id="packages">
             {gridOffers.map((offer, idx) => (
               <PackageCard
                 key={offer.id}

@@ -79,7 +79,7 @@ export function Hero() {
           muted
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
-          src="/videos/altair-landing-page-video.mp4"
+          src="https://res.cloudinary.com/dan9camhs/video/upload/v1773839084/altair-landing-page-video_wap37p.mp4"
         />
       </div>
 
