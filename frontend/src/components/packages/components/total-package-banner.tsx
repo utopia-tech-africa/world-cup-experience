@@ -4,6 +4,7 @@ import { TotalPackageMatches } from "./total-package-matches";
 import { TotalPackageBg } from "@/assets/svg";
 import { MaskRevealButton } from "../../mask-reveal-button";
 import type { Match } from "@/components/games/data/games-data";
+import Link from "next/link";
 
 type TotalPackageBannerProps = {
   matches: Match[];
@@ -58,13 +59,16 @@ export const TotalPackageBanner = ({
           >
             Book now
           </MaskRevealButton>
-          <MaskRevealButton
-            className="px-3 sm:px-6 py-5"
-            hoverBgClass="bg-primary-200"
-            textClassName="text-primary-200"
-          >
-            Corporate packages
-          </MaskRevealButton>
+
+          <Link href="tel:+233200894547">
+            <MaskRevealButton
+              className="px-3 sm:px-6 py-5"
+              hoverBgClass="bg-primary-200"
+              textClassName="text-primary-200"
+            >
+              Corporate packages
+            </MaskRevealButton>
+          </Link>
         </div>
       </div>
 

@@ -14,6 +14,9 @@ import ExploreImg5 from "./explore-img-5.webp";
 import BookImg from "./book-img.webp";
 import FooterBgImg from "./footer-bg-img.webp";
 import CupBgImg from "./cup-bg-img.webp";
+import TotalPackageRoomBg from "./total-package-room-bg.webp";
+import HotelRoomBg from "./hotel-room-bg.webp";
+import HostelRoomBg from "./hostel-room-bg.webp";
 
 export {
   heroBgImg,
@@ -32,4 +35,7 @@ export {
   BookImg,
   FooterBgImg,
   CupBgImg,
+  TotalPackageRoomBg,
+  HotelRoomBg,
+  HostelRoomBg,
 };
