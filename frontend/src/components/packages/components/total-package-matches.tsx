@@ -1,20 +1,41 @@
 "use client";
 
 import Image from "next/image";
-import { totalPackageGameCardBg } from "@/assets/img";
+import { useState } from "react";
+import { totalPackageGameCardBg, TotalPackageRoomBg } from "@/assets/img";
 import { cn } from "@/lib/utils";
 import type { Match } from "@/components/games/data/games-data";
 
 export const TotalPackageMatches = ({ matches }: { matches: Match[] }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <div className="w-full  relative flex flex-col p-5 overflow-hidden items-center justify-center text-white">
-      {/* Stadium background */}
-      <Image
-        src={totalPackageGameCardBg}
-        alt="Stadium"
-        fill
-        className="object-cover opacity-80 z-0 scale-110"
-      />{" "}
+    <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="w-full relative flex flex-col p-5 overflow-hidden items-center justify-center text-white cursor-pointer"
+    >
+      {/* Background Images */}
+      <div className="absolute inset-0 z-0 scale-110 overflow-hidden">
+        <Image
+          src={totalPackageGameCardBg}
+          alt="Stadium"
+          fill
+          className={cn(
+            "object-cover opacity-80 transition-opacity duration-700 ease-in-out",
+            isHovered ? "opacity-0" : "opacity-80",
+          )}
+        />
+        <Image
+          src={TotalPackageRoomBg}
+          alt="Room"
+          fill
+          className={cn(
+            "object-cover transition-opacity duration-700 ease-in-out",
+            isHovered ? "opacity-80" : "opacity-0",
+          )}
+        />
+      </div>{" "}
       <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-black/70" />
       {/* Content Overlay */}
       <div className="relative z-20 flex flex-col gap-6 w-full max-w-3xl">
