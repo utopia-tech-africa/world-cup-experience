@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ghanaFlag, croatiaFlag, englandFlag } from "@/assets";
+import { ghanaFlag, croatiaFlag, englandFlag, PanamaFlag } from "@/assets";
 import { MaskRevealButton } from "../../mask-reveal-button";
 import Link from "next/link";
 
@@ -46,7 +46,7 @@ export const HotPackagesWidget = () => {
         </div>
 
         <div className="flex gap-4">
-          <TeamItem flag={croatiaFlag} name="Croatia" />
+          <TeamItem flag={PanamaFlag} name="Panama" />
           <TeamItem flag={englandFlag} name="England" />
           <TeamItem flag={croatiaFlag} name="Croatia" />
         </div>
