@@ -5,6 +5,7 @@ import doubleGameCardBg from "./double-game-card-bg.webp";
 import ghanaFlag from "./ghana-flag.webp";
 import croatiaFlag from "./croatia-flag.webp";
 import englandFlag from "./england-flag.webp";
+import PanamaFlag from "./panama-flag.webp";
 import FifaFinfestImg from "./fifa-finfest-img.webp";
 import ExploreImg1 from "./explore-img-1.webp";
 import ExploreImg2 from "./explore-img-2.webp";
@@ -38,4 +39,5 @@ export {
   TotalPackageRoomBg,
   HotelRoomBg,
   HostelRoomBg,
+  PanamaFlag,
 };
