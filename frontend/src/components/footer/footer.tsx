@@ -1,10 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { WTWCLogoWhite, FooterBgImg } from "@/assets";
-import { ArrowUpRight, Facebook, Instagram, Youtube } from "lucide-react";
+import {
+  ArrowUpRight,
+  Facebook,
+  Instagram,
+  LocateIcon,
+  Youtube,
+} from "lucide-react";
 import ComponentLayout from "../component-layout";
 import { cn } from "@/lib/utils";
 import { PiTiktokLogoLight } from "react-icons/pi";
+import { FaLocationDot } from "react-icons/fa6";
 
 const leftLinks = [
   { label: "PACKAGES", href: "#packages" },
@@ -80,6 +87,7 @@ export default function Footer() {
           <div className=" hidden md:flex flex-col items-center justify-start lg:w-2/4 gap-12 ">
             <CenterLogo />
             <Socials />
+            <OfficeAdress />
           </div>
 
           {/* Right Links */}
@@ -99,6 +107,7 @@ export default function Footer() {
           </div>
 
           <Socials className="md:hidden items-start" />
+          <OfficeAdress className="md:hidden items-start mt-4" />
         </div>
 
         {/* Bottom Copyright */}
@@ -157,5 +166,25 @@ const Socials = ({ className }: { className?: string }) => {
         })}
       </div>
     </div>
+  );
+};
+
+const OfficeAdress = ({ className }: { className?: string }) => {
+  return (
+    <Link
+      href="https://maps.app.goo.gl/43ktFiwd7jFqe6fD6"
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn(
+        `group flex items-center justify-start md:justify-center lg:justify-end gap-3 w-fit ${className}`,
+      )}
+    >
+      <FaLocationDot className="w-[18px] h-[18px]" />
+      <address className="not-italic font-clash font-medium text-sm md:text-base lg:text-lg text-neutral-200 group-hover:text-white transition-colors text-left md:text-center lg:text-right leading-snug">
+        No. 21 Nii Adjei Onano Street{""}
+        <br />
+        East Legon, Accra - Ghana
+      </address>
+    </Link>
   );
 };
