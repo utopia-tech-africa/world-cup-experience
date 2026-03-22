@@ -60,7 +60,7 @@ export const TotalPackageBanner = ({
             Book now
           </MaskRevealButton>
 
-          <Link href="tel:+233200894547">
+          <Link href="tel:+233593679741">
             <MaskRevealButton
               className="px-3 sm:px-6 py-5"
               hoverBgClass="bg-primary-200"
