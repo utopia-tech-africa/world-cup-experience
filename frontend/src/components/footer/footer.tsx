@@ -14,7 +14,7 @@ const leftLinks = [
 ];
 
 const rightLinks = [
-  { label: "PHONE", href: "tel:593679741" },
+  { label: "PHONE", href: "tel:+233593679741" },
   { label: "EMAIL", href: "#" },
   { label: "TERMS OF SERVICE", href: "#" },
   { label: "PRIVACY POLICY", href: "#" },
