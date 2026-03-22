@@ -10,11 +10,11 @@ const leftLinks = [
   { label: "PACKAGES", href: "#packages" },
   { label: "TOTAL", href: "#total-package" },
   { label: "EXPERIENCE", href: "#explore" },
-  { label: "CORPORATE", href: "tel:+233200894547" },
+  { label: "CORPORATE", href: "tel:+233593679741" },
 ];
 
 const rightLinks = [
-  { label: "PHONE", href: "tel:0257554514" },
+  { label: "PHONE", href: "tel:+233593679741" },
   { label: "EMAIL", href: "#" },
   { label: "TERMS OF SERVICE", href: "#" },
   { label: "PRIVACY POLICY", href: "#" },
