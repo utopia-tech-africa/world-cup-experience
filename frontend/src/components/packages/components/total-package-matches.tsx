@@ -47,7 +47,7 @@ export const TotalPackageMatches = ({ matches }: { matches: Match[] }) => {
             )}
           >
             {" "}
-            13 nights (Tripple game)
+            13 nights (Triple game)
           </span>
         </div>
 
