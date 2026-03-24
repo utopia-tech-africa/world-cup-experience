@@ -18,6 +18,10 @@ import CupBgImg from "./cup-bg-img.webp";
 import TotalPackageRoomBg from "./total-package-room-bg.webp";
 import HotelRoomBg from "./hotel-room-bg.webp";
 import HostelRoomBg from "./hostel-room-bg.webp";
+import IvoryCoastFlag from "./ivory-coast-flag.webp";
+import EcuadorFlag from "./ecuador-flag.webp";
+import GermanyFlag from "./germany-flag.webp";
+import CuracaoFlag from "./curacao-flag.webp";
 
 export {
   heroBgImg,
@@ -40,4 +44,8 @@ export {
   HotelRoomBg,
   HostelRoomBg,
   PanamaFlag,
+  IvoryCoastFlag,
+  EcuadorFlag,
+  GermanyFlag,
+  CuracaoFlag,
 };
