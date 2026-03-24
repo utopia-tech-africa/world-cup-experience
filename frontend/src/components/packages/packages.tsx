@@ -40,21 +40,24 @@ export const Packages = () => {
   /** Derive packageName and duration from GameOffer.type (e.g. "13 nights (Triple game)"). */
   function getTripSummaryFromOffer(offer: GameOffer) {
     const match = offer.type.match(/^(.+?)\s*\((.+)\)\s*$/);
-    const duration =
-      match?.[1]?.trim() ??
-      (offer.matches.length >= 3
+    const fallbackDuration =
+      offer.matches.length >= 3
         ? "13 nights"
         : offer.matches.length > 1
           ? "7 nights"
-          : "4 nights");
+          : "4 nights";
+    const duration =
+      offer.duration?.trim() ?? match?.[1]?.trim() ?? fallbackDuration;
     const typeLabel = match?.[2]?.trim() ?? "";
-    const packageName = typeLabel.toLowerCase().includes("triple")
-      ? "Triple Game"
-      : typeLabel.toLowerCase().includes("double")
-        ? "Double Game"
-        : typeLabel.toLowerCase().includes("quad")
-          ? "Quad Game"
-          : "One Game";
+    const packageName =
+      offer.packageName?.trim() ||
+      (typeLabel.toLowerCase().includes("triple")
+        ? "Triple Game"
+        : typeLabel.toLowerCase().includes("double")
+          ? "Double Game"
+          : typeLabel.toLowerCase().includes("quad")
+            ? "Quad Game"
+            : "One Game");
     return { packageName, duration };
   }
 
@@ -101,6 +104,15 @@ export const Packages = () => {
           {/* Total Package Banner Section */}
           <TotalPackageBanner
             matches={tripleMatches}
+            cityCount={tripleOffer?.cityCount ?? 3}
+            nights={
+              (() => {
+                const fromDuration = tripleOffer?.duration?.match(/(\d+)/)?.[1];
+                const fromType = tripleOffer?.type.match(/(\d+)\s*nights?/i)?.[1];
+                return Number(fromDuration ?? fromType ?? 13);
+              })()
+            }
+            includedItems={tripleOffer?.includedItems ?? []}
             onBook={() => {
               if (!tripleOffer) return;
               const { packageName, duration } =

@@ -58,12 +58,40 @@ export interface BookingPackage {
   nights?: number;
   hostelPrice: number;
   hotelPrice: number;
+  threeStarHotelPrice?: number;
+  fourStarHotelPrice?: number;
+  cityCount?: number;
+  includedItems?: string[];
   displayOrder: number;
   isActive: boolean;
   /** Games nested when fetching packages (public GET /api/packages) */
   games?: PublicGame[];
   /** Game IDs linked to this package (admin API only; used when creating/editing) */
   gameIds?: string[];
+  comparisonOptions?: PackageComparisonOption[];
+}
+
+export type PackageComparisonTier = 'three_star' | 'four_star';
+
+export interface PackageComparisonFeature {
+  id?: string;
+  lineKey: string;
+  title: string;
+  description?: string;
+  iconKey?: string;
+  displayOrder?: number;
+}
+
+export interface PackageComparisonOption {
+  id?: string;
+  tier: PackageComparisonTier;
+  label: string;
+  price: number;
+  roomLabel?: string;
+  imageUrl?: string;
+  ctaLabel?: string;
+  displayOrder?: number;
+  features: PackageComparisonFeature[];
 }
 
 export interface Package {
