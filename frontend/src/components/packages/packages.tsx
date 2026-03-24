@@ -29,8 +29,10 @@ import {
   EcuadorFlag,
   GermanyFlag,
   CuracaoFlag,
+  PackageBgImg,
 } from "@/assets/img";
 import { SINGLE_MATCH, DOUBLE_MATCHES } from "./data/packages-data";
+import Image from "next/image";
 
 const BLACK_STAR_MATCHES = [
   {
@@ -211,7 +213,7 @@ export const Packages = () => {
             ]}
             badgePackageType="13 nights (Triple game)"
             bgPattern={PackageBgPattern1}
-            bgColorClass="bg-primary-200"
+            bgColorClass="bg-primary-600"
             gameCardBg={totalPackageGameCardBg}
             roomBg={TotalPackageRoomBg}
             matches={BLACK_STAR_MATCHES as unknown as Match[]}
@@ -252,7 +254,7 @@ export const Packages = () => {
             ]}
             badgePackageType="7 nights (Double game)"
             bgPattern={PackageBgPattern1}
-            bgColorClass="bg-primary-200"
+            bgColorClass="bg-primary-600"
             gameCardBg={doubleGameCardBg}
             roomBg={HotelRoomBg}
             matches={MIENU_MATCHES as unknown as Match[]}
@@ -292,8 +294,8 @@ export const Packages = () => {
               "Shopping mall trips",
             ]}
             badgePackageType="13 nights (Triple game)"
-            bgPattern={PackageBgPattern2}
-            bgColorClass="bg-primary-100"
+            bgPattern={PackageBgImgComponent}
+            bgColorClass="bg-primary-700"
             gameCardBg={totalPackageGameCardBg}
             roomBg={TotalPackageRoomBg}
             matches={ELEPHANT_MATCHES as unknown as Match[]}
@@ -333,8 +335,8 @@ export const Packages = () => {
               "Shopping mall trips",
             ]}
             badgePackageType="7 nights (Double game)"
-            bgPattern={PackageBgPattern2}
-            bgColorClass="bg-primary-100"
+            bgPattern={PackageBgImgComponent}
+            bgColorClass="bg-primary-700"
             gameCardBg={doubleGameCardBg}
             roomBg={HotelRoomBg}
             matches={DEUX_MATCHES as unknown as Match[]}
@@ -359,3 +361,15 @@ export const Packages = () => {
     </section>
   );
 };
+
+const PackageBgImgComponent = () => (
+  <div className="absolute inset-0 overflow-hidden">
+    <Image
+      src={PackageBgImg}
+      alt="Package Background"
+      fill
+      className="object-cover opacity-80"
+    />
+    <div className="absolute inset-0 bg-primary-100 opacity-90 mix-blend-multiply" />
+  </div>
+);

@@ -22,6 +22,7 @@ import IvoryCoastFlag from "./ivory-coast-flag.webp";
 import EcuadorFlag from "./ecuador-flag.webp";
 import GermanyFlag from "./germany-flag.webp";
 import CuracaoFlag from "./curacao-flag.webp";
+import PackageBgImg from "./package-bg-img.webp";
 
 export {
   heroBgImg,
@@ -48,4 +49,5 @@ export {
   EcuadorFlag,
   GermanyFlag,
   CuracaoFlag,
+  PackageBgImg,
 };

@@ -29,7 +29,7 @@ export const TotalPackageMatches = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "w-full relative flex flex-col p-5 overflow-hidden items-center justify-center text-white cursor-pointer",
+        "w-full relative flex flex-col p-5 overflow-hidden items-center justify-center text-white cursor-pointer lg:w-[50%] align-start",
         className,
       )}
     >
@@ -55,20 +55,19 @@ export const TotalPackageMatches = ({
         />
       </div>{" "}
       <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-black/70" />
-      {/* Content Overlay */}
-      <div className="relative z-20 flex flex-col gap-6 w-full max-w-3xl">
-        {/* Badge */}
-        <div className="mb-2">
-          <span
-            className={cn(
-              "inline-block px-4 py-1.5 rounded font-clash tracking-wider shadow-lg bg-primary-100",
-              badgeClassName,
-            )}
-          >
-            {packageType}
-          </span>
-        </div>
-
+      {/* Badge moved to top corner */}
+      <div className="absolute top-5 left-5 md:top-8 md:left-8 z-30">
+        <span
+          className={cn(
+            "inline-block px-4 py-1.5 rounded font-clash tracking-wider shadow-lg bg-primary-100",
+            badgeClassName,
+          )}
+        >
+          {packageType}
+        </span>
+      </div>
+      {/* Content Overlay (Matches) */}
+      <div className="relative z-20 flex flex-col gap-6 w-full max-w-3xl pt-14">
         {/* Match Details List */}
         <div className="flex flex-col gap-4">
           {matches.map((match, idx) => (

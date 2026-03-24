@@ -42,7 +42,7 @@ export const PackageDetails = ({
   return (
     <div
       className={cn(
-        "relative overflow-hidden lg:w-[70%] p-4 sm:p-8 flex flex-col justify-between text-white rounded-bl-[40px] sm:rounded-bl-[60px]",
+        "relative overflow-hidden lg:w-[50%] p-4 sm:p-8 flex flex-col justify-between text-white rounded-bl-[40px] sm:rounded-bl-[60px]",
         bgColorClass,
       )}
     >
@@ -87,19 +87,21 @@ export const PackageDetails = ({
       </div>
 
       {pricing && (
-        <div className="relative z-10 flex flex-col items-center gap-2 mt-8 ">
+        <div className="relative z-10 flex flex-col items-center gap-2 mt-4 ">
           <div className="flex justify-center gap-8">
             {pricing.options.map((opt, i) => {
               const [whole, decimal] = opt.price.split(".");
               return (
                 <div key={i} className="flex flex-col items-center">
-                  <span className="text-lg md:text-2xl tracking-wide opacity-90 font-light">
+                  <span className="text-base md:text-xl tracking-wide opacity-90 font-light">
                     {opt.hotelType}
                   </span>
                   <div className="flex items-start font-bold tracking-wider">
-                    <span className="text-2xl md:text-4xl">{whole}</span>
+                    <span className="text-xl md:text-2xl">{whole}</span>
                     {decimal && (
-                      <sup className="text-lg md:text-2xl mt-1">.{decimal}</sup>
+                      <sup className="text-base md:text-xl mt-2.5">
+                        .{decimal}
+                      </sup>
                     )}
                   </div>
                 </div>
@@ -112,24 +114,19 @@ export const PackageDetails = ({
         </div>
       )}
 
-      <div className="flex items-center gap-2 sm:gap-5 mt-14 relative z-10 w-full">
+      <div className="flex items-center gap-2 sm:gap-5 mt-4 relative z-10 w-full">
         <MaskRevealButton
           onClick={onBook}
           className="flex-1 rounded-bl-3xl font-bold px-3 sm:px-6 py-8 text-xl md:text-2xl"
           hoverBgClass={bgColorClass}
-          textClassName={cn("text-white", bgColorClass.replace("bg-", "text-"))}
         >
           Book now
         </MaskRevealButton>
 
         <Link href="tel:+233593679741" className="flex-1">
           <MaskRevealButton
-            className="w-full px-3 sm:px-6 py-8 text-xl md:text-2xl font-normal"
+            className="w-full px-3 sm:px-6 py-8 text-xl md:text-2xl font-normal "
             hoverBgClass={bgColorClass}
-            textClassName={cn(
-              "text-white",
-              bgColorClass.replace("bg-", "text-"),
-            )}
           >
             Corporate packages
           </MaskRevealButton>
