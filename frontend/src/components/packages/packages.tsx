@@ -125,7 +125,7 @@ export const Packages = () => {
 
           <div className="w-full h-px bg-neutral-300/50" />
           {/* Grid of Standard Packages */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 ">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4" id="packages">
             {gridOffers.map((offer, idx) => (
               <PackageCard
                 key={offer.id}

@@ -1,10 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { PlaneTakeoff } from "lucide-react";
+import { Bed, PlaneTakeoff } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { totalPackageGameCardBg } from "@/assets/img";
+import { singleGameCardBg, doubleGameCardBg } from "@/assets/img";
+import { MaskRevealButton } from "../../mask-reveal-button";
 import type { GameOffer } from "@/components/games/data/games-data";
+import { HotelRoomBg, HostelRoomBg } from "@/assets/img";
 
 interface PackageCardProps {
   offer: GameOffer;
@@ -19,17 +21,27 @@ export const PackageCard = ({ offer, className, onBook }: PackageCardProps) => {
   return (
     <div
       className={cn(
-        "relative group overflow-hidden  flex flex-col p-5 text-white bg-neutral-900 border border-white/5",
+        "relative group/card overflow-hidden  flex flex-col p-5 text-white bg-neutral-900 border border-white/5",
         className,
       )}
     >
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
+      {/* Background Images */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
         <Image
-          src={totalPackageGameCardBg}
+          src={isDouble ? doubleGameCardBg : singleGameCardBg}
           alt="Stadium Background"
           fill
-          className="object-cover transition-transform duration-700 group-hover:scale-105 opacity-50"
+          className="object-cover opacity-50 transition-opacity duration-700 group-hover/card:opacity-0 group-hover/card:scale-105"
+        />
+        <Image
+          src={
+            offer.accommodation.toLowerCase().includes("hotel")
+              ? HotelRoomBg
+              : HostelRoomBg
+          }
+          alt="Room Background"
+          fill
+          className="object-cover opacity-0 transition-opacity duration-700 group-hover/card:opacity-50 group-hover/card:scale-105"
         />
         <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-black/10" />
       </div>
@@ -119,17 +131,18 @@ export const PackageCard = ({ offer, className, onBook }: PackageCardProps) => {
             </span>
           </div>
 
-          <button
-            type="button"
+          <MaskRevealButton
             onClick={onBook}
-            className="flex items-center gap-2 px-4 py-2 rounded bg-white text-primary-300 hover:bg-primary-300 hover:text-white transition-all font-semibold font-clash group/btn shadow-2xl cursor-pointer"
+            hoverBgClass="bg-primary-300"
+            textClassName="text-primary-300"
+            className="flex items-center gap-2 px-4 py-2 rounded bg-white text-primary-300 hover:text-white transition-all font-semibold font-clash group/btn shadow-2xl cursor-pointer"
           >
-            Book Seat
-            <PlaneTakeoff
+            Book Stay
+            <Bed
               size={18}
-              className="translate-y-px group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform"
+              className="relative z-10 translate-y-px group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
             />
-          </button>
+          </MaskRevealButton>
         </div>
       </div>
     </div>

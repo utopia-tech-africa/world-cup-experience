@@ -1,28 +1,48 @@
 import Image from "next/image";
 import Link from "next/link";
 import { WTWCLogoWhite, FooterBgImg } from "@/assets";
-import { ArrowUpRight, Facebook, Instagram, Youtube } from "lucide-react";
+import {
+  ArrowUpRight,
+  Facebook,
+  Instagram,
+  LocateIcon,
+  Youtube,
+} from "lucide-react";
 import ComponentLayout from "../component-layout";
 import { cn } from "@/lib/utils";
+import { PiTiktokLogoLight } from "react-icons/pi";
+import { FaLocationDot } from "react-icons/fa6";
 
 const leftLinks = [
-  { label: "PACKAGES", href: "#" },
-  { label: "TORONTO", href: "#" },
-  { label: "EXPERIENCE", href: "#" },
-  { label: "CORPORATE", href: "#" },
+  { label: "PACKAGES", href: "#packages" },
+  { label: "TOTAL", href: "#total-package" },
+  { label: "EXPERIENCE", href: "#explore" },
+  { label: "CORPORATE", href: "tel:+233593679741" },
 ];
 
 const rightLinks = [
-  { label: "PHONE", href: "#" },
+  { label: "PHONE", href: "tel:+233593679741" },
   { label: "EMAIL", href: "#" },
   { label: "TERMS OF SERVICE", href: "#" },
   { label: "PRIVACY POLICY", href: "#" },
 ];
 
 const socialLinks = [
-  { label: "Facebook", icon: Facebook, href: "#" },
-  { label: "Instagram", icon: Instagram, href: "#" },
-  { label: "Youtube", icon: Youtube, href: "#" },
+  {
+    label: "Facebook",
+    icon: Facebook,
+    href: "https://web.facebook.com/profile.php?id=61585047495195",
+  },
+  {
+    label: "Instagram",
+    icon: Instagram,
+    href: "https://www.instagram.com/watch_theworldcup/",
+  },
+  {
+    label: "Tiktok",
+    icon: PiTiktokLogoLight,
+    href: "https://www.tiktok.com/@watchtheworldcup?_r=1&_t=ZS-94nJbvlzHTM",
+  },
 ];
 
 export default function Footer() {
@@ -67,6 +87,7 @@ export default function Footer() {
           <div className=" hidden md:flex flex-col items-center justify-start lg:w-2/4 gap-12 ">
             <CenterLogo />
             <Socials />
+            <OfficeAdress />
           </div>
 
           {/* Right Links */}
@@ -86,6 +107,7 @@ export default function Footer() {
           </div>
 
           <Socials className="md:hidden items-start" />
+          <OfficeAdress className="md:hidden items-start mt-4" />
         </div>
 
         {/* Bottom Copyright */}
@@ -135,6 +157,7 @@ const Socials = ({ className }: { className?: string }) => {
               key={social.label}
               href={social.href}
               className="group flex items-center gap-2 transition-colors hover:text-neutral-200"
+              target="_blank"
             >
               <Icon className="w-[18px] h-[18px]" />
               <span className="font-helvetica text-lg">{social.label}</span>
@@ -143,5 +166,25 @@ const Socials = ({ className }: { className?: string }) => {
         })}
       </div>
     </div>
+  );
+};
+
+const OfficeAdress = ({ className }: { className?: string }) => {
+  return (
+    <Link
+      href="https://maps.app.goo.gl/43ktFiwd7jFqe6fD6"
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn(
+        `group flex items-center justify-start md:justify-center lg:justify-end gap-3 w-fit ${className}`,
+      )}
+    >
+      <FaLocationDot className="w-[18px] h-[18px]" />
+      <address className="not-italic font-clash font-medium text-sm md:text-base lg:text-lg text-neutral-200 group-hover:text-white transition-colors text-left md:text-center lg:text-right leading-snug">
+        No. 21 Nii Adjei Onano Street{""}
+        <br />
+        East Legon, Accra - Ghana
+      </address>
+    </Link>
   );
 };

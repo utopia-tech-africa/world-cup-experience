@@ -5,6 +5,7 @@ import { HeroLoader } from "./components/hero-loader";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { WTWCLogoWhite, ballGif } from "@/assets";
+import { HotPackagesWidget } from "./components/hot-packages-widget";
 
 export function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -78,7 +79,7 @@ export function Hero() {
           muted
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
-          src="/videos/altair-landing-page-video.mp4"
+          src="https://res.cloudinary.com/dan9camhs/video/upload/v1773839084/altair-landing-page-video_wap37p.mp4"
         />
       </div>
 
@@ -97,7 +98,7 @@ export function Hero() {
         </div>
 
         {/* Bottom panel */}
-        <div className="absolute bottom-0 left-0 w-full h-[9%] bg-black/10 backdrop-blur-md flex justify-between items-center px-8 md:px-14 lg:px-20">
+        <div className="absolute bottom-0 left-0 w-full h-[9%] bg-black/10 backdrop-blur-md flex justify-between items-center px-8 md:px-14 lg:px-28">
           {/* Scroll Indicator Inside Bottom Panel */}
           <div className="flex items-center gap-4">
             <span className="text-white font-clash text-xl md:text-2xl font-medium tracking-tight">
@@ -173,13 +174,16 @@ export function Hero() {
         onClick={handleToggleAudio}
       />
 
-      {/* Hero UI Content */}
       <motion.div
         className="relative z-30 h-full w-full flex flex-col justify-end p-8 md:p-14 lg:px-20 lg:py-8 pointer-events-none"
         initial={{ opacity: 0 }}
         animate={loaderDone ? { opacity: 1 } : {}}
         transition={{ duration: 1, delay: 1.2 }}
-      ></motion.div>
+      >
+        <div className="absolute bottom-24  md:bottom-26 right-3 md:right-24 2xl:right-28">
+          <HotPackagesWidget />
+        </div>
+      </motion.div>
     </section>
   );
 }

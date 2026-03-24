@@ -5,6 +5,7 @@ import doubleGameCardBg from "./double-game-card-bg.webp";
 import ghanaFlag from "./ghana-flag.webp";
 import croatiaFlag from "./croatia-flag.webp";
 import englandFlag from "./england-flag.webp";
+import PanamaFlag from "./panama-flag.webp";
 import FifaFinfestImg from "./fifa-finfest-img.webp";
 import ExploreImg1 from "./explore-img-1.webp";
 import ExploreImg2 from "./explore-img-2.webp";
@@ -14,6 +15,9 @@ import ExploreImg5 from "./explore-img-5.webp";
 import BookImg from "./book-img.webp";
 import FooterBgImg from "./footer-bg-img.webp";
 import CupBgImg from "./cup-bg-img.webp";
+import TotalPackageRoomBg from "./total-package-room-bg.webp";
+import HotelRoomBg from "./hotel-room-bg.webp";
+import HostelRoomBg from "./hostel-room-bg.webp";
 
 export {
   heroBgImg,
@@ -32,4 +36,8 @@ export {
   BookImg,
   FooterBgImg,
   CupBgImg,
+  TotalPackageRoomBg,
+  HotelRoomBg,
+  HostelRoomBg,
+  PanamaFlag,
 };

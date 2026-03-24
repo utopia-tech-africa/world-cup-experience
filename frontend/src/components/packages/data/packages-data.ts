@@ -1,4 +1,4 @@
-import { ghanaFlag, croatiaFlag, englandFlag } from "@/assets/img";
+import { ghanaFlag, croatiaFlag, englandFlag, PanamaFlag } from "@/assets/img";
 
 export interface Match {
   stadium: string;
@@ -41,7 +41,7 @@ export const TRIPLE_MATCHES: Match[] = [
   {
     stadium: "BMO Field, Toronto",
     team1: { name: "Ghana", flag: ghanaFlag },
-    team2: { name: "Croatia", flag: croatiaFlag },
+    team2: { name: "Panama", flag: PanamaFlag },
     date: "June 17th 2026",
   },
   ...DOUBLE_MATCHES,
