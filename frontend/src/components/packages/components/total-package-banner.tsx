@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { TotalPackageMatches } from "./total-package-matches";
 import { Button } from "@/components/ui/button";
 import { TotalPackageBg } from "@/assets/svg";
@@ -8,10 +7,19 @@ import type { Match } from "@/components/games/data/games-data";
 
 type TotalPackageBannerProps = {
   matches: Match[];
+  cityCount?: number;
+  nights?: number;
+  includedItems?: string[];
   onBook?: () => void;
 };
 
-export const TotalPackageBanner = ({ matches, onBook }: TotalPackageBannerProps) => {
+export const TotalPackageBanner = ({
+  matches,
+  cityCount = 0,
+  nights = 13,
+  includedItems = [],
+  onBook,
+}: TotalPackageBannerProps) => {
   return (
     <div className="flex flex-col-reverse lg:flex-row gap-5">
       {/* Total Package Left info */}
@@ -28,23 +36,33 @@ export const TotalPackageBanner = ({ matches, onBook }: TotalPackageBannerProps)
 
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2  text-base sm:text-lg font-clash tracking-wider text-nowrap">
-              <div className="size-1.5 bg-white" /> Three matches
+              <div className="size-1.5 bg-white" /> {matches.length} matches
             </div>
             <div className="flex items-center gap-2  text-base sm:text-lg font-clash tracking-wider text-nowrap">
-              <div className="size-1.5 bg-white" /> 13 days
+              <div className="size-1.5 bg-white" /> {nights} nights
             </div>
             <div className="flex items-center gap-2 text-base sm:text-lg font-clash tracking-wider text-nowrap">
-              <div className="size-1.5 bg-white" /> 3 cities
+              <div className="size-1.5 bg-white" /> {cityCount} cities
             </div>
           </div>
 
-          <p className=" tracking-wider font-light leading-relaxed text-base md:text-lg font-helvetica ">
-            Take your World Cup adventure further with our 13-day football
-            journey featuring three thrilling matches and unforgettable fan
-            experiences. Enjoy the excitement of the tournament while exploring
-            Toronto, Boston and Philadelphia touring the cities and visiting
-            some of their most iconic attractions.
-          </p>
+          {includedItems.length > 0 ? (
+            <div className="space-y-2">
+              <p className="font-clash text-xl">Package includes:</p>
+              <ul className="space-y-1">
+                {includedItems.map((item) => (
+                  <li key={item} className="font-helvetica text-base leading-relaxed">
+                    • {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p className=" tracking-wider font-light leading-relaxed text-base md:text-lg font-helvetica ">
+              Take your World Cup adventure further with unforgettable fan
+              experiences across multiple cities.
+            </p>
+          )}
         </div>
 
         <div className="flex items-center gap-2 sm:gap-5 mt-14  relative z-10 mx-auto md:mx-0">

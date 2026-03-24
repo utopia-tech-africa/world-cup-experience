@@ -3,6 +3,25 @@ import { prisma } from "../config/database.config";
 import { z } from "zod";
 import { nightsBetween } from "../utils/date.utils";
 
+const comparisonFeatureSchema = z.object({
+  lineKey: z.string().min(1, "Feature lineKey is required"),
+  title: z.string().min(1, "Feature title is required"),
+  description: z.string().optional(),
+  iconKey: z.string().optional(),
+  displayOrder: z.number().int().min(0).default(0),
+});
+
+const comparisonOptionSchema = z.object({
+  tier: z.enum(["three_star", "four_star"]),
+  label: z.string().min(1, "Option label is required"),
+  price: z.number().positive("Option price must be positive"),
+  roomLabel: z.string().optional(),
+  imageUrl: z.string().optional(),
+  ctaLabel: z.string().optional(),
+  displayOrder: z.number().int().min(0).default(0),
+  features: z.array(comparisonFeatureSchema).default([]),
+});
+
 const createPackageSchema = z.object({
   name: z.string().min(1, "Name is required"),
   typeId: z.string().uuid("Invalid type ID"),
@@ -11,6 +30,9 @@ const createPackageSchema = z.object({
   endDate: z.string().optional(),
   hostelPrice: z.number().positive("Hostel price must be positive"),
   hotelPrice: z.number().positive("Hotel price must be positive"),
+  cityCount: z.number().int().min(0).default(0),
+  includedItems: z.array(z.string().min(1)).default([]),
+  comparisonOptions: z.array(comparisonOptionSchema).optional().default([]),
   displayOrder: z.number().int().min(0).default(0),
   isActive: z.boolean().optional().default(true),
   gameIds: z.array(z.string().uuid()).optional().default([]),
@@ -28,19 +50,43 @@ function serializePackage(pkg: {
   endDate?: string | null;
   hostelPrice: unknown;
   hotelPrice: unknown;
+  cityCount: number;
+  includedItems: string[];
   displayOrder: number;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
   type?: { id: string; name: string; code: string; displayOrder: number } | null;
   packageGames?: Array<{ gameId: string }>;
+  comparisonOptions?: Array<{
+    id: string;
+    tier: "three_star" | "four_star";
+    label: string;
+    price: unknown;
+    roomLabel?: string | null;
+    imageUrl?: string | null;
+    ctaLabel?: string | null;
+    displayOrder: number;
+    features?: Array<{
+      id: string;
+      lineKey: string;
+      title: string;
+      description?: string | null;
+      iconKey?: string | null;
+      displayOrder: number;
+    }>;
+  }>;
 }) {
-  const { type, packageGames, ...rest } = pkg;
+  const { type, packageGames, comparisonOptions, ...rest } = pkg;
   const nights = nightsBetween(pkg.startDate ?? null, pkg.endDate ?? null);
   return {
     ...rest,
     hostelPrice: Number(pkg.hostelPrice),
     hotelPrice: Number(pkg.hotelPrice),
+    threeStarHotelPrice: Number(pkg.hostelPrice),
+    fourStarHotelPrice: Number(pkg.hotelPrice),
+    cityCount: pkg.cityCount,
+    includedItems: pkg.includedItems ?? [],
     startDate: pkg.startDate ?? undefined,
     endDate: pkg.endDate ?? undefined,
     nights: nights ?? undefined,
@@ -48,6 +94,20 @@ function serializePackage(pkg: {
       ? { id: type.id, name: type.name, code: type.code, displayOrder: type.displayOrder }
       : undefined,
     gameIds: packageGames?.map((pg) => pg.gameId) ?? [],
+    comparisonOptions:
+      comparisonOptions?.map((option) => ({
+        ...option,
+        price: Number(option.price),
+        roomLabel: option.roomLabel ?? undefined,
+        imageUrl: option.imageUrl ?? undefined,
+        ctaLabel: option.ctaLabel ?? undefined,
+        features:
+          option.features?.map((f) => ({
+            ...f,
+            description: f.description ?? undefined,
+            iconKey: f.iconKey ?? undefined,
+          })) ?? [],
+      })) ?? [],
   };
 }
 
@@ -55,7 +115,14 @@ function serializePackage(pkg: {
 export const getAdminPackages = async (_req: Request, res: Response) => {
   try {
     const packages = await prisma.bookingPackage.findMany({
-      include: { type: true, packageGames: { select: { gameId: true } } },
+      include: {
+        type: true,
+        packageGames: { select: { gameId: true } },
+        comparisonOptions: {
+          orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+          include: { features: { orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] } },
+        },
+      },
       orderBy: [{ displayOrder: "asc" }, { name: "asc" }],
     });
     res.json({ packages: packages.map(serializePackage) });
@@ -85,6 +152,9 @@ export const createPackage = async (req: Request, res: Response) => {
       endDate,
       hostelPrice,
       hotelPrice,
+      cityCount,
+      includedItems,
+      comparisonOptions,
       displayOrder,
       isActive,
       gameIds,
@@ -123,10 +193,39 @@ export const createPackage = async (req: Request, res: Response) => {
         endDate: endDate?.trim() || null,
         hostelPrice,
         hotelPrice,
+        cityCount,
+        includedItems,
+        comparisonOptions: {
+          create: comparisonOptions.map((option) => ({
+            tier: option.tier,
+            label: option.label,
+            price: option.price,
+            roomLabel: option.roomLabel?.trim() || null,
+            imageUrl: option.imageUrl?.trim() || null,
+            ctaLabel: option.ctaLabel?.trim() || null,
+            displayOrder: option.displayOrder,
+            features: {
+              create: option.features.map((feature) => ({
+                lineKey: feature.lineKey.trim(),
+                title: feature.title.trim(),
+                description: feature.description?.trim() || null,
+                iconKey: feature.iconKey?.trim() || null,
+                displayOrder: feature.displayOrder,
+              })),
+            },
+          })),
+        },
         displayOrder,
         isActive,
       },
-      include: { type: true, packageGames: { select: { gameId: true } } },
+      include: {
+        type: true,
+        packageGames: { select: { gameId: true } },
+        comparisonOptions: {
+          orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+          include: { features: { orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] } },
+        },
+      },
     });
     if (gameIdsToLink.length > 0) {
       await prisma.bookingPackageGame.createMany({
@@ -135,7 +234,14 @@ export const createPackage = async (req: Request, res: Response) => {
     }
     const withGames = await prisma.bookingPackage.findUnique({
       where: { id: pkg.id },
-      include: { type: true, packageGames: { select: { gameId: true } } },
+      include: {
+        type: true,
+        packageGames: { select: { gameId: true } },
+        comparisonOptions: {
+          orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+          include: { features: { orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] } },
+        },
+      },
     });
     res.status(201).json({ package: serializePackage(withGames!) });
   } catch (error: unknown) {
@@ -169,6 +275,9 @@ export const updatePackage = async (req: Request, res: Response) => {
       endDate,
       hostelPrice,
       hotelPrice,
+      cityCount,
+      includedItems,
+      comparisonOptions,
       displayOrder,
       isActive,
       gameIds,
@@ -200,6 +309,10 @@ export const updatePackage = async (req: Request, res: Response) => {
       (nights != null ? `${nights} night${plural}` : null) ||
       "—";
     await prisma.bookingPackageGame.deleteMany({ where: { packageId: id } });
+    await prisma.bookingPackageOptionFeature.deleteMany({
+      where: { option: { packageId: id } },
+    });
+    await prisma.bookingPackageOption.deleteMany({ where: { packageId: id } });
     if (gameIdsToLink.length > 0) {
       await prisma.bookingPackageGame.createMany({
         data: gameIdsToLink.map((gameId) => ({ packageId: id, gameId })),
@@ -215,10 +328,39 @@ export const updatePackage = async (req: Request, res: Response) => {
         endDate: endDate?.trim() || null,
         hostelPrice,
         hotelPrice,
+        cityCount,
+        includedItems,
+        comparisonOptions: {
+          create: comparisonOptions.map((option) => ({
+            tier: option.tier,
+            label: option.label,
+            price: option.price,
+            roomLabel: option.roomLabel?.trim() || null,
+            imageUrl: option.imageUrl?.trim() || null,
+            ctaLabel: option.ctaLabel?.trim() || null,
+            displayOrder: option.displayOrder,
+            features: {
+              create: option.features.map((feature) => ({
+                lineKey: feature.lineKey.trim(),
+                title: feature.title.trim(),
+                description: feature.description?.trim() || null,
+                iconKey: feature.iconKey?.trim() || null,
+                displayOrder: feature.displayOrder,
+              })),
+            },
+          })),
+        },
         displayOrder,
         isActive,
       },
-      include: { type: true, packageGames: { select: { gameId: true } } },
+      include: {
+        type: true,
+        packageGames: { select: { gameId: true } },
+        comparisonOptions: {
+          orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+          include: { features: { orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] } },
+        },
+      },
     });
     res.json({ package: serializePackage(pkg) });
   } catch (error: unknown) {

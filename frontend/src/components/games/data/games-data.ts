@@ -13,6 +13,10 @@ export type GameOffer = {
   matches: Match[];
   price: string;
   accommodation: string;
+  packageName?: string;
+  duration?: string;
+  cityCount?: number;
+  includedItems?: string[];
 };
 
 function formatPrice(value: number): string {
@@ -61,14 +65,22 @@ export function buildGameOffersFromPackages(
           type: `${nightsLabel} (${baseTypeLabel})`,
           matches,
           price: formatPrice(pkg.hostelPrice),
-          accommodation: "Hostel",
+          accommodation: "3-star Hotel",
+          packageName: pkg.name,
+          duration: pkg.duration,
+          cityCount: pkg.cityCount ?? 0,
+          includedItems: pkg.includedItems ?? [],
         },
         {
           id: `${pkg.id}-hotel`,
           type: `${nightsLabel} (${baseTypeLabel})`,
           matches,
           price: formatPrice(pkg.hotelPrice),
-          accommodation: "Hotel",
+          accommodation: "4-star Hotel",
+          packageName: pkg.name,
+          duration: pkg.duration,
+          cityCount: pkg.cityCount ?? 0,
+          includedItems: pkg.includedItems ?? [],
         },
       ] satisfies GameOffer[];
     });
