@@ -1,3 +1,3 @@
+export * from "./package-details";
+export * from "./package-matches";
 export * from "./package-card";
-export * from "./total-package-banner";
-export * from "./total-package-matches";
