@@ -4,6 +4,7 @@ import type {
   AdminGame,
   BookingPackage,
   GamePackageType,
+  PackageComparisonOption,
   Team,
 } from '@/types/booking';
 
@@ -174,6 +175,9 @@ export type CreatePackageInput = {
   endDate?: string;
   hostelPrice: number;
   hotelPrice: number;
+  cityCount?: number;
+  includedItems?: string[];
+  comparisonOptions?: PackageComparisonOption[];
   displayOrder?: number;
   isActive?: boolean;
   gameIds?: string[];
@@ -182,6 +186,9 @@ export type CreatePackageInput = {
 export const createPackage = async (input: CreatePackageInput): Promise<BookingPackage> => {
   const { data } = await axios.post<{ package: BookingPackage }>('/admin/packages', {
     ...input,
+    cityCount: input.cityCount ?? 0,
+    includedItems: input.includedItems ?? [],
+    comparisonOptions: input.comparisonOptions ?? [],
     displayOrder: input.displayOrder ?? 0,
     isActive: input.isActive ?? true,
   });
@@ -193,6 +200,9 @@ export type UpdatePackageInput = CreatePackageInput;
 export const updatePackage = async (id: string, input: UpdatePackageInput): Promise<BookingPackage> => {
   const { data } = await axios.patch<{ package: BookingPackage }>(`/admin/packages/${id}`, {
     ...input,
+    cityCount: input.cityCount ?? 0,
+    includedItems: input.includedItems ?? [],
+    comparisonOptions: input.comparisonOptions ?? [],
     displayOrder: input.displayOrder ?? 0,
     isActive: input.isActive ?? true,
   });

@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-export const TotalPackageBg = ({ className }: { className?: string }) => {
+export const PackageBgPattern2 = ({ className }: { className?: string }) => {
   return (
     <svg
       className={cn(className)}

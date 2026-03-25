@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../config/database.config";
 import { nightsBetween } from "../utils/date.utils";
+import { z } from "zod";
 
 type PackageWithType = {
   id: string;
@@ -11,6 +12,8 @@ type PackageWithType = {
   endDate: string | null;
   hostelPrice: unknown;
   hotelPrice: unknown;
+  cityCount: number;
+  includedItems: string[];
   displayOrder: number;
   isActive: boolean;
   createdAt: Date;
@@ -25,6 +28,24 @@ type PackageWithType = {
       team1: { id: string; name: string; flagUrl: string | null };
       team2: { id: string; name: string; flagUrl: string | null };
     };
+  }>;
+  comparisonOptions?: Array<{
+    id: string;
+    tier: "three_star" | "four_star";
+    label: string;
+    price: unknown;
+    roomLabel?: string | null;
+    imageUrl?: string | null;
+    ctaLabel?: string | null;
+    displayOrder: number;
+    features?: Array<{
+      id: string;
+      lineKey: string;
+      title: string;
+      description?: string | null;
+      iconKey?: string | null;
+      displayOrder: number;
+    }>;
   }>;
 };
 
@@ -90,9 +111,27 @@ function serializePackage(
     nights: nights ?? undefined,
     hostelPrice: Number(pkg.hostelPrice),
     hotelPrice: Number(pkg.hotelPrice),
+    threeStarHotelPrice: Number(pkg.hostelPrice),
+    fourStarHotelPrice: Number(pkg.hotelPrice),
+    cityCount: pkg.cityCount ?? 0,
+    includedItems: pkg.includedItems ?? [],
     displayOrder: pkg.displayOrder,
     isActive: pkg.isActive,
     games,
+    comparisonOptions:
+      pkg.comparisonOptions?.map((option) => ({
+        ...option,
+        price: Number(option.price),
+        roomLabel: option.roomLabel ?? undefined,
+        imageUrl: option.imageUrl ?? undefined,
+        ctaLabel: option.ctaLabel ?? undefined,
+        features:
+          option.features?.map((f) => ({
+            ...f,
+            description: f.description ?? undefined,
+            iconKey: f.iconKey ?? undefined,
+          })) ?? [],
+      })) ?? [],
   };
 }
 
@@ -104,6 +143,10 @@ export const getPackages = async (_req: Request, res: Response) => {
         where: { isActive: true },
         include: {
           type: true,
+          comparisonOptions: {
+            orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+            include: { features: { orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] } },
+          },
           packageGames: {
             include: {
               game: {
@@ -144,6 +187,372 @@ export const getPackages = async (_req: Request, res: Response) => {
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : "Failed to fetch packages";
+    res.status(500).json({ error: message });
+  }
+};
+
+/** GET /api/packages/:id/comparison — package comparison rows aligned by lineKey */
+export const getPackageComparison = async (req: Request, res: Response) => {
+  try {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    if (!id) {
+      res.status(400).json({ error: "Package ID is required" });
+      return;
+    }
+
+    const pkg = await prisma.bookingPackage.findUnique({
+      where: { id },
+      include: {
+        type: true,
+        packageGames: {
+          include: { game: { include: { team1: true, team2: true } } },
+        },
+        comparisonOptions: {
+          orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+          include: { features: { orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] } },
+        },
+      },
+    });
+
+    if (!pkg || !pkg.isActive) {
+      res.status(404).json({ error: "Package not found" });
+      return;
+    }
+
+    const games = (pkg.packageGames ?? []).map((pg) => ({
+      id: pg.game.id,
+      typeCode: pkg.type.code,
+      stadium: pg.game.stadium ?? "",
+      team1: {
+        id: pg.game.team1.id,
+        name: pg.game.team1.name,
+        flagUrl: pg.game.team1.flagUrl ?? undefined,
+      },
+      team2: {
+        id: pg.game.team2.id,
+        name: pg.game.team2.name,
+        flagUrl: pg.game.team2.flagUrl ?? undefined,
+      },
+      matchDate: pg.game.matchDate ?? "",
+      displayOrder: pg.game.displayOrder ?? 0,
+    }));
+
+    const optionByTier = {
+      three_star: pkg.comparisonOptions.find((o) => o.tier === "three_star"),
+      four_star: pkg.comparisonOptions.find((o) => o.tier === "four_star"),
+    };
+
+    const lineMap = new Map<
+      string,
+      {
+        lineKey: string;
+        displayOrder: number;
+        left?: { title: string; description?: string; iconKey?: string };
+        right?: { title: string; description?: string; iconKey?: string };
+      }
+    >();
+
+    const putSide = (
+      side: "left" | "right",
+      features: Array<{
+        lineKey: string;
+        title: string;
+        description: string | null;
+        iconKey: string | null;
+        displayOrder: number;
+      }>
+    ) => {
+      features.forEach((f) => {
+        const existing = lineMap.get(f.lineKey) ?? {
+          lineKey: f.lineKey,
+          displayOrder: f.displayOrder,
+        };
+        existing.displayOrder = Math.min(existing.displayOrder, f.displayOrder);
+        existing[side] = {
+          title: f.title,
+          description: f.description ?? undefined,
+          iconKey: f.iconKey ?? undefined,
+        };
+        lineMap.set(f.lineKey, existing);
+      });
+    };
+
+    if (optionByTier.four_star) putSide("left", optionByTier.four_star.features);
+    if (optionByTier.three_star) putSide("right", optionByTier.three_star.features);
+
+    const comparisonRows = Array.from(lineMap.values()).sort(
+      (a, b) => a.displayOrder - b.displayOrder
+    );
+
+    const nights = nightsBetween(pkg.startDate, pkg.endDate);
+
+    res.json({
+      package: {
+        id: pkg.id,
+        name: pkg.name,
+        type: pkg.type.code,
+        typeName: pkg.type.name,
+        duration: pkg.duration,
+        nights: nights ?? undefined,
+        cityCount: pkg.cityCount ?? 0,
+        includedItems: pkg.includedItems ?? [],
+        games,
+      },
+      options: {
+        fourStar: optionByTier.four_star
+          ? {
+              id: optionByTier.four_star.id,
+              label: optionByTier.four_star.label,
+              price: Number(optionByTier.four_star.price),
+              roomLabel: optionByTier.four_star.roomLabel ?? undefined,
+              imageUrl: optionByTier.four_star.imageUrl ?? undefined,
+              ctaLabel: optionByTier.four_star.ctaLabel ?? undefined,
+            }
+          : null,
+        threeStar: optionByTier.three_star
+          ? {
+              id: optionByTier.three_star.id,
+              label: optionByTier.three_star.label,
+              price: Number(optionByTier.three_star.price),
+              roomLabel: optionByTier.three_star.roomLabel ?? undefined,
+              imageUrl: optionByTier.three_star.imageUrl ?? undefined,
+              ctaLabel: optionByTier.three_star.ctaLabel ?? undefined,
+            }
+          : null,
+      },
+      comparisonRows,
+    });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Failed to fetch package comparison";
+    res.status(500).json({ error: message });
+  }
+};
+
+const compareOptionsQuerySchema = z
+  .object({
+    leftOptionId: z.string().uuid().optional(),
+    rightOptionId: z.string().uuid().optional(),
+    leftPackageId: z.string().uuid().optional(),
+    rightPackageId: z.string().uuid().optional(),
+    leftTier: z.enum(["three_star", "four_star"]).optional(),
+    rightTier: z.enum(["three_star", "four_star"]).optional(),
+  })
+  .refine(
+    (q) => Boolean(q.leftOptionId) || (Boolean(q.leftPackageId) && Boolean(q.leftTier)),
+    { message: "Provide either leftOptionId or leftPackageId+leftTier" }
+  )
+  .refine(
+    (q) => Boolean(q.rightOptionId) || (Boolean(q.rightPackageId) && Boolean(q.rightTier)),
+    { message: "Provide either rightOptionId or rightPackageId+rightTier" }
+  );
+
+type ComparisonOptionWithPackage = {
+  id: string;
+  packageId: string;
+  tier: "three_star" | "four_star";
+  label: string;
+  price: unknown;
+  roomLabel: string | null;
+  imageUrl: string | null;
+  ctaLabel: string | null;
+  displayOrder: number;
+  features: Array<{
+    lineKey: string;
+    title: string;
+    description: string | null;
+    iconKey: string | null;
+    displayOrder: number;
+  }>;
+  package: {
+    id: string;
+    name: string;
+    type: { code: string; name: string };
+    duration: string;
+    startDate: string | null;
+    endDate: string | null;
+    cityCount: number;
+    includedItems: string[];
+    packageGames: Array<{
+      game: {
+        id: string;
+        stadium: string;
+        matchDate: string;
+        displayOrder: number;
+        team1: { id: string; name: string; flagUrl: string | null };
+        team2: { id: string; name: string; flagUrl: string | null };
+      };
+    }>;
+  };
+};
+
+function serializeComparisonOption(option: ComparisonOptionWithPackage) {
+  const nights = nightsBetween(option.package.startDate, option.package.endDate);
+  const games = (option.package.packageGames ?? []).map((pg) => ({
+    id: pg.game.id,
+    typeCode: option.package.type.code,
+    stadium: pg.game.stadium ?? "",
+    team1: {
+      id: pg.game.team1.id,
+      name: pg.game.team1.name,
+      flagUrl: pg.game.team1.flagUrl ?? undefined,
+    },
+    team2: {
+      id: pg.game.team2.id,
+      name: pg.game.team2.name,
+      flagUrl: pg.game.team2.flagUrl ?? undefined,
+    },
+    matchDate: pg.game.matchDate ?? "",
+    displayOrder: pg.game.displayOrder ?? 0,
+  }));
+
+  return {
+    id: option.id,
+    packageId: option.packageId,
+    packageName: option.package.name,
+    packageTypeName: option.package.type.name,
+    packageTypeCode: option.package.type.code,
+    tier: option.tier,
+    label: option.label,
+    price: Number(option.price),
+    roomLabel: option.roomLabel ?? undefined,
+    imageUrl: option.imageUrl ?? undefined,
+    ctaLabel: option.ctaLabel ?? undefined,
+    duration: option.package.duration,
+    nights: nights ?? undefined,
+    cityCount: option.package.cityCount ?? 0,
+    includedItems: option.package.includedItems ?? [],
+    games,
+  };
+}
+
+/**
+ * GET /api/packages/comparison
+ * Compare any two package options, including across different packages.
+ * Query:
+ *   - leftOptionId/rightOptionId, OR
+ *   - leftPackageId+leftTier and rightPackageId+rightTier
+ */
+export const comparePackageOptions = async (req: Request, res: Response) => {
+  try {
+    const parsed = compareOptionsQuerySchema.safeParse(req.query);
+    if (!parsed.success) {
+      const msg = parsed.error.issues.map((i) => i.message).join("; ");
+      res.status(400).json({ error: msg });
+      return;
+    }
+
+    const q = parsed.data;
+
+    const resolveOption = async (
+      optionId: string | undefined,
+      packageId: string | undefined,
+      tier: "three_star" | "four_star" | undefined
+    ) => {
+      if (optionId) {
+        return prisma.bookingPackageOption.findUnique({
+          where: { id: optionId },
+          include: {
+            features: { orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] },
+            package: {
+              include: {
+                type: true,
+                packageGames: {
+                  include: {
+                    game: { include: { team1: true, team2: true } },
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+      return prisma.bookingPackageOption.findFirst({
+        where: {
+          packageId: packageId!,
+          tier: tier!,
+          package: { isActive: true },
+        },
+        include: {
+          features: { orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] },
+          package: {
+            include: {
+              type: true,
+              packageGames: {
+                include: {
+                  game: { include: { team1: true, team2: true } },
+                },
+              },
+            },
+          },
+        },
+      });
+    };
+
+    const [left, right] = await Promise.all([
+      resolveOption(q.leftOptionId, q.leftPackageId, q.leftTier),
+      resolveOption(q.rightOptionId, q.rightPackageId, q.rightTier),
+    ]);
+
+    if (!left || !left.package.isActive) {
+      res.status(404).json({ error: "Left comparison option not found" });
+      return;
+    }
+    if (!right || !right.package.isActive) {
+      res.status(404).json({ error: "Right comparison option not found" });
+      return;
+    }
+
+    const lineMap = new Map<
+      string,
+      {
+        lineKey: string;
+        displayOrder: number;
+        left?: { title: string; description?: string; iconKey?: string };
+        right?: { title: string; description?: string; iconKey?: string };
+      }
+    >();
+
+    const putSide = (
+      side: "left" | "right",
+      features: Array<{
+        lineKey: string;
+        title: string;
+        description: string | null;
+        iconKey: string | null;
+        displayOrder: number;
+      }>
+    ) => {
+      features.forEach((f) => {
+        const existing = lineMap.get(f.lineKey) ?? {
+          lineKey: f.lineKey,
+          displayOrder: f.displayOrder,
+        };
+        existing.displayOrder = Math.min(existing.displayOrder, f.displayOrder);
+        existing[side] = {
+          title: f.title,
+          description: f.description ?? undefined,
+          iconKey: f.iconKey ?? undefined,
+        };
+        lineMap.set(f.lineKey, existing);
+      });
+    };
+
+    putSide("left", left.features);
+    putSide("right", right.features);
+
+    const comparisonRows = Array.from(lineMap.values()).sort(
+      (a, b) => a.displayOrder - b.displayOrder
+    );
+
+    res.json({
+      left: serializeComparisonOption(left as unknown as ComparisonOptionWithPackage),
+      right: serializeComparisonOption(right as unknown as ComparisonOptionWithPackage),
+      comparisonRows,
+    });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Failed to compare package options";
     res.status(500).json({ error: message });
   }
 };

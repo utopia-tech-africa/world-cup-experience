@@ -1,4 +1,13 @@
-import { ghanaFlag, croatiaFlag, englandFlag, PanamaFlag } from "@/assets/img";
+import {
+  ghanaFlag,
+  croatiaFlag,
+  englandFlag,
+  PanamaFlag,
+  IvoryCoastFlag,
+  EcuadorFlag,
+  GermanyFlag,
+  CuracaoFlag,
+} from "@/assets/img";
 
 export interface Match {
   stadium: string;

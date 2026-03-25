@@ -111,7 +111,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Copyright */}
-        <div className="w-full mt-24 pt-8 text-center opacity-70">
+        <div className="w-full mt-4 pt-8 text-center opacity-70">
           <p className="font-helvetica font-light">
             Altair Logistics © 2026. All Rights Reserved.
           </p>
@@ -180,10 +180,8 @@ const OfficeAdress = ({ className }: { className?: string }) => {
       )}
     >
       <FaLocationDot className="w-[18px] h-[18px]" />
-      <address className="not-italic font-clash font-medium text-sm md:text-base lg:text-lg text-neutral-200 group-hover:text-white transition-colors text-left md:text-center lg:text-right leading-snug">
-        No. 21 Nii Adjei Onano Street{""}
-        <br />
-        East Legon, Accra - Ghana
+      <address className="not-italic font-clash font-medium text-sm md:text-base  text-neutral-200 group-hover:text-white transition-colors text-left md:text-center lg:text-right leading-snug">
+        No. 21 Nii Adjei Onano Street East Legon, Accra - Ghana
       </address>
     </Link>
   );

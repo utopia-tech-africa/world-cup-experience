@@ -2,23 +2,41 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { totalPackageGameCardBg, TotalPackageRoomBg } from "@/assets/img";
 import { cn } from "@/lib/utils";
 import type { Match } from "@/components/games/data/games-data";
 
-export const TotalPackageMatches = ({ matches }: { matches: Match[] }) => {
+interface TotalPackageMatchesProps {
+  matches: Match[];
+  packageType: string;
+  gameCardBg: any;
+  roomBg: any;
+  className?: string;
+  badgeClassName?: string;
+}
+
+export const TotalPackageMatches = ({
+  matches,
+  packageType,
+  gameCardBg,
+  roomBg,
+  className,
+  badgeClassName,
+}: TotalPackageMatchesProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="w-full relative flex flex-col p-5 overflow-hidden items-center justify-center text-white cursor-pointer"
+      className={cn(
+        "w-full relative flex flex-col p-5 overflow-hidden items-center justify-center text-white cursor-pointer lg:w-[50%] align-start",
+        className,
+      )}
     >
       {/* Background Images */}
       <div className="absolute inset-0 z-0 scale-110 overflow-hidden">
         <Image
-          src={totalPackageGameCardBg}
+          src={gameCardBg}
           alt="Stadium"
           fill
           className={cn(
@@ -27,7 +45,7 @@ export const TotalPackageMatches = ({ matches }: { matches: Match[] }) => {
           )}
         />
         <Image
-          src={TotalPackageRoomBg}
+          src={roomBg}
           alt="Room"
           fill
           className={cn(
@@ -37,33 +55,32 @@ export const TotalPackageMatches = ({ matches }: { matches: Match[] }) => {
         />
       </div>{" "}
       <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-black/70" />
-      {/* Content Overlay */}
-      <div className="relative z-20 flex flex-col gap-6 w-full max-w-3xl">
-        {/* Badge */}
-        <div className="mb-2">
-          <span
-            className={cn(
-              "inline-block px-4 py-1.5 rounded  font-clash tracking-wider shadow-lg bg-primary-100",
-            )}
-          >
-            {" "}
-            13 nights (Triple game)
-          </span>
-        </div>
-
+      {/* Badge moved to top corner */}
+      <div className="absolute top-5 left-5 md:top-8 md:left-8 z-30">
+        <span
+          className={cn(
+            "inline-block px-4 py-1.5 rounded font-clash tracking-wider shadow-lg bg-primary-100",
+            badgeClassName,
+          )}
+        >
+          {packageType}
+        </span>
+      </div>
+      {/* Content Overlay (Matches) */}
+      <div className="relative z-20 flex flex-col gap-6 w-full max-w-3xl pt-14">
         {/* Match Details List */}
-        <div className="flex flex-col gap-4 ">
+        <div className="flex flex-col gap-4">
           {matches.map((match, idx) => (
             <div key={idx} className="flex flex-col items-center w-full">
               {/* Stadium Name on Top */}
-              <p className=" font-helvetica mb-3 tracking-wide text-white/80">
+              <p className="font-helvetica mb-3 tracking-wide text-white/80 text-center">
                 {match.stadium}
               </p>
 
-              <div className="flex items-center justify-between w-full px-4 md:px-6 ">
+              <div className="flex items-center justify-between w-full px-4 md:px-6">
                 {/* Team 1 */}
-                <div className="flex flex-col items-center gap-2 ">
-                  <div className="relative w-16 h-10 md:w-20 md:h-12 overflow-hidden rounded-sm shadow-xl border border-white/10">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="relative w-24 h-14 md:w-40 md:h-24 overflow-hidden rounded-sm shadow-xl border border-white/10">
                     <Image
                       src={match.team1.flag ?? ""}
                       alt={match.team1.name}
@@ -71,21 +88,21 @@ export const TotalPackageMatches = ({ matches }: { matches: Match[] }) => {
                       className="object-cover"
                     />
                   </div>
-                  <span className="text-lg md:text-xl font-bold font-clash tracking-wide">
+                  <span className="text-xl md:text-3xl font-bold font-clash tracking-wide">
                     {match.team1.name}
                   </span>
                 </div>
 
                 {/* VS Spacer */}
                 <div className="px-3 pb-6 flex items-center justify-center">
-                  <span className="md:text-lg font-clash font-bold font-general tracking-wider">
+                  <span className="text-2xl md:text-5xl font-clash font-bold font-general tracking-wider">
                     VS
                   </span>
                 </div>
 
                 {/* Team 2 */}
-                <div className="flex flex-col items-center gap-2 ">
-                  <div className="relative w-16 h-10 md:w-20 md:h-12 overflow-hidden rounded-sm shadow-xl border border-white/10">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="relative w-24 h-14 md:w-40 md:h-24 overflow-hidden rounded-sm shadow-xl border border-white/10">
                     <Image
                       src={match.team2.flag ?? ""}
                       alt={match.team2.name}
@@ -93,12 +110,12 @@ export const TotalPackageMatches = ({ matches }: { matches: Match[] }) => {
                       className="object-cover"
                     />
                   </div>
-                  <span className="text-lg md:text-xl font-bold font-clash tracking-wide">
+                  <span className="text-xl md:text-3xl font-bold font-clash tracking-wide">
                     {match.team2.name}
                   </span>
                 </div>
               </div>
-              <p className=" font-helvetica  tracking-wide text-white/80">
+              <p className="font-helvetica tracking-wide text-white/80 text-center">
                 {match.date}
               </p>
 

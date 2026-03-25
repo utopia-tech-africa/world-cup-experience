@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
-import { AdminPackagesView } from './packages-view';
+import { PackageComparisonsView } from './package-comparisons-view';
 
-function PackagesFallback() {
+function PackageComparisonsFallback() {
   return (
     <div className="flex items-center gap-2 p-6 text-sm text-muted-foreground">
       <Loader2 className="size-4 animate-spin" />
@@ -11,10 +11,10 @@ function PackagesFallback() {
   );
 }
 
-export default function AdminPackagesPage() {
+export default function AdminPackageComparisonsPage() {
   return (
-    <Suspense fallback={<PackagesFallback />}>
-      <AdminPackagesView />
+    <Suspense fallback={<PackageComparisonsFallback />}>
+      <PackageComparisonsView />
     </Suspense>
   );
 }

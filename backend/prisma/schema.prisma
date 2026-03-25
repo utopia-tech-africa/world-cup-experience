@@ -128,6 +128,8 @@ model BookingPackage {
   endDate      String?      @map("end_date") @db.Text
   hostelPrice  Decimal      @map("hostel_price") @db.Decimal(10, 2)
   hotelPrice   Decimal      @map("hotel_price") @db.Decimal(10, 2)
+  cityCount    Int          @default(0) @map("city_count")
+  includedItems String[]    @default([]) @map("included_items")
   displayOrder Int          @default(0) @map("display_order")
   isActive     Boolean      @default(true) @map("is_active")
   createdAt    DateTime     @default(now()) @map("created_at")
@@ -135,8 +137,51 @@ model BookingPackage {
 
   type PackageType @relation(fields: [typeId], references: [id], onDelete: Restrict)
   packageGames BookingPackageGame[]
+  comparisonOptions BookingPackageOption[]
 
   @@map("packages")
+}
+
+enum PackageComparisonTier {
+  three_star
+  four_star
+}
+
+model BookingPackageOption {
+  id           String                 @id @default(uuid())
+  packageId    String                 @map("package_id")
+  tier         PackageComparisonTier
+  label        String                 @db.Text
+  price        Decimal                @db.Decimal(10, 2)
+  roomLabel    String?                @map("room_label") @db.Text
+  imageUrl     String?                @map("image_url") @db.Text
+  ctaLabel     String?                @map("cta_label") @db.Text
+  displayOrder Int                    @default(0) @map("display_order")
+  createdAt    DateTime               @default(now()) @map("created_at")
+  updatedAt    DateTime               @updatedAt @map("updated_at")
+
+  package  BookingPackage             @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  features BookingPackageOptionFeature[]
+
+  @@unique([packageId, tier])
+  @@map("package_options")
+}
+
+model BookingPackageOptionFeature {
+  id           String   @id @default(uuid())
+  optionId     String   @map("option_id")
+  lineKey      String   @map("line_key") @db.Text
+  title        String   @db.Text
+  description  String?  @db.Text
+  iconKey      String?  @map("icon_key") @db.Text
+  displayOrder Int      @default(0) @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  option BookingPackageOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@index([optionId, lineKey])
+  @@map("package_option_features")
 }
 
 model BookingPackageGame {
