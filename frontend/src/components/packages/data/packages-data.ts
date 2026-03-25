@@ -86,3 +86,45 @@ export const offers: PackageOffer[] = [
     accommodation: "Hotel",
   },
 ];
+
+export const EXCLUSIONS_INCLUSIONS_DATA = {
+  inclusions: [
+    "Philadelphia airport pick up and drop off",
+    "Accommodation near match venues",
+    "Double Occupancy Hotel rooms (Single on request at extra cost)",
+    "Daily Breakfast",
+    "Free WiFi",
+    "Match Day Transportation, Interstate",
+    "Fan Village experience",
+    "City tour - museums, galleries and other tourist attractions",
+    "Shopping mall trips",
+  ],
+  exclusions: [
+    "Visa",
+    "International flight tickets",
+    "Match Tickets (Purchasing assistance available)",
+    "Tour Venue Tickets",
+    "Lunch and Dinner",
+  ],
+};
+
+export const INCLUSIONS_EXCLUSIONS_DATA = {
+  inclusions: [
+    "Philadelphia airport pick up and drop off",
+    "Accommodation near match venues",
+    "Double Occupancy Hotel rooms (Single on request at extra cost)",
+    "Daily Breakfast",
+    "Free WiFi",
+    "Match Day Transportation, Interstate",
+    "Fan Village experience",
+    "City tour - museums, galleries and other tourist attractions",
+    "Shopping mall trips",
+  ],
+  exclusions: [
+    "Visa",
+    "International flight tickets",
+    "Match Tickets (Purchasing assistance available)",
+    "Tour Venue Tickets",
+    "Lunch and Dinner",
+  ],
+};
