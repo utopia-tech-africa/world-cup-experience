@@ -22,7 +22,7 @@ const leftLinks = [
 
 const rightLinks = [
   { label: "PHONE", href: "tel:+233593679741" },
-  { label: "EMAIL", href: "#" },
+  { label: "EMAIL", href: "mailto:info@watchtheworldcup.live" },
   { label: "TERMS OF SERVICE", href: "#" },
   { label: "PRIVACY POLICY", href: "#" },
 ];
