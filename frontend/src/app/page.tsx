@@ -4,14 +4,18 @@ import { FifaFanfest } from "@/components/fifa-fanfest";
 import { Packages } from "@/components/packages";
 import { Explore } from "@/components/explore";
 import { FAQ } from "@/components/faq";
+import InclusionsExclusions from "@/components/packages/components/inclusions-exclusions";
+import { ComparePackages } from "@/components/compare-packages";
 
 export default function Home() {
   return (
-    <main className="space-y-4">
+    <main className="space-y-10 md:space-y-30">
       <Hero />
-      <Packages />
       <AboutAltair />
       <FifaFanfest />
+      <Packages />
+      <InclusionsExclusions />
+      <ComparePackages />
       <Explore />
       <FAQ />
     </main>

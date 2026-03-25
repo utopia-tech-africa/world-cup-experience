@@ -4,9 +4,9 @@ import ComponentLayout from "@/components/component-layout";
 
 export default function InclusionsExclusions() {
   return (
-    <section className="py-10">
+    <section className="">
       <ComponentLayout>
-        <div className="max-w-7xl mx-auto">
+        <div className=" mx-auto">
           <div className="flex flex-col gap-2 mb-6">
             <h2 className="text-[30px] md:text-[30px] lg:text-[40px] font-medium text-[#2A2A2A] font-clash">
               Inclusions and Exclusions
