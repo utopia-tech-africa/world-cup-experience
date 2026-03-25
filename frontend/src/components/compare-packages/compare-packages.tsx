@@ -4,14 +4,14 @@ import { ChevronDown, Bed } from "lucide-react";
 import ComponentLayout from "@/components/component-layout";
 import { cn } from "@/lib/utils";
 import { COMPARISON_PACKAGES, FEATURE_CATEGORIES } from "./data";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 export const ComparePackages = () => {
   const [leftSelectedId, setLeftSelectedId] = useState(
-    COMPARISON_PACKAGES[0].id,
+    COMPARISON_PACKAGES[1].id,
   );
   const [rightSelectedId, setRightSelectedId] = useState(
-    COMPARISON_PACKAGES[1].id,
+    COMPARISON_PACKAGES[0].id,
   );
 
   const [isLeftOpen, setIsLeftOpen] = useState(false);
@@ -208,15 +208,23 @@ export const ComparePackages = () => {
                         </>
                       ) : (
                         <>
-                          {leftFeat.icon && (
-                            <leftFeat.icon
-                              className={cn(
-                                "size-6 md:size-8 mb-2",
-                                leftFeat.iconColor,
-                              )}
-                              strokeWidth={2.5}
-                            />
-                          )}
+                          {(() => {
+                            const style = (category as any).styles?.[
+                              leftPkg.id
+                            ];
+                            const Icon = style?.icon;
+                            return (
+                              Icon && (
+                                <Icon
+                                  className={cn(
+                                    "size-6 md:size-8 mb-2",
+                                    style.color,
+                                  )}
+                                  strokeWidth={2.5}
+                                />
+                              )
+                            );
+                          })()}
                           <h4 className="text-sm md:text-2xl font-bold text-neutral-800 mb-2">
                             {leftFeat.title}
                           </h4>
@@ -248,15 +256,23 @@ export const ComparePackages = () => {
                         </>
                       ) : (
                         <>
-                          {rightFeat.icon && (
-                            <rightFeat.icon
-                              className={cn(
-                                "size-6 md:size-8 mb-2",
-                                rightFeat.iconColor,
-                              )}
-                              strokeWidth={2.5}
-                            />
-                          )}
+                          {(() => {
+                            const style = (category as any).styles?.[
+                              rightPkg.id
+                            ];
+                            const Icon = style?.icon;
+                            return (
+                              Icon && (
+                                <Icon
+                                  className={cn(
+                                    "size-6 md:size-8 mb-2",
+                                    style.color,
+                                  )}
+                                  strokeWidth={2.5}
+                                />
+                              )
+                            );
+                          })()}
                           <h4 className="text-sm md:text-2xl font-bold text-neutral-800 mb-2">
                             {rightFeat.title}
                           </h4>
