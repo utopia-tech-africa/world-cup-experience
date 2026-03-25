@@ -108,9 +108,10 @@ export const COMPARISON_PACKAGES = [
 ];
 
 export const FEATURE_CATEGORIES = [
-  { id: "accommodation", name: "Accommodation", hasBg: false },
-  { id: "proximity", name: "Venue Proximity", hasBg: true },
-  { id: "support", name: "Service & Support", hasBg: false },
-  { id: "location", name: "Location Benefits", hasBg: true },
-  { id: "gifts", name: "Exclusive Gifts", hasBg: false },
+  { id: "cost", name: "Package Cost", hasBg: false, isPricing: true },
+  { id: "accommodation", name: "Accommodation", hasBg: true },
+  { id: "proximity", name: "Venue Proximity", hasBg: false },
+  { id: "support", name: "Service & Support", hasBg: true },
+  { id: "location", name: "Location Benefits", hasBg: false },
+  { id: "gifts", name: "Exclusive Gifts", hasBg: true },
 ];

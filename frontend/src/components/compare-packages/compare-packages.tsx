@@ -164,55 +164,16 @@ export const ComparePackages = () => {
           </div>
         </div>
 
-        {/* Comparison Row: Pricing */}
-        <div className="w-screen relative left-1/2 -translate-x-1/2 overflow-hidden bg-transparent">
-          <div className="mx-auto px-4 md:px-8 py-6">
-            <div className="grid grid-cols-2 gap-4 md:gap-32 w-full">
-              {/* Left Pricing */}
-              <div className="flex flex-col items-center text-center max-w-sm mx-auto">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <span className="text-2xl md:text-5xl font-black text-primary-300">
-                    {leftPkg.price}
-                  </span>
-                  <sup className="text-sm md:text-3xl font-black text-primary-300 mt-2">
-                    {leftPkg.cents}
-                  </sup>
-                </div>
-                <h4 className="text-sm md:text-2xl font-bold text-neutral-800 mb-2">
-                  Package Cost
-                </h4>
-                <p className="text-neutral-400 text-xs md:text-base leading-relaxed">
-                  {leftPkg.occupancy}
-                </p>
-              </div>
-
-              {/* Right Pricing */}
-              <div className="flex flex-col items-center text-center max-w-sm mx-auto">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <span className="text-2xl md:text-5xl font-black text-primary-300">
-                    {rightPkg.price}
-                  </span>
-                  <sup className="text-sm md:text-3xl font-black text-primary-300 mt-2">
-                    {rightPkg.cents}
-                  </sup>
-                </div>
-                <h4 className="text-sm md:text-2xl font-bold text-neutral-800 mb-2">
-                  Package Cost
-                </h4>
-                <p className="text-neutral-400 text-xs md:text-base leading-relaxed">
-                  {rightPkg.occupancy}
-                </p>
-              </div>
-            </div>
-          </div>
-          <hr className="border-neutral-200 mt-4 pb-4 max-w-5xl mx-auto" />
-        </div>
-
-        {/* Features Comparison Rows */}
+        {/* Comparison Table Rows */}
         <div className="w-full space-y-0">
           {FEATURE_CATEGORIES.map((category, idx) => {
-            const leftFeat = (leftPkg.features as any)[category.id];
-            const rightFeat = (rightPkg.features as any)[category.id];
+            const isCost = category.id === "cost";
+            const leftFeat = isCost
+              ? null
+              : (leftPkg.features as any)[category.id];
+            const rightFeat = isCost
+              ? null
+              : (rightPkg.features as any)[category.id];
 
             return (
               <div
@@ -226,42 +187,84 @@ export const ComparePackages = () => {
                   )}
                 >
                   <div className="grid grid-cols-2 gap-4 md:gap-32 w-full">
-                    {/* Left Feature */}
+                    {/* Left Column */}
                     <div className="flex flex-col items-center text-center max-w-sm mx-auto">
-                      {leftFeat.icon && (
-                        <leftFeat.icon
-                          className={cn(
-                            "size-6 md:size-8 mb-2",
-                            leftFeat.iconColor,
+                      {isCost ? (
+                        <>
+                          <div className="flex items-center justify-center gap-1 mb-1">
+                            <span className="text-2xl md:text-5xl font-black text-primary-300">
+                              {leftPkg.price}
+                            </span>
+                            <sup className="text-sm md:text-3xl font-black text-primary-300 mt-2">
+                              {leftPkg.cents}
+                            </sup>
+                          </div>
+                          <h4 className="text-sm md:text-2xl font-bold text-neutral-800 mb-2">
+                            Package Cost
+                          </h4>
+                          <p className="text-neutral-400 text-xs md:text-base leading-relaxed">
+                            {leftPkg.occupancy}
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          {leftFeat.icon && (
+                            <leftFeat.icon
+                              className={cn(
+                                "size-6 md:size-8 mb-2",
+                                leftFeat.iconColor,
+                              )}
+                              strokeWidth={2.5}
+                            />
                           )}
-                          strokeWidth={2.5}
-                        />
+                          <h4 className="text-sm md:text-2xl font-bold text-neutral-800 mb-2">
+                            {leftFeat.title}
+                          </h4>
+                          <p className="text-neutral-400 text-xs md:text-base leading-relaxed">
+                            {leftFeat.description}
+                          </p>
+                        </>
                       )}
-                      <h4 className="text-sm md:text-2xl font-bold text-neutral-800 mb-2">
-                        {leftFeat.title}
-                      </h4>
-                      <p className="text-neutral-400 text-xs md:text-base leading-relaxed">
-                        {leftFeat.description}
-                      </p>
                     </div>
 
-                    {/* Right Feature */}
+                    {/* Right Column */}
                     <div className="flex flex-col items-center text-center max-w-sm mx-auto">
-                      {rightFeat.icon && (
-                        <rightFeat.icon
-                          className={cn(
-                            "size-6 md:size-8 mb-2",
-                            rightFeat.iconColor,
+                      {isCost ? (
+                        <>
+                          <div className="flex items-center justify-center gap-1 mb-1">
+                            <span className="text-2xl md:text-5xl font-black text-primary-300">
+                              {rightPkg.price}
+                            </span>
+                            <sup className="text-sm md:text-3xl font-black text-primary-300 mt-2">
+                              {rightPkg.cents}
+                            </sup>
+                          </div>
+                          <h4 className="text-sm md:text-2xl font-bold text-neutral-800 mb-2">
+                            Package Cost
+                          </h4>
+                          <p className="text-neutral-400 text-xs md:text-base leading-relaxed">
+                            {rightPkg.occupancy}
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          {rightFeat.icon && (
+                            <rightFeat.icon
+                              className={cn(
+                                "size-6 md:size-8 mb-2",
+                                rightFeat.iconColor,
+                              )}
+                              strokeWidth={2.5}
+                            />
                           )}
-                          strokeWidth={2.5}
-                        />
+                          <h4 className="text-sm md:text-2xl font-bold text-neutral-800 mb-2">
+                            {rightFeat.title}
+                          </h4>
+                          <p className="text-neutral-400 text-xs md:text-base leading-relaxed">
+                            {rightFeat.description}
+                          </p>
+                        </>
                       )}
-                      <h4 className="text-sm md:text-2xl font-bold text-neutral-800 mb-2">
-                        {rightFeat.title}
-                      </h4>
-                      <p className="text-neutral-400 text-xs md:text-base leading-relaxed">
-                        {rightFeat.description}
-                      </p>
                     </div>
                   </div>
                 </div>
