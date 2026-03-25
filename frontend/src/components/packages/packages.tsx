@@ -118,6 +118,7 @@ export const Packages = () => {
   );
 
   return (
+<<<<<<< HEAD
     <section className="relative overflow-hiddenm">
       {/* Decorative Grid Lines and Nodes */}
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -126,23 +127,34 @@ export const Packages = () => {
         <div className="absolute bottom-10 md:bottom-14 left-0 w-full h-px bg-neutral-300/50" />
         <div className="absolute top-0 left-3 lg:left-15 w-px h-full bg-neutral-300/50" />
         <div className="absolute top-0 right-3 lg:right-15 w-px h-full bg-neutral-300/50" />
+=======
+    <section className="relative">
+      <ComponentLayout className="relative py-12 md:py-16 overflow-visible" id="packages">
+        {/* Decorative Grid Lines and Nodes */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          {/* Continuous Grid Lines (framing the content) */}
+          <div className="absolute top-6 md:top-8 left-0 w-full h-px bg-neutral-300/50" />
+          <div className="absolute bottom-6 md:bottom-8 left-0 w-full h-px bg-neutral-300/50" />
+          <div className="absolute top-0 left-3 lg:left-15 w-px h-full bg-neutral-300/50" />
+          <div className="absolute top-0 right-3 lg:right-15 w-px h-full bg-neutral-300/50" />
+>>>>>>> 1ca192f2b459263d2fd562587aff1255b5e2ea48
 
-        {/* Intersection marker pluses */}
-        <div className="absolute top-10 md:top-14 left-3 lg:left-15 -translate-x-1/2 -translate-y-1/2 opacity-80">
-          <Plus className="size-10 text-primary-100" />
+          {/* Intersection marker pluses */}
+          <div className="absolute top-6 md:top-8 left-3 lg:left-15 -translate-x-1/2 -translate-y-1/2 opacity-80">
+            <Plus className="size-10 text-primary-100" />
+          </div>
+          <div className="absolute top-6 md:top-8 right-3 lg:right-15 translate-x-1/2 -translate-y-1/2 opacity-80">
+            <Plus className="size-10 text-primary-100" />
+          </div>
+          <div className="absolute bottom-6 md:bottom-8 left-3 lg:left-15 -translate-x-1/2 translate-y-1/2 opacity-80">
+            <Plus className="size-10 text-primary-100" />
+          </div>
+          <div className="absolute bottom-6 md:bottom-8 right-3 lg:right-15 translate-x-1/2 translate-y-1/2 opacity-80">
+            <Plus className="size-10 text-primary-100" />
+          </div>
         </div>
-        <div className="absolute top-10 md:top-14 right-3 lg:right-15 translate-x-1/2 -translate-y-1/2 opacity-80">
-          <Plus className="size-10 text-primary-100" />
-        </div>
-        <div className="absolute bottom-10 md:bottom-14 left-3 lg:left-15 -translate-x-1/2 translate-y-1/2 opacity-80">
-          <Plus className="size-10 text-primary-100" />
-        </div>
-        <div className="absolute bottom-10 md:bottom-14 right-3 lg:right-15 translate-x-1/2 translate-y-1/2 opacity-80">
-          <Plus className="size-10 text-primary-100" />
-        </div>
-      </div>
 
-      <ComponentLayout className="relative z-10 py-15" id="packages">
+        <div className="relative z-10 px-4 md:px-6 pt-8 md:pt-10 pb-8 md:pb-10">
         {/* Header */}
         <div className="mb-14">
           <h2 className="text-4xl md:text-5xl font-clash text-neutral-800 leading-[1.05] mb-2 tracking-tight">
@@ -252,6 +264,7 @@ export const Packages = () => {
                 />
               );
             })}
+        </div>
         </div>
       </ComponentLayout>
     </section>

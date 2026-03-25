@@ -41,6 +41,136 @@ const createPackageSchema = z.object({
   { message: "Either duration or both startDate and endDate are required", path: ["duration"] }
 );
 
+const FOUR_STAR_FEATURE_BY_LINE_KEY: Record<string, { title: string; description: string }> = {
+  accommodation: {
+    title: "Upscale Luxury",
+    description:
+      "Luxury 4-Star accommodation with enhanced comfort and premium modern amenities.",
+  },
+  row_1: {
+    title: "Upscale Luxury",
+    description:
+      "Luxury 4-Star accommodation with enhanced comfort and premium modern amenities.",
+  },
+  proximity: {
+    title: "15 Min to Venue",
+    description:
+      "Unbeatable proximity to match venues, saving you valuable time on game day.",
+  },
+  row_2: {
+    title: "15 Min to Venue",
+    description:
+      "Unbeatable proximity to match venues, saving you valuable time on game day.",
+  },
+  support: {
+    title: "24hr Room Service",
+    description:
+      "Dedicated lifestyle manager for restaurant bookings, city tours, and personal errands.",
+  },
+  row_3: {
+    title: "24hr Room Service",
+    description:
+      "Dedicated lifestyle manager for restaurant bookings, city tours, and personal errands.",
+  },
+  location: {
+    title: "Prime City Access",
+    description:
+      "Direct access to major shopping, high-end dining, and Qatar's historic sites.",
+  },
+  row_4: {
+    title: "Prime City Access",
+    description:
+      "Direct access to major shopping, high-end dining, and Qatar's historic sites.",
+  },
+  gifts: {
+    title: "Official Merchandise Kit",
+    description:
+      "Premium collection including official jersey, leather scarf, and match-ball replica.",
+  },
+  row_5: {
+    title: "Official Merchandise Kit",
+    description:
+      "Premium collection including official jersey, leather scarf, and match-ball replica.",
+  },
+};
+
+const THREE_STAR_FEATURE_BY_LINE_KEY: Record<string, { title: string; description: string }> = {
+  accommodation: {
+    title: "Standard Comfort",
+    description:
+      "Daily premium buffet breakfast to start your match day with localized delicacies.",
+  },
+  row_1: {
+    title: "Standard Comfort",
+    description:
+      "Daily premium buffet breakfast to start your match day with localized delicacies.",
+  },
+  proximity: {
+    title: "35 Min to Venue",
+    description:
+      "Reliable transport with a standard commute time to the tournament stadium.",
+  },
+  row_2: {
+    title: "35 Min to Venue",
+    description:
+      "Reliable transport with a standard commute time to the tournament stadium.",
+  },
+  support: {
+    title: "24hr Room Service",
+    description:
+      "Centralized digital support desk for logistics and tournament-related queries",
+  },
+  row_3: {
+    title: "24hr Room Service",
+    description:
+      "Centralized digital support desk for logistics and tournament-related queries",
+  },
+  location: {
+    title: "Strategic Location",
+    description:
+      "Conveniently located with easy public transit links to the city center.",
+  },
+  row_4: {
+    title: "Strategic Location",
+    description:
+      "Conveniently located with easy public transit links to the city center.",
+  },
+  gifts: {
+    title: "Commemorative Pin",
+    description:
+      "Limited edition tournament lapel pin and official welcome lanyard.",
+  },
+  row_5: {
+    title: "Commemorative Pin",
+    description:
+      "Limited edition tournament lapel pin and official welcome lanyard.",
+  },
+};
+
+type ParsedPackageInput = z.infer<typeof createPackageSchema>;
+
+const withTierDescriptionDefaults = (
+  options: ParsedPackageInput["comparisonOptions"]
+): ParsedPackageInput["comparisonOptions"] =>
+  options.map((option) => {
+    const descriptionMap =
+      option.tier === "four_star"
+        ? FOUR_STAR_FEATURE_BY_LINE_KEY
+        : THREE_STAR_FEATURE_BY_LINE_KEY;
+
+    return {
+      ...option,
+      features: option.features.map((feature) => {
+        const normalizedLineKey = feature.lineKey.trim().toLowerCase();
+        return {
+          ...feature,
+          title: descriptionMap[normalizedLineKey]?.title ?? feature.title,
+          description: descriptionMap[normalizedLineKey]?.description ?? feature.description,
+        };
+      }),
+    };
+  });
+
 function serializePackage(pkg: {
   id: string;
   name: string;
@@ -159,6 +289,8 @@ export const createPackage = async (req: Request, res: Response) => {
       isActive,
       gameIds,
     } = parsed.data;
+    const normalizedComparisonOptions =
+      withTierDescriptionDefaults(comparisonOptions);
     const typeExists = await prisma.packageType.findUnique({
       where: { id: typeId },
     });
@@ -196,7 +328,7 @@ export const createPackage = async (req: Request, res: Response) => {
         cityCount,
         includedItems,
         comparisonOptions: {
-          create: comparisonOptions.map((option) => ({
+          create: normalizedComparisonOptions.map((option) => ({
             tier: option.tier,
             label: option.label,
             price: option.price,
@@ -282,6 +414,8 @@ export const updatePackage = async (req: Request, res: Response) => {
       isActive,
       gameIds,
     } = parsed.data;
+    const normalizedComparisonOptions =
+      withTierDescriptionDefaults(comparisonOptions);
     const typeExists = await prisma.packageType.findUnique({
       where: { id: typeId },
     });
@@ -331,7 +465,7 @@ export const updatePackage = async (req: Request, res: Response) => {
         cityCount,
         includedItems,
         comparisonOptions: {
-          create: comparisonOptions.map((option) => ({
+          create: normalizedComparisonOptions.map((option) => ({
             tier: option.tier,
             label: option.label,
             price: option.price,

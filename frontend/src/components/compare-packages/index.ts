@@ -1,1 +1,1 @@
-export * from "./compare-packages";
+export * from "./compare-packages-backend";

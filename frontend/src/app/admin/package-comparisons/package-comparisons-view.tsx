@@ -18,7 +18,14 @@ import {
 import { useToast } from '@/components/ui/toast';
 import { useAdminPackages } from '@/hooks/queries/useAdminPackages';
 import { useUpdatePackage } from '@/hooks/mutations/useUpdatePackage';
-import type { BookingPackage, PackageComparisonOption } from '@/types/booking';
+import { useComparePackageOptions } from '@/hooks/mutations/useComparePackageOptions';
+import type {
+  BookingPackage,
+  ComparePackageOptionsQuery,
+  PackageComparisonOption,
+  PackageComparisonResponse,
+} from '@/types/booking';
+import { z } from 'zod';
 
 function parseFeatureLines(text: string): Array<{ title: string; description?: string }> {
   return text
@@ -51,6 +58,7 @@ export function PackageComparisonsView() {
   const { addToast } = useToast();
   const { data: packages = [], isLoading } = useAdminPackages();
   const updatePackageMutation = useUpdatePackage();
+  const compareMutation = useComparePackageOptions();
 
   const [packageId, setPackageId] = useState('');
   const [fourStarLabel, setFourStarLabel] = useState('4 Star Hotel Package');
@@ -63,6 +71,21 @@ export function PackageComparisonsView() {
   const [threeStarImageUrl, setThreeStarImageUrl] = useState('');
   const [threeStarCtaLabel, setThreeStarCtaLabel] = useState('Book Stay');
   const [threeStarFeaturesText, setThreeStarFeaturesText] = useState('');
+
+  const [compareQueryText, setCompareQueryText] = useState<string>(
+    JSON.stringify(
+      {
+        leftPackageId: '',
+        leftTier: 'four_star',
+        rightPackageId: '',
+        rightTier: 'three_star',
+      },
+      null,
+      2,
+    ),
+  );
+  const [compareResult, setCompareResult] = useState<PackageComparisonResponse | null>(null);
+  const [compareErrorText, setCompareErrorText] = useState<string | null>(null);
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -187,6 +210,72 @@ export function PackageComparisonsView() {
     }
   };
 
+  const compareQuerySchema = z
+    .object({
+      leftOptionId: z.string().uuid().optional(),
+      rightOptionId: z.string().uuid().optional(),
+      leftPackageId: z.string().uuid().optional(),
+      rightPackageId: z.string().uuid().optional(),
+      leftTier: z.enum(['three_star', 'four_star']).optional(),
+      rightTier: z.enum(['three_star', 'four_star']).optional(),
+    })
+    .refine(
+      (q) => Boolean(q.leftOptionId) || Boolean(q.leftPackageId && q.leftTier),
+      { message: 'Provide either leftOptionId or leftPackageId + leftTier' },
+    )
+    .refine(
+      (q) => Boolean(q.rightOptionId) || Boolean(q.rightPackageId && q.rightTier),
+      { message: 'Provide either rightOptionId or rightPackageId + rightTier' },
+    );
+
+  const normalizeCompareQuery = (
+    input: unknown,
+  ): ComparePackageOptionsQuery | null => {
+    if (!input || typeof input !== 'object') return null;
+    const record = input as Record<string, unknown>;
+    const normalized: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(record)) {
+      if (typeof value === 'string' && value.trim() === '') continue;
+      normalized[key] = value;
+    }
+    const parsed = compareQuerySchema.safeParse(normalized);
+    if (!parsed.success) return null;
+    return parsed.data as ComparePackageOptionsQuery;
+  };
+
+  const handleCompare = async () => {
+    setCompareErrorText(null);
+    setCompareResult(null);
+
+    let parsedJson: unknown;
+    try {
+      parsedJson = JSON.parse(compareQueryText);
+    } catch {
+      setCompareErrorText('Invalid JSON. Please check your query.');
+      return;
+    }
+
+    const normalized = normalizeCompareQuery(parsedJson);
+    if (!normalized) {
+      setCompareErrorText(
+        'Query is invalid. Provide either leftOptionId/rightOptionId OR leftPackageId+leftTier and rightPackageId+rightTier.',
+      );
+      return;
+    }
+
+    try {
+      const result = await compareMutation.mutateAsync(normalized);
+      setCompareResult(result);
+      addToast('Comparison loaded.', 'success');
+    } catch (error: unknown) {
+      const message =
+        error && typeof error === 'object' && 'response' in error
+          ? (error as { response?: { data?: { error?: string } } }).response?.data?.error
+          : null;
+      setCompareErrorText(message || 'Failed to compare package options.');
+    }
+  };
+
   return (
     <div className="space-y-6 p-4 md:p-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -302,6 +391,132 @@ export function PackageComparisonsView() {
           </CardContent>
         </Card>
       )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Compare (backend-aligned)</CardTitle>
+          <CardDescription>
+            Paste query JSON for <code>GET /api/packages/comparison</code> to compare two 3-star/4-star options.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-2">
+            <Label htmlFor="compare-query">Compare query JSON</Label>
+            <textarea
+              id="compare-query"
+              value={compareQueryText}
+              onChange={(e) => setCompareQueryText(e.target.value)}
+              className="border-input bg-background min-h-40 w-full rounded-md border px-3 py-2 font-mono text-xs"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button type="button" onClick={handleCompare} disabled={compareMutation.isPending}>
+              {compareMutation.isPending ? <Loader2 className="size-4 animate-spin" /> : 'Compare now'}
+            </Button>
+            {selectedPackage && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setCompareResult(null);
+                  setCompareErrorText(null);
+                  setCompareQueryText(
+                    JSON.stringify(
+                      {
+                        leftPackageId: selectedPackage.id,
+                        leftTier: 'four_star',
+                        rightPackageId: selectedPackage.id,
+                        rightTier: 'three_star',
+                      },
+                      null,
+                      2,
+                    ),
+                  );
+                }}
+              >
+                Compare selected pkg (4 vs 3)
+              </Button>
+            )}
+          </div>
+
+          {compareErrorText && (
+            <p className="text-destructive text-sm">{compareErrorText}</p>
+          )}
+
+          {compareResult && (
+            <div className="space-y-4">
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="rounded-md border p-3">
+                  <p className="text-sm text-muted-foreground">Left</p>
+                  <p className="font-medium">
+                    {compareResult.left.packageName} ({compareResult.left.tier.replace('_', ' ')})
+                  </p>
+                  <p className="text-sm">
+                    {compareResult.left.label} - ${compareResult.left.price.toLocaleString()}
+                  </p>
+                </div>
+                <div className="rounded-md border p-3">
+                  <p className="text-sm text-muted-foreground">Right</p>
+                  <p className="font-medium">
+                    {compareResult.right.packageName} ({compareResult.right.tier.replace('_', ' ')})
+                  </p>
+                  <p className="text-sm">
+                    {compareResult.right.label} - ${compareResult.right.price.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[640px] border-collapse">
+                  <thead>
+                    <tr>
+                      <th className="text-left text-xs text-muted-foreground font-medium border-b px-3 py-2">
+                        Feature (lineKey)
+                      </th>
+                      <th className="text-left text-xs text-muted-foreground font-medium border-b px-3 py-2">
+                        Left
+                      </th>
+                      <th className="text-left text-xs text-muted-foreground font-medium border-b px-3 py-2">
+                        Right
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {compareResult.comparisonRows.map((row) => (
+                      <tr key={row.lineKey} className="border-b last:border-b-0">
+                        <td className="px-3 py-2 align-top">
+                          <div className="font-medium text-sm">{row.lineKey}</div>
+                        </td>
+                        <td className="px-3 py-2 align-top">
+                          <div className="font-medium text-sm">
+                            {row.left?.title ?? '—'}
+                          </div>
+                          {row.left?.description && (
+                            <div className="text-sm text-muted-foreground mt-1">
+                              {row.left.description}
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-3 py-2 align-top">
+                          <div className="font-medium text-sm">
+                            {row.right?.title ?? '—'}
+                          </div>
+                          {row.right?.description && (
+                            <div className="text-sm text-muted-foreground mt-1">
+                              {row.right.description}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
