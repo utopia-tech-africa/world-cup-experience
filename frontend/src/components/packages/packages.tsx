@@ -45,15 +45,22 @@ function getTripSummaryForBooking(pkg: BookingPackage) {
   const typeCode =
     typeof pkg.type === "string" ? pkg.type : (pkg.type?.code ?? "");
   const haystack = `${pkg.typeName ?? ""} ${typeCode}`.toLowerCase();
+  const matchCount = pkg.games?.length ?? 0;
   const packageName =
-    pkg.name?.trim() ||
-    (haystack.includes("triple")
-      ? "Triple Game"
-      : haystack.includes("double")
-        ? "Double Game"
-        : haystack.includes("quad")
-          ? "Quad Game"
-          : "One Game");
+    pkg.name.trim() ||
+    (haystack.includes("quad") || haystack.includes("four")
+      ? "Quad Game"
+      : haystack.includes("triple") || haystack.includes("three")
+        ? "Triple Game"
+        : haystack.includes("double") || haystack.includes("two")
+          ? "Double Game"
+          : matchCount >= 4
+            ? "Quad Game"
+            : matchCount >= 3
+              ? "Triple Game"
+              : matchCount === 2
+                ? "Double Game"
+                : "One Game");
   return { packageName, duration };
 }
 
@@ -233,11 +240,11 @@ export const Packages = () => {
                     dateRange: formatPackageDateRange(pkg),
                     options: [
                       {
-                        hotelType: "4 star Hotel",
+                        hotelType: "4 stars",
                         price: formatUsdPrice(pkg.hotelPrice),
                       },
                       {
-                        hotelType: "3 star Hotel",
+                        hotelType: "3 stars",
                         price: formatUsdPrice(pkg.hostelPrice),
                       },
                     ],
