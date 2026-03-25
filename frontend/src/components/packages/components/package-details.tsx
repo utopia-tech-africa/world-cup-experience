@@ -61,7 +61,7 @@ export const PackageDetails = ({
           ) : null}
         </h3>
 
-        <div className="flex items-center gap-3 sm:gap-6">
+        <div className="flex items-center gap-3 sm:gap-6 flex-wrap">
           <div className="flex items-center gap-2  text-base sm:text-lg font-clash tracking-wider text-nowrap">
             <div className="size-1.5 bg-white" /> {matchesLabel}
           </div>
@@ -119,10 +119,10 @@ export const PackageDetails = ({
         </div>
       )}
 
-      <div className="flex items-center gap-2 sm:gap-5 mt-4 relative z-10 w-full">
+      <div className="flex items-center gap-2 sm:gap-5 mt-4 relative z-10 w-full flex-wrap">
         <MaskRevealButton
           onClick={onBook}
-          className="flex-1 lg:rounded-bl-3xl font-bold px-3 sm:px-6 py-8 text-xl md:text-2xl"
+          className="flex-1 lg:rounded-bl-3xl font-bold px-3 sm:px-6 py-8 text-xl md:text-2xl min-w-[200px]"
           hoverBgClass={bgColorClass}
         >
           Book now
@@ -130,7 +130,7 @@ export const PackageDetails = ({
 
         <Link href="tel:+233593679741" className="flex-1">
           <MaskRevealButton
-            className="w-full px-3 sm:px-6 py-8 text-xl md:text-2xl font-normal "
+            className="w-full px-3 sm:px-6 py-8 text-xl md:text-2xl font-normal min-w-[200px] "
             hoverBgClass={bgColorClass}
           >
             Corporate packages
