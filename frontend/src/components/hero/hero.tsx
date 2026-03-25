@@ -180,7 +180,7 @@ export function Hero() {
         animate={loaderDone ? { opacity: 1 } : {}}
         transition={{ duration: 1, delay: 1.2 }}
       >
-        <div className="absolute bottom-24  md:bottom-26 right-3 md:right-24 2xl:right-28">
+        <div className="absolute top-24  md:top-26 right-3 md:right-24 2xl:right-28">
           <HotPackagesWidget />
         </div>
       </motion.div>
