@@ -5,13 +5,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { Match } from "@/components/games/data/games-data";
 
-function TeamFlag({
-  src,
-  alt,
-}: {
-  src: string;
-  alt: string;
-}) {
+function TeamFlag({ src, alt }: { src: string; alt: string }) {
   const trimmed = src.trim();
   const isRemote =
     trimmed.startsWith("http://") || trimmed.startsWith("https://");
@@ -28,17 +22,11 @@ function TeamFlag({
     return (
       // Remote team flags may be on any CDN; avoid Next image domain config.
       // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={trimmed}
-        alt={alt}
-        className="size-full object-cover"
-      />
+      <img src={trimmed} alt={alt} className="size-full object-cover" />
     );
   }
 
-  return (
-    <Image src={trimmed} alt={alt} fill className="object-cover" />
-  );
+  return <Image src={trimmed} alt={alt} fill className="object-cover" />;
 }
 
 interface TotalPackageMatchesProps {
@@ -65,7 +53,7 @@ export const TotalPackageMatches = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "w-full relative flex flex-col p-5 overflow-hidden items-center justify-center text-white cursor-pointer lg:w-[50%] align-start rounded-bl-[60px] lg:rounded-bl-none",
+        "w-full relative flex flex-col p-5 overflow-hidden items-center justify-center text-white cursor-pointer lg:w-[50%] align-start rounded-bl-[30px] lg:rounded-bl-none",
         className,
       )}
     >

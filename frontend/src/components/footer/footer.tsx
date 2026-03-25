@@ -47,7 +47,7 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="relative w-full bg-black py-8 overflow-hidden text-neutral-100 flex items-center justify-center">
+    <footer className="relative w-full bg-black mt-10 md:mt-30 py-8 overflow-hidden text-neutral-100 flex items-center justify-center">
       {/* Top Decorative Line */}
       <div className="absolute top-0 left-0 w-full h-[15px] z-50 bg-[linear-gradient(45deg,#d14b21_33%,#a2d149_33%,#a2d149_66%,#79d1d1_66%)]" />
 

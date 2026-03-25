@@ -79,8 +79,13 @@ export function Hero() {
           muted
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
-          src="https://res.cloudinary.com/dan9camhs/video/upload/v1774370993/altair-landing-page-video_qyeesp.mp4"
-        />
+        >
+          <source
+            src="https://res.cloudinary.com/dan9camhs/video/upload/v1774370993/altair-landing-page-video_qyeesp.mp4"
+            media="(min-width: 640px)"
+          />
+          <source src="https://res.cloudinary.com/dan9camhs/video/upload/v1774448270/altair-hero-bg-mobile_adsyii.mp4" />
+        </video>
       </div>
 
       {/* Decorative Frosted Glass Panels */}

@@ -6,7 +6,7 @@ import { MaskRevealButton } from "../mask-reveal-button";
 
 export const FifaFanfest = () => {
   return (
-    <div className="relative mb-30">
+    <div className="relative">
       <Image
         src={FifaFinfestImg}
         alt="Fifa Fan Fest Img"
