@@ -1,21 +1,23 @@
 import { PackageDetails } from "./package-details";
 import { TotalPackageMatches } from "./package-matches";
 import type { Match } from "@/components/games/data/games-data";
+import type { ComponentType } from "react";
+import type { StaticImport } from "next/dist/shared/lib/get-img-props";
 
 type PackageCardProps = {
   matches: Match[];
   onBook?: () => void;
   title: string;
-  subtitle: string;
+  subtitle?: string;
   matchesLabel: string;
   daysLabel: string;
   citiesLabel: string;
   includes: string[];
-  bgPattern?: any;
+  bgPattern?: ComponentType<{ className?: string }>;
   bgColorClass?: string;
   badgePackageType: string;
-  gameCardBg: any;
-  roomBg: any;
+  gameCardBg: StaticImport | string;
+  roomBg: StaticImport | string;
   pricing?: {
     dateRange: string;
     options: { hotelType: string; price: string }[];

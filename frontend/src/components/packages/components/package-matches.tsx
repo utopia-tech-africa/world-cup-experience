@@ -5,6 +5,42 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { Match } from "@/components/games/data/games-data";
 
+function TeamFlag({
+  src,
+  alt,
+}: {
+  src: string;
+  alt: string;
+}) {
+  const trimmed = src.trim();
+  const isRemote =
+    trimmed.startsWith("http://") || trimmed.startsWith("https://");
+
+  if (!trimmed) {
+    return (
+      <div className="flex size-full items-center justify-center bg-white/10 text-xs font-semibold uppercase tracking-wide text-white">
+        {alt.slice(0, 3)}
+      </div>
+    );
+  }
+
+  if (isRemote) {
+    return (
+      // Remote team flags may be on any CDN; avoid Next image domain config.
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={trimmed}
+        alt={alt}
+        className="size-full object-cover"
+      />
+    );
+  }
+
+  return (
+    <Image src={trimmed} alt={alt} fill className="object-cover" />
+  );
+}
+
 interface TotalPackageMatchesProps {
   matches: Match[];
   packageType: string;
@@ -70,6 +106,11 @@ export const TotalPackageMatches = ({
       <div className="relative z-20 flex flex-col gap-6 w-full max-w-3xl pt-14">
         {/* Match Details List */}
         <div className="flex flex-col gap-4">
+          {matches.length === 0 && (
+            <p className="text-center font-helvetica text-base text-white/80">
+              Match fixtures will appear here once they are published.
+            </p>
+          )}
           {matches.map((match, idx) => (
             <div key={idx} className="flex flex-col items-center w-full">
               {/* Stadium Name on Top */}
@@ -80,13 +121,8 @@ export const TotalPackageMatches = ({
               <div className="flex items-center justify-between w-full px-4 md:px-6">
                 {/* Team 1 */}
                 <div className="flex flex-col items-center gap-2">
-                  <div className="relative w-24 h-14 md:w-40 md:h-24 overflow-hidden rounded-sm shadow-xl border border-white/10">
-                    <Image
-                      src={match.team1.flag ?? ""}
-                      alt={match.team1.name}
-                      fill
-                      className="object-cover"
-                    />
+                  <div className="relative h-14 w-24 overflow-hidden rounded-sm border border-white/10 shadow-xl md:h-24 md:w-40">
+                    <TeamFlag src={match.team1.flag} alt={match.team1.name} />
                   </div>
                   <span className="text-xl md:text-3xl font-bold font-clash tracking-wide">
                     {match.team1.name}
@@ -102,13 +138,8 @@ export const TotalPackageMatches = ({
 
                 {/* Team 2 */}
                 <div className="flex flex-col items-center gap-2">
-                  <div className="relative w-24 h-14 md:w-40 md:h-24 overflow-hidden rounded-sm shadow-xl border border-white/10">
-                    <Image
-                      src={match.team2.flag ?? ""}
-                      alt={match.team2.name}
-                      fill
-                      className="object-cover"
-                    />
+                  <div className="relative h-14 w-24 overflow-hidden rounded-sm border border-white/10 shadow-xl md:h-24 md:w-40">
+                    <TeamFlag src={match.team2.flag} alt={match.team2.name} />
                   </div>
                   <span className="text-xl md:text-3xl font-bold font-clash tracking-wide">
                     {match.team2.name}

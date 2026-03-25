@@ -13,7 +13,8 @@ interface PricingOption {
 
 interface PackageDetailsProps {
   title: string;
-  subtitle: string;
+  /** Second line under the title; omit when the full name is already in `title`. */
+  subtitle?: string;
   matchesLabel: string;
   daysLabel: string;
   citiesLabel: string;
@@ -52,8 +53,12 @@ export const PackageDetails = ({
       <div className="relative z-10 space-y-4">
         <h3 className="text-6xl md:text-6xl font-semibold font-clash  tracking-wider">
           {title}
-          <br />
-          {subtitle}
+          {subtitle ? (
+            <>
+              <br />
+              {subtitle}
+            </>
+          ) : null}
         </h3>
 
         <div className="flex items-center gap-3 sm:gap-6">
