@@ -16,6 +16,8 @@ import {
   Trash2,
   UserCheck,
   UserPlus,
+  Check,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -30,6 +32,7 @@ import { toBackendDateString } from "@/lib/booking-api-payload";
 import { getBasePackagePrice } from "@/lib/booking-pricing";
 import { useAddons } from "@/hooks/queries/useAddons";
 import { usePackages } from "@/hooks/queries/usePackages";
+import { INCLUSIONS_EXCLUSIONS_DATA } from "@/components/packages/data/packages-data";
 import type { AddOn } from "@/types/booking";
 
 const extraTravelerSchema = z.object({
@@ -222,21 +225,57 @@ export function BookingForm() {
 
       <hr className="border-0 border-t border-[#BFBFBF]/80" />
 
-      {/* Package details — Figma 608-3033: above optional addons */}
-      <section className="flex flex-col gap-2">
-        <h2 className="text-foreground font-clash text-lg font-medium md:text-2xl">
-          Package details
-        </h2>
-        <ul className="font-helvetica text-muted-foreground list-disc space-y-1 pl-5 text-base md:text-lg">
-          <li>All packages require that you have a visa</li>
-          <li>Plane tickets are not included in package</li>
-          <li>Transportation to matches included</li>
-          <li>All tours are included (You will have to purchase tickets)</li>
-          <li>
-            Match tickets are not included (Assistance to acquire them are
-            available)
-          </li>
-        </ul>
+      {/* Package inclusions/exclusions block (Figma card style) */}
+      <section className="flex flex-col lg:flex-row gap-6">
+        {/* inclusions */}
+        <div className="flex-1 border border-[#A0C63E] p-6 rounded-bl-[40px] shadow-[0_0_10px_2px_rgba(113,163,79,0.15)]">
+          <div className="mb-6">
+            <h3 className="text-[24px] text-[#386D13] font-semibold font-clash">
+              Package Inclusions
+            </h3>
+            <div className="w-full mt-3 border-b border-black/27" />
+          </div>
+
+          <div className="flex flex-col gap-[4px]">
+            {INCLUSIONS_EXCLUSIONS_DATA.inclusions.map((item, index) => (
+              <div key={`${item}-${index}`} className="flex items-start gap-3">
+                <div className="mt-1">
+                  <div className="w-[12px] h-[12px] flex items-center justify-center bg-[#71A34F]">
+                    <Check size={10} color="#FFFFFF" />
+                  </div>
+                </div>
+                <p className="text-[#2A2A2A] font-helvetica font-medium text-[13px]">
+                  {item}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* exclusions */}
+        <div className="flex-1 border border-[#FF3401D9] p-6 shadow-[0_0_10px_3px_rgba(255,52,1,0.15)] rounded-bl-[40px] lg:rounded-bl-none">
+          <div className="mb-6">
+            <h3 className="text-[24px] text-[#FF3401] font-semibold font-clash">
+              Package Exclusions
+            </h3>
+            <div className="w-full mt-3 border-b border-black/27" />
+          </div>
+
+          <div className="flex flex-col gap-[4px]">
+            {INCLUSIONS_EXCLUSIONS_DATA.exclusions.map((item, index) => (
+              <div key={`${item}-${index}`} className="flex items-start gap-3">
+                <div className="mt-1">
+                  <div className="w-[12px] h-[12px] flex items-center justify-center bg-[#FF3401]">
+                    <X size={10} color="#FFFFFF" />
+                  </div>
+                </div>
+                <p className="text-[#2A2A2A] font-medium text-[13px] font-helvetica">
+                  {item}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       <hr className="border-0 border-t border-[#BFBFBF]/80" />
