@@ -43,7 +43,7 @@ export const PackageDetails = ({
   return (
     <div
       className={cn(
-        "relative overflow-hidden lg:w-[50%] p-4 sm:p-8 flex flex-col justify-between text-white rounded-bl-[40px] sm:rounded-bl-[60px]",
+        "relative overflow-hidden lg:w-[50%] p-4 sm:p-8 flex flex-col justify-between text-white lg:rounded-bl-[60px]",
         bgColorClass,
       )}
     >
@@ -122,7 +122,7 @@ export const PackageDetails = ({
       <div className="flex items-center gap-2 sm:gap-5 mt-4 relative z-10 w-full">
         <MaskRevealButton
           onClick={onBook}
-          className="flex-1 rounded-bl-3xl font-bold px-3 sm:px-6 py-8 text-xl md:text-2xl"
+          className="flex-1 lg:rounded-bl-3xl font-bold px-3 sm:px-6 py-8 text-xl md:text-2xl"
           hoverBgClass={bgColorClass}
         >
           Book now

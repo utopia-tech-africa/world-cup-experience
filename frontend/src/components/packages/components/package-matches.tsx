@@ -65,7 +65,7 @@ export const TotalPackageMatches = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "w-full relative flex flex-col p-5 overflow-hidden items-center justify-center text-white cursor-pointer lg:w-[50%] align-start",
+        "w-full relative flex flex-col p-5 overflow-hidden items-center justify-center text-white cursor-pointer lg:w-[50%] align-start rounded-bl-[60px] lg:rounded-bl-none",
         className,
       )}
     >
