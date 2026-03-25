@@ -25,9 +25,25 @@ export function getBasePackagePriceFromPackages(
   packageName: string,
   accommodation: "hostel" | "hotel"
 ): number {
+  const normalizedPackageName = packageName.trim().toLowerCase();
+  const exactMatch = packages.find(
+    (p) => p.name.trim().toLowerCase() === normalizedPackageName,
+  );
+
+  if (exactMatch) {
+    return accommodation === "hostel"
+      ? exactMatch.hostelPrice
+      : exactMatch.hotelPrice;
+  }
+
   const type = packageNameToType(packageName);
-  const pkg = packages.find((p) => p.type === type);
-  if (pkg) return accommodation === "hostel" ? pkg.hostelPrice : pkg.hotelPrice;
+  const matchedByType = packages.find((p) => {
+    const typeCode = typeof p.type === "string" ? p.type : p.type.code;
+    return typeCode === type;
+  });
+  if (matchedByType) {
+    return accommodation === "hostel" ? matchedByType.hostelPrice : matchedByType.hotelPrice;
+  }
   const fallback = PACKAGE_PRICES_BY_TYPE[type];
   return fallback ? fallback[accommodation] : PACKAGE_PRICES_BY_TYPE.single_game[accommodation];
 }

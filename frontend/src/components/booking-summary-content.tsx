@@ -96,7 +96,7 @@ export function BookingSummaryContent({ data }: BookingSummaryContentProps) {
   );
   const passengerCount = 1 + (store.extraTravelers?.length ?? 0);
   const packagePriceTotal = packagePricePerPerson * passengerCount;
-  const accommodationLabel = accommodation === "hotel" ? "Hotel" : "Hostel";
+  const accommodationLabel = accommodation === "hotel" ? "4 Stars" : "3 Stars";
 
   const addOnQuantities =
     typeof addOns === "object" && !Array.isArray(addOns) ? addOns : {};

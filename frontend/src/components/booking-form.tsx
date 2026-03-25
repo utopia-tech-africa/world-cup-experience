@@ -179,13 +179,13 @@ export function BookingForm() {
           {[
             {
               value: "hostel" as const,
-              label: "Hostel",
+              label: "3 Stars",
               price: hostelPrice,
               Icon: Building,
             },
             {
               value: "hotel" as const,
-              label: "Hotel",
+              label: "4 Stars",
               price: hotelPrice,
               Icon: Building2,
             },

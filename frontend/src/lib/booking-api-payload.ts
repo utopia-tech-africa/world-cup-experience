@@ -83,7 +83,21 @@ export function buildBookingPayload(
     extraTravelers = [],
   } = params;
 
-  const packageType = packageNameToType(packageName);
+  const resolvedPackageType = (() => {
+    if (packages && packages.length > 0) {
+      const normalizedPackageName = packageName.trim().toLowerCase();
+      const exactMatch = packages.find(
+        (p) => p.name.trim().toLowerCase() === normalizedPackageName,
+      );
+      if (exactMatch) {
+        return typeof exactMatch.type === "string"
+          ? exactMatch.type
+          : exactMatch.type.code;
+      }
+    }
+
+    return packageNameToType(packageName);
+  })();
   const basePackagePricePerPerson = getBasePackagePrice(
     packageName,
     accommodationType,
@@ -125,7 +139,7 @@ export function buildBookingPayload(
     phone: phone.trim(),
     passportNumber: passportNumber.trim(),
     passportExpiry,
-    packageType,
+    packageType: resolvedPackageType,
     accommodationType,
     numberOfTravelers: 1 + extraTravelersPayload.length,
     extraTravelers: extraTravelersPayload,
