@@ -1,14 +1,13 @@
 "use client";
 
 import ComponentLayout from "../component-layout";
-import { Plus } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { offers as staticOffers, TRIPLE_MATCHES } from "./data/packages-data";
+import { Loader2, Plus } from "lucide-react";
+import { useMemo } from "react";
 import { usePackages } from "@/hooks/queries/usePackages";
 import {
-  buildGameOffersFromPackages,
-  type GameOffer,
-  type Match,
+  formatUsdPrice,
+  getPackageBadgeTypeLabel,
+  mapPublicGamesToMatches,
 } from "@/components/games/data/games-data";
 import { useBookingStore } from "@/stores/booking-store";
 import { useRouter } from "next/navigation";
@@ -21,137 +20,95 @@ import {
   singleGameCardBg,
   HotelRoomBg,
   HostelRoomBg,
-  ghanaFlag,
-  PanamaFlag,
-  englandFlag,
-  croatiaFlag,
-  IvoryCoastFlag,
-  EcuadorFlag,
-  GermanyFlag,
-  CuracaoFlag,
   PackageBgImg,
 } from "@/assets/img";
-import { SINGLE_MATCH, DOUBLE_MATCHES } from "./data/packages-data";
+import { formatDate } from "@/lib/format";
+import type { BookingPackage } from "@/types/booking";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
-const BLACK_STAR_MATCHES = [
-  {
-    stadium: "BMO Field, Toronto",
-    team1: { name: "Ghana", flag: ghanaFlag },
-    team2: { name: "Panama", flag: PanamaFlag },
-    date: "June 17th 2026",
-  },
-  {
-    stadium: "Boston Stadium, USA",
-    team1: { name: "Ghana", flag: ghanaFlag },
-    team2: { name: "England", flag: englandFlag },
-    date: "June 23rd 2026",
-  },
-  {
-    stadium: "Philadelphia Stadium, USA",
-    team1: { name: "Ghana", flag: ghanaFlag },
-    team2: { name: "Croatia", flag: croatiaFlag },
-    date: "June 27th 2026",
-  },
+const DEFAULT_INCLUDES = [
+  "Airport pick up and drop off",
+  "Accommodation near match venues",
+  "Double Occupancy Hotel rooms (Single on request at extra cost)",
+  "Daily Breakfast",
+  "Free WiFi",
+  "Match Day Transportation",
+  "Fan Village experience",
+  "City tour - museums, galleries and other tourist attractions",
+  "Shopping mall trips",
 ];
 
-const MIENU_MATCHES = [
-  {
-    stadium: "Boston Stadium, USA",
-    team1: { name: "Ghana", flag: ghanaFlag },
-    team2: { name: "England", flag: englandFlag },
-    date: "June 23rd 2026",
-  },
-  {
-    stadium: "Philadelphia Stadium, USA",
-    team1: { name: "Ghana", flag: ghanaFlag },
-    team2: { name: "Croatia", flag: croatiaFlag },
-    date: "June 27th 2026",
-  },
-];
+function getTripSummaryForBooking(pkg: BookingPackage) {
+  const duration =
+    pkg.nights != null ? `${pkg.nights} nights` : pkg.duration?.trim() || "—";
+  const typeCode =
+    typeof pkg.type === "string" ? pkg.type : (pkg.type?.code ?? "");
+  const haystack = `${pkg.typeName ?? ""} ${typeCode}`.toLowerCase();
+  const packageName =
+    pkg.name?.trim() ||
+    (haystack.includes("triple")
+      ? "Triple Game"
+      : haystack.includes("double")
+        ? "Double Game"
+        : haystack.includes("quad")
+          ? "Quad Game"
+          : "One Game");
+  return { packageName, duration };
+}
 
-const ELEPHANT_MATCHES = [
-  {
-    stadium: "Lincoln Field Philadelphia, USA",
-    team1: { name: "Ivory Coast", flag: IvoryCoastFlag },
-    team2: { name: "Ecuador", flag: EcuadorFlag },
-    date: "June 14th 2026",
-  },
-  {
-    stadium: "BMO Field, Toronto",
-    team1: { name: "Ivory Coast", flag: IvoryCoastFlag },
-    team2: { name: "Germany", flag: GermanyFlag },
-    date: "June 20th 2026",
-  },
-  {
-    stadium: "Lincoln Field Philadelphia, USA",
-    team1: { name: "Ivory Coast", flag: IvoryCoastFlag },
-    team2: { name: "Curacao", flag: CuracaoFlag },
-    date: "June 25th 2026",
-  },
-];
+function formatPackageDateRange(pkg: BookingPackage): string {
+  if (pkg.startDate && pkg.endDate) {
+    return `${formatDate(pkg.startDate)} – ${formatDate(pkg.endDate)}`;
+  }
+  return "Dates confirmed at booking";
+}
 
-const DEUX_MATCHES = [
-  {
-    stadium: "BMO Field, Toronto",
-    team1: { name: "Ivory Coast", flag: IvoryCoastFlag },
-    team2: { name: "Germany", flag: GermanyFlag },
-    date: "June 20th 2026",
-  },
-  {
-    stadium: "Lincoln Field Philadelphia, USA",
-    team1: { name: "Ivory Coast", flag: IvoryCoastFlag },
-    team2: { name: "Curacao", flag: CuracaoFlag },
-    date: "June 25th 2026",
-  },
-];
+function cardVisualsForMatchCount(matchCount: number) {
+  if (matchCount >= 3) {
+    return {
+      gameCardBg: totalPackageGameCardBg,
+      roomBg: TotalPackageRoomBg,
+    };
+  }
+  if (matchCount === 2) {
+    return { gameCardBg: doubleGameCardBg, roomBg: HotelRoomBg };
+  }
+  return { gameCardBg: singleGameCardBg, roomBg: HostelRoomBg };
+}
+
+function matchesCountLabel(count: number): string {
+  if (count === 1) return "One match";
+  if (count === 2) return "Two matches";
+  return `${count} matches`;
+}
+
+function citiesLabel(pkg: BookingPackage): string {
+  const n = pkg.cityCount ?? 0;
+  return `${n} ${n === 1 ? "city" : "cities"}`;
+}
+
+function nightsLabel(pkg: BookingPackage): string {
+  if (pkg.nights != null) {
+    return `${pkg.nights} Night${pkg.nights === 1 ? "" : "s"}`;
+  }
+  const d = pkg.duration?.trim();
+  return d || "—";
+}
 
 export const Packages = () => {
   const router = useRouter();
   const setTripSummary = useBookingStore((s) => s.setTripSummary);
   const setBookingForm = useBookingStore((s) => s.setBookingForm);
   const { data: apiPackages = [], isLoading, isError } = usePackages();
-  const offers: GameOffer[] =
-    !isLoading && !isError && apiPackages.length > 0
-      ? buildGameOffersFromPackages(apiPackages)
-      : (staticOffers as unknown as GameOffer[]);
 
-  // Triple game: pick the hotel variant for the Total Package banner
-  const tripleOffer =
-    offers.find(
-      (offer) =>
-        offer.matches.length >= 3 &&
-        offer.accommodation.toLowerCase().includes("hotel"),
-    ) ?? offers.find((offer) => offer.matches.length >= 3);
-
-  const tripleMatches: Match[] = (tripleOffer?.matches ??
-    TRIPLE_MATCHES) as unknown as Match[];
-  // Grid should only show single/double game packages (no triple-game cards)
-  const gridOffers = offers.filter((offer) => offer.matches.length < 3);
-
-  /** Derive packageName and duration from GameOffer.type (e.g. "13 nights (Triple game)"). */
-  function getTripSummaryFromOffer(offer: GameOffer) {
-    const match = offer.type.match(/^(.+?)\s*\((.+)\)\s*$/);
-    const fallbackDuration =
-      offer.matches.length >= 3
-        ? "13 nights"
-        : offer.matches.length > 1
-          ? "7 nights"
-          : "4 nights";
-    const duration =
-      offer.duration?.trim() ?? match?.[1]?.trim() ?? fallbackDuration;
-    const typeLabel = match?.[2]?.trim() ?? "";
-    const packageName =
-      offer.packageName?.trim() ||
-      (typeLabel.toLowerCase().includes("triple")
-        ? "Triple Game"
-        : typeLabel.toLowerCase().includes("double")
-          ? "Double Game"
-          : typeLabel.toLowerCase().includes("quad")
-            ? "Quad Game"
-            : "One Game");
-    return { packageName, duration };
-  }
+  const packagesForCards = useMemo(
+    () =>
+      [...apiPackages]
+        .filter((p) => p.isActive)
+        .sort((a, b) => a.displayOrder - b.displayOrder),
+    [apiPackages],
+  );
 
   return (
     <section className="py-20 md:py-32 relative overflow-hidden">
@@ -193,177 +150,109 @@ export const Packages = () => {
         </div>
 
         <div className="flex flex-col gap-10">
-          {/* Black Star Package */}
-          <PackageCard
-            title="Black Star"
-            subtitle="Package"
-            matchesLabel="Three matches"
-            daysLabel="13 Nights"
-            citiesLabel="3 Cities"
-            includes={[
-              "Philadelphia airport pick up and drop off",
-              "Accommodation near match venues",
-              "Double Occupancy Hotel rooms (Single on request at extra cost)",
-              "Daily Breakfast",
-              "Free WiFi",
-              "Match Day Transportation",
-              "Fan Village experience",
-              "City tour - museums, galleries and other tourist attractions",
-              "Shopping mall trips",
-            ]}
-            badgePackageType="13 nights (Triple game)"
-            bgPattern={PackageBgPattern1}
-            bgColorClass="bg-primary-600"
-            gameCardBg={totalPackageGameCardBg}
-            roomBg={TotalPackageRoomBg}
-            matches={BLACK_STAR_MATCHES as unknown as Match[]}
-            onBook={() => {
-              setTripSummary({
-                packageName: "Triple Game",
-                duration: "13 nights",
-              });
-              setBookingForm({ accommodation: "hotel" });
-              router.push("/booking");
-            }}
-            pricing={{
-              dateRange: "June 16th - June 29th, 2026",
-              options: [
-                { hotelType: "4 star Hotel", price: "$4,500.00" },
-                { hotelType: "3 star Hotel", price: "$3,000.00" },
-              ],
-            }}
-          />
+          {isLoading && (
+            <div className="flex items-center justify-center gap-2 py-16 text-neutral-500">
+              <Loader2 className="size-6 animate-spin" />
+              <span className="font-helvetica text-sm">Loading packages…</span>
+            </div>
+          )}
 
-          {/* Mienu Package */}
-          <PackageCard
-            title="Mienu"
-            subtitle="Package"
-            matchesLabel="Two matches"
-            daysLabel="7 Nights"
-            citiesLabel="2 cities"
-            includes={[
-              "Philadelphia airport pick up and drop off",
-              "Accommodation near match venues",
-              "Double Occupancy Hotel rooms (Single on request at extra cost)",
-              "Daily Breakfast",
-              "Free WiFi",
-              "Match Day Transportation",
-              "Fan Village experience",
-              "City tour - museums, galleries and other tourist attractions",
-              "Shopping mall trips",
-            ]}
-            badgePackageType="7 nights (Double game)"
-            bgPattern={PackageBgPattern1}
-            bgColorClass="bg-primary-600"
-            gameCardBg={doubleGameCardBg}
-            roomBg={HotelRoomBg}
-            matches={MIENU_MATCHES as unknown as Match[]}
-            onBook={() => {
-              setTripSummary({
-                packageName: "Double Game",
-                duration: "7 nights",
-              });
-              setBookingForm({ accommodation: "hotel" });
-              router.push("/booking");
-            }}
-            pricing={{
-              dateRange: "June 22nd - June 29th, 2026",
-              options: [
-                { hotelType: "4 star Hotel", price: "$3,000.00" },
-                { hotelType: "3 star Hotel", price: "$1,500.00" },
-              ],
-            }}
-          />
+          {!isLoading && isError && (
+            <p className="py-12 text-center font-helvetica text-sm text-neutral-500">
+              We couldn&apos;t load packages right now. Please refresh or try
+              again later.
+            </p>
+          )}
 
-          {/* Elephant Package */}
-          <PackageCard
-            title="Elephant"
-            subtitle="Package"
-            matchesLabel="Three matches"
-            daysLabel="13 Nights"
-            citiesLabel="3 Cities"
-            includes={[
-              "Philadelphia airport pick up and drop off",
-              "Accommodation near match venues",
-              "Double Occupancy Hotel rooms (Single on request at extra cost)",
-              "Daily Breakfast",
-              "Free WiFi",
-              "Match Day Transportation",
-              "Fan Village experience",
-              "City tour - museums, galleries and other tourist attractions",
-              "Shopping mall trips",
-            ]}
-            badgePackageType="13 nights (Triple game)"
-            bgPattern={PackageBgImgComponent}
-            bgColorClass="bg-primary-700"
-            gameCardBg={totalPackageGameCardBg}
-            roomBg={TotalPackageRoomBg}
-            matches={ELEPHANT_MATCHES as unknown as Match[]}
-            onBook={() => {
-              setTripSummary({
-                packageName: "Triple Game",
-                duration: "13 nights",
-              });
-              setBookingForm({ accommodation: "hotel" });
-              router.push("/booking");
-            }}
-            pricing={{
-              dateRange: "June 16th - June 29th, 2026",
-              options: [
-                { hotelType: "4 star Hotel", price: "$4,500.00" },
-                { hotelType: "3 star Hotel", price: "$3,000.00" },
-              ],
-            }}
-          />
+          {!isLoading && !isError && packagesForCards.length === 0 && (
+            <p className="py-12 text-center font-helvetica text-sm text-neutral-500">
+              No packages are available yet. Check back soon.
+            </p>
+          )}
 
-          {/* Deux Package */}
-          <PackageCard
-            title="Deux"
-            subtitle="Package"
-            matchesLabel="Two matches"
-            daysLabel="7 Nights"
-            citiesLabel="2 cities"
-            includes={[
-              "Philadelphia airport pick up and drop off",
-              "Accommodation near match venues",
-              "Double Occupancy Hotel rooms (Single on request at extra cost)",
-              "Daily Breakfast",
-              "Free WiFi",
-              "Match Day Transportation",
-              "Fan Village experience",
-              "City tour - museums, galleries and other tourist attractions",
-              "Shopping mall trips",
-            ]}
-            badgePackageType="7 nights (Double game)"
-            bgPattern={PackageBgImgComponent}
-            bgColorClass="bg-primary-700"
-            gameCardBg={doubleGameCardBg}
-            roomBg={HotelRoomBg}
-            matches={DEUX_MATCHES as unknown as Match[]}
-            onBook={() => {
-              setTripSummary({
-                packageName: "Double Game",
-                duration: "7 nights",
-              });
-              setBookingForm({ accommodation: "hotel" });
-              router.push("/booking");
-            }}
-            pricing={{
-              dateRange: "June 22nd - June 29th, 2026",
-              options: [
-                { hotelType: "4 star Hotel", price: "$3,000.00" },
-                { hotelType: "3 star Hotel", price: "$1,500.00" },
-              ],
-            }}
-          />
+          {!isLoading &&
+            !isError &&
+            packagesForCards.map((pkg, index) => {
+              const matches = mapPublicGamesToMatches(pkg.games);
+              const hasGhana = matches.some(
+                (match) =>
+                  match.team1.name === "Ghana" || match.team2.name === "Ghana",
+              );
+              const hasIvoryCoast = matches.some(
+                (match) =>
+                  match.team1.name === "Ivory Coast" ||
+                  match.team2.name === "Ivory Coast",
+              );
+              const { gameCardBg, roomBg } = cardVisualsForMatchCount(
+                matches.length,
+              );
+              const usePrimary200 = index % 2 === 0;
+              const includes =
+                pkg.includedItems && pkg.includedItems.length > 0
+                  ? pkg.includedItems
+                  : DEFAULT_INCLUDES;
+
+              return (
+                <PackageCard
+                  key={pkg.id}
+                  title={pkg.name}
+                  matchesLabel={matchesCountLabel(matches.length)}
+                  daysLabel={nightsLabel(pkg)}
+                  citiesLabel={citiesLabel(pkg)}
+                  includes={includes}
+                  badgePackageType={getPackageBadgeTypeLabel(pkg)}
+                  bgPattern={
+                    hasGhana
+                      ? PackageBgPattern1
+                      : hasIvoryCoast
+                        ? PackageBgImgComponent
+                        : usePrimary200
+                          ? PackageBgPattern1
+                          : PackageBgPattern2
+                  }
+                  bgColorClass={
+                    hasGhana
+                      ? "bg-primary-200"
+                      : hasIvoryCoast
+                        ? "bg-primary-100"
+                        : usePrimary200
+                          ? "bg-primary-200"
+                          : "bg-primary-100"
+                  }
+                  gameCardBg={gameCardBg}
+                  roomBg={roomBg}
+                  matches={matches}
+                  onBook={() => {
+                    const { packageName, duration } =
+                      getTripSummaryForBooking(pkg);
+                    setTripSummary({ packageName, duration });
+                    setBookingForm({ accommodation: "hotel" });
+                    router.push("/booking");
+                  }}
+                  pricing={{
+                    dateRange: formatPackageDateRange(pkg),
+                    options: [
+                      {
+                        hotelType: "4 star Hotel",
+                        price: formatUsdPrice(pkg.hotelPrice),
+                      },
+                      {
+                        hotelType: "3 star Hotel",
+                        price: formatUsdPrice(pkg.hostelPrice),
+                      },
+                    ],
+                  }}
+                />
+              );
+            })}
         </div>
       </ComponentLayout>
     </section>
   );
 };
 
-const PackageBgImgComponent = () => (
-  <div className="absolute inset-0 overflow-hidden">
+const PackageBgImgComponent = ({ className }: { className?: string }) => (
+  <div className={cn("absolute inset-0 overflow-hidden", className)}>
     <Image
       src={PackageBgImg}
       alt="Package Background"
