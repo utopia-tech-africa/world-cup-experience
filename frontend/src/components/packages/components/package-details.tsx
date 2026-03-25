@@ -48,7 +48,7 @@ export const PackageDetails = ({
       )}
     >
       {/* Background pattern inside the block */}
-      <BgPattern className="absolute size-[1000px]  -top-50 -left-50 pointer-events-none" />
+      <BgPattern className="absolute inset-0 h-full w-full pointer-events-none" />
 
       <div className="relative z-10 space-y-4">
         <h3 className="text-6xl md:text-6xl font-semibold font-clash  tracking-wider">

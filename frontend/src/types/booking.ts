@@ -94,6 +94,63 @@ export interface PackageComparisonOption {
   features: PackageComparisonFeature[];
 }
 
+export type PackageComparisonRowSideValue = {
+  title: string;
+  description?: string;
+  iconKey?: string;
+};
+
+export interface PackageComparisonRow {
+  lineKey: string;
+  displayOrder: number;
+  left?: PackageComparisonRowSideValue;
+  right?: PackageComparisonRowSideValue;
+}
+
+export type ComparePackageOptionsQuery = {
+  leftOptionId?: string;
+  rightOptionId?: string;
+  leftPackageId?: string;
+  rightPackageId?: string;
+  leftTier?: PackageComparisonTier;
+  rightTier?: PackageComparisonTier;
+};
+
+export interface ComparedPackageGame {
+  id: string;
+  typeCode: string;
+  stadium: string;
+  team1: { id: string; name: string; flagUrl?: string };
+  team2: { id: string; name: string; flagUrl?: string };
+  matchDate: string;
+  displayOrder: number;
+}
+
+export interface ComparedPackageComparisonOption {
+  id: string;
+  packageId: string;
+  packageName: string;
+  packageTypeName: string;
+  packageTypeCode: string;
+  tier: PackageComparisonTier;
+  label: string;
+  price: number;
+  roomLabel?: string;
+  imageUrl?: string;
+  ctaLabel?: string;
+  duration: string;
+  nights?: number;
+  cityCount: number;
+  includedItems: string[];
+  games: ComparedPackageGame[];
+}
+
+export type PackageComparisonResponse = {
+  left: ComparedPackageComparisonOption;
+  right: ComparedPackageComparisonOption;
+  comparisonRows: PackageComparisonRow[];
+};
+
 export interface Package {
   id: string;
   name: string;
