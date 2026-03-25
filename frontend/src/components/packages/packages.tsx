@@ -178,7 +178,7 @@ export const Packages = () => {
         </div>
       </div>
 
-      <ComponentLayout className="relative z-10">
+      <ComponentLayout className="relative z-10" id="packages">
         {/* Header */}
         <div className="mb-14">
           <h2 className="text-4xl md:text-5xl font-clash text-neutral-800 leading-[1.05] mb-2 tracking-tight">
