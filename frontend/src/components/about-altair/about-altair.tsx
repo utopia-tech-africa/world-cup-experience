@@ -7,7 +7,7 @@ export const AboutAltair = () => {
   return (
     <section className="py-8 md:py-16 bg-white relative overflow-hidden">
       <ComponentLayout>
-        <div className="max-w-8xl mx-auto flex flex-col gap-16 md:gap-24">
+        <div className="max-w-8xl mx-auto flex flex-col gap-16">
           {/* Main Heading with Background Trophy */}
           <div className="relative group">
             {/* Trophy background image */}
@@ -30,22 +30,26 @@ export const AboutAltair = () => {
           {/* Description Text Section */}
           <div className="relative flex justify-end w-full ">
             <div className="text-xl md:text-2xl lg:text-3xl text-neutral-700 font-helvetica leading-[1.3] tracking-tight relative flex items-start">
-              <p className="indent-12 md:indent-32">
-                <Plus
-                  className="inline-block text-primary-100 size-6 md:size-8 mr-4 md:mr-6 -translate-y-1"
-                  strokeWidth={3}
-                />
-                From stadium thrills to curated city tours, enjoy an
-                unforgettable football journey filled with world-class matches,
-                exciting attractions, and hospitality join us via our premium
-                hosting packages designed for passionate fans who want more than
-                just the game.
-                {/* Closing Plus Icon */}
-                <Plus
-                  className="inline-block ml-3 text-primary-100 size-6 md:size-8 align-middle"
-                  strokeWidth={3}
-                />
-              </p>
+              <div className="flex flex-col">
+                <p className="indent-12 md:indent-32">
+                  <Plus
+                    className="inline-block text-primary-100 size-6 md:size-8 mr-4 md:mr-6 -translate-y-1"
+                    strokeWidth={3}
+                  />
+                  From stadium thrills to curated city tours, enjoy an
+                  unforgettable football journey filled with world-class
+                  matches, exciting attractions and hospitality.
+                </p>
+                <p className="indent-20 md:indent-42">
+                  Join us via our premium hosting packages designed for
+                  passionate fans who want more than just the game.
+                  {/* Closing Plus Icon */}
+                  <Plus
+                    className="inline-block ml-3 text-primary-100 size-6 md:size-8 align-middle"
+                    strokeWidth={3}
+                  />
+                </p>
+              </div>
             </div>
           </div>
         </div>
