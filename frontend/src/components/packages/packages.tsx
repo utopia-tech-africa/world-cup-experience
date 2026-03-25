@@ -118,7 +118,7 @@ export const Packages = () => {
   );
 
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-hiddenm">
       {/* Decorative Grid Lines and Nodes */}
       <div className="absolute inset-0 pointer-events-none z-0">
         {/* Continuous Grid Lines (framing the content) */}
@@ -142,7 +142,7 @@ export const Packages = () => {
         </div>
       </div>
 
-      <ComponentLayout className="relative z-10" id="packages">
+      <ComponentLayout className="relative z-10 py-15" id="packages">
         {/* Header */}
         <div className="mb-14">
           <h2 className="text-4xl md:text-5xl font-clash text-neutral-800 leading-[1.05] mb-2 tracking-tight">
