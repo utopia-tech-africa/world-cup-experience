@@ -5,7 +5,7 @@ import { Packages } from "@/components/packages";
 import { Explore } from "@/components/explore";
 import { FAQ } from "@/components/faq";
 import InclusionsExclusions from "@/components/packages/components/inclusions-exclusions";
-import { ComparePackages } from "@/components/compare-packages";
+// import { ComparePackages } from "@/components/compare-packages";
 
 export default function Home() {
   return (
@@ -15,7 +15,7 @@ export default function Home() {
       <FifaFanfest />
       <Packages />
       <InclusionsExclusions />
-      <ComparePackages />
+      {/* <ComparePackages /> */}
       <Explore />
       <FAQ />
     </main>
