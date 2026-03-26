@@ -2,6 +2,7 @@ import { render } from "@react-email/render";
 import * as React from "react";
 import { Resend } from "resend";
 import { Booking } from "@prisma/client";
+import { prisma } from "../config/database.config";
 import { SubmissionEmail } from "../utils/emails/SubmissionEmail";
 import { ConfirmationEmail } from "../utils/emails/ConfirmationEmail";
 import { RejectedEmail } from "../utils/emails/RejectedEmail";
@@ -60,11 +61,26 @@ export async function sendConfirmationEmail(booking: Booking): Promise<void> {
   const firstName = booking.fullName.split(" ")[0];
   const packageLabel = packageTypeToLabel(booking.packageType);
 
+  // Fetch package date (start date)
+  const pkgType = await prisma.packageType.findUnique({
+    where: { code: booking.packageType },
+    include: {
+      packages: {
+        where: { isActive: true },
+        take: 1,
+      },
+    },
+  });
+  const bookingPackage = pkgType?.packages[0];
+  const bookingDate = bookingPackage?.startDate ?? "-";
+
+  console.log(bookingPackage);
   const html = await render(
     React.createElement(ConfirmationEmail, {
       firstName,
       bookingReference: booking.bookingReference,
       packageLabel,
+      bookingDate,
     }),
   );
 
