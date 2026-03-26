@@ -3,6 +3,7 @@ import * as React from "react";
 import { Resend } from "resend";
 import { Booking } from "@prisma/client";
 import { prisma } from "../config/database.config";
+import { formatToDisplayDate } from "../utils/date.utils";
 import { SubmissionEmail } from "../utils/emails/SubmissionEmail";
 import { ConfirmationEmail } from "../utils/emails/ConfirmationEmail";
 import { RejectedEmail } from "../utils/emails/RejectedEmail";
@@ -72,9 +73,10 @@ export async function sendConfirmationEmail(booking: Booking): Promise<void> {
     },
   });
   const bookingPackage = pkgType?.packages[0];
-  const bookingDate = bookingPackage?.startDate ?? "-";
+  const bookingDate = bookingPackage
+    ? `${formatToDisplayDate(bookingPackage.startDate)} – ${formatToDisplayDate(bookingPackage.endDate)}`
+    : "TBD";
 
-  console.log(bookingPackage);
   const html = await render(
     React.createElement(ConfirmationEmail, {
       firstName,
