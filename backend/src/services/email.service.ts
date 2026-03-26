@@ -81,7 +81,7 @@ export async function sendConfirmationEmail(booking: Booking): Promise<void> {
     React.createElement(ConfirmationEmail, {
       firstName,
       bookingReference: booking.bookingReference,
-      packageLabel,
+      packageName: bookingPackage?.name || "-",
       bookingDate,
     }),
   );
