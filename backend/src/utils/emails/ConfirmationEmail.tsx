@@ -12,14 +12,14 @@ import { BaseLayout } from "./BaseLayout";
 interface ConfirmationEmailProps {
   firstName: string;
   bookingReference: string;
-  packageLabel: string;
+  packageName: string;
   bookingDate: string;
 }
 
 export const ConfirmationEmail = ({
   firstName,
   bookingReference,
-  packageLabel,
+  packageName,
   bookingDate,
 }: ConfirmationEmailProps) => {
   return (
@@ -43,7 +43,7 @@ export const ConfirmationEmail = ({
         </Text>
         <Text className="text-[#1A1A1A] text-[14px] leading-[24px] text-left m-0 mobile-text">
           Booking ID: <b>{bookingReference}</b> <br />
-          Package: <b>{packageLabel}</b> <br />
+          Package: <b>{packageName}</b> <br />
           Booking Date: <b>{bookingDate}</b>
         </Text>
 
@@ -125,7 +125,7 @@ export const ConfirmationEmail = ({
 ConfirmationEmail.PreviewProps = {
   firstName: "Ebenezer",
   bookingReference: "WC-2026-CONF",
-  packageLabel: "Triple Game Package",
+  packageName: "Triple Game Package",
 } as ConfirmationEmailProps;
 
 export default ConfirmationEmail;
