@@ -12,10 +12,10 @@ export default function Home() {
     <main className="space-y-10 md:space-y-30">
       <Hero />
       <AboutAltair />
-      <FifaFanfest />
       <Packages />
       <InclusionsExclusions />
       {/* <ComparePackages /> */}
+      <FifaFanfest />
       <Explore />
       <FAQ />
     </main>

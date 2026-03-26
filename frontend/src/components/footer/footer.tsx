@@ -15,7 +15,7 @@ import { FaLocationDot } from "react-icons/fa6";
 
 const leftLinks = [
   { label: "PACKAGES", href: "#packages" },
-  { label: "TOTAL", href: "#total-package" },
+  { label: "FAQ", href: "#faq" },
   { label: "EXPERIENCE", href: "#explore" },
   { label: "CORPORATE", href: "tel:+233593679741" },
 ];

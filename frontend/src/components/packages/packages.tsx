@@ -119,7 +119,10 @@ export const Packages = () => {
 
   return (
     <section className="relative">
-      <ComponentLayout className="relative py-12 md:py-16 overflow-visible" id="packages">
+      <ComponentLayout
+        className="relative py-12 md:py-16 overflow-visible"
+        id="packages"
+      >
         {/* Decorative Grid Lines and Nodes */}
         <div className="absolute inset-0 pointer-events-none z-0">
           {/* Continuous Grid Lines (framing the content) */}
@@ -144,116 +147,119 @@ export const Packages = () => {
         </div>
 
         <div className="relative z-10 px-4 md:px-6 pt-8 md:pt-10 pb-8 md:pb-10">
-        {/* Header */}
-        <div className="mb-14">
-          <h2 className="text-4xl md:text-5xl font-clash text-neutral-800 leading-[1.05] mb-2 tracking-tight">
-            Choose Your Perfect World Cup Experience
-          </h2>
-          <p className="text-base md:text-xl text-neutral-400/90 max-w-5xl font-helvetica ">
-            Whether you&apos;re attending one iconic match or doubling the
-            excitement with two unforgettable games, our hosting packages
-            combine football, travel, and premium fan experiences into one
-            seamless trip.
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-10">
-          {isLoading && (
-            <div className="flex items-center justify-center gap-2 py-16 text-neutral-500">
-              <Loader2 className="size-6 animate-spin" />
-              <span className="font-helvetica text-sm">Loading packages…</span>
-            </div>
-          )}
-
-          {!isLoading && isError && (
-            <p className="py-12 text-center font-helvetica text-sm text-neutral-500">
-              We couldn&apos;t load packages right now. Please refresh or try
-              again later.
+          {/* Header */}
+          <div className="mb-14">
+            <h2 className="text-4xl md:text-5xl font-clash text-neutral-800 leading-[1.05] mb-2 tracking-tight">
+              Choose Your Perfect World Cup Experience
+            </h2>
+            <p className="text-base md:text-xl text-neutral-400/90 max-w-5xl font-helvetica ">
+              Whether you&apos;re attending one iconic match or doubling the
+              excitement with two unforgettable games, our hosting packages
+              combine football, travel, and premium fan experiences into one
+              seamless trip.
             </p>
-          )}
+          </div>
 
-          {!isLoading && !isError && packagesForCards.length === 0 && (
-            <p className="py-12 text-center font-helvetica text-sm text-neutral-500">
-              No packages are available yet. Check back soon.
-            </p>
-          )}
+          <div className="flex flex-col gap-5">
+            {isLoading && (
+              <div className="flex items-center justify-center gap-2 py-16 text-neutral-500">
+                <Loader2 className="size-6 animate-spin" />
+                <span className="font-helvetica text-sm">
+                  Loading packages…
+                </span>
+              </div>
+            )}
 
-          {!isLoading &&
-            !isError &&
-            packagesForCards.map((pkg, index) => {
-              const matches = mapPublicGamesToMatches(pkg.games);
-              const hasGhana = matches.some(
-                (match) =>
-                  match.team1.name === "Ghana" || match.team2.name === "Ghana",
-              );
-              const hasIvoryCoast = matches.some(
-                (match) =>
-                  match.team1.name === "Ivory Coast" ||
-                  match.team2.name === "Ivory Coast",
-              );
-              const { gameCardBg, roomBg } = cardVisualsForMatchCount(
-                matches.length,
-              );
-              const usePrimary200 = index % 2 === 0;
-              const includes =
-                pkg.includedItems && pkg.includedItems.length > 0
-                  ? pkg.includedItems
-                  : DEFAULT_INCLUDES;
+            {!isLoading && isError && (
+              <p className="py-12 text-center font-helvetica text-sm text-neutral-500">
+                We couldn&apos;t load packages right now. Please refresh or try
+                again later.
+              </p>
+            )}
 
-              return (
-                <PackageCard
-                  key={pkg.id}
-                  title={pkg.name}
-                  matchesLabel={matchesCountLabel(matches.length)}
-                  daysLabel={nightsLabel(pkg)}
-                  citiesLabel={citiesLabel(pkg)}
-                  includes={includes}
-                  badgePackageType={getPackageBadgeTypeLabel(pkg)}
-                  bgPattern={
-                    hasGhana
-                      ? PackageBgPattern1
-                      : hasIvoryCoast
-                        ? PackageBgImgComponent
-                        : usePrimary200
-                          ? PackageBgPattern1
-                          : PackageBgPattern2
-                  }
-                  bgColorClass={
-                    hasGhana
-                      ? "bg-primary-200"
-                      : hasIvoryCoast
-                        ? "bg-primary-100"
-                        : usePrimary200
-                          ? "bg-primary-200"
-                          : "bg-primary-100"
-                  }
-                  gameCardBg={gameCardBg}
-                  roomBg={roomBg}
-                  matches={matches}
-                  onBook={() => {
-                    const { packageName, duration } =
-                      getTripSummaryForBooking(pkg);
-                    setTripSummary({ packageName, duration });
-                    setBookingForm({ accommodation: "hotel" });
-                    router.push("/booking");
-                  }}
-                  pricing={{
-                    dateRange: formatPackageDateRange(pkg),
-                    options: [
-                      {
-                        hotelType: "4 stars",
-                        price: formatUsdPrice(pkg.hotelPrice),
-                      },
-                      {
-                        hotelType: "3 stars",
-                        price: formatUsdPrice(pkg.hostelPrice),
-                      },
-                    ],
-                  }}
-                />
-              );
-            })}
-        </div>
+            {!isLoading && !isError && packagesForCards.length === 0 && (
+              <p className="py-12 text-center font-helvetica text-sm text-neutral-500">
+                No packages are available yet. Check back soon.
+              </p>
+            )}
+
+            {!isLoading &&
+              !isError &&
+              packagesForCards.map((pkg, index) => {
+                const matches = mapPublicGamesToMatches(pkg.games);
+                const hasGhana = matches.some(
+                  (match) =>
+                    match.team1.name === "Ghana" ||
+                    match.team2.name === "Ghana",
+                );
+                const hasIvoryCoast = matches.some(
+                  (match) =>
+                    match.team1.name === "Ivory Coast" ||
+                    match.team2.name === "Ivory Coast",
+                );
+                const { gameCardBg, roomBg } = cardVisualsForMatchCount(
+                  matches.length,
+                );
+                const usePrimary200 = index % 2 === 0;
+                const includes =
+                  pkg.includedItems && pkg.includedItems.length > 0
+                    ? pkg.includedItems
+                    : DEFAULT_INCLUDES;
+
+                return (
+                  <PackageCard
+                    key={pkg.id}
+                    title={pkg.name}
+                    matchesLabel={matchesCountLabel(matches.length)}
+                    daysLabel={nightsLabel(pkg)}
+                    citiesLabel={citiesLabel(pkg)}
+                    includes={includes}
+                    badgePackageType={getPackageBadgeTypeLabel(pkg)}
+                    bgPattern={
+                      hasGhana
+                        ? PackageBgPattern1
+                        : hasIvoryCoast
+                          ? PackageBgImgComponent
+                          : usePrimary200
+                            ? PackageBgPattern1
+                            : PackageBgPattern2
+                    }
+                    bgColorClass={
+                      hasGhana
+                        ? "bg-primary-200"
+                        : hasIvoryCoast
+                          ? "bg-primary-100"
+                          : usePrimary200
+                            ? "bg-primary-200"
+                            : "bg-primary-100"
+                    }
+                    gameCardBg={gameCardBg}
+                    roomBg={roomBg}
+                    matches={matches}
+                    onBook={() => {
+                      const { packageName, duration } =
+                        getTripSummaryForBooking(pkg);
+                      setTripSummary({ packageName, duration });
+                      setBookingForm({ accommodation: "hotel" });
+                      router.push("/booking");
+                    }}
+                    pricing={{
+                      dateRange: formatPackageDateRange(pkg),
+                      options: [
+                        {
+                          hotelType: "4 stars",
+                          price: formatUsdPrice(pkg.hotelPrice),
+                        },
+                        {
+                          hotelType: "3 stars",
+                          price: formatUsdPrice(pkg.hostelPrice),
+                        },
+                      ],
+                    }}
+                  />
+                );
+              })}
+          </div>
         </div>
       </ComponentLayout>
     </section>
