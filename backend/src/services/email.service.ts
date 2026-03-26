@@ -75,7 +75,7 @@ export async function sendConfirmationEmail(booking: Booking): Promise<void> {
   const bookingPackage = pkgType?.packages[0];
   const bookingDate = bookingPackage
     ? `${formatToDisplayDate(bookingPackage.startDate)} – ${formatToDisplayDate(bookingPackage.endDate)}`
-    : "TBD";
+    : "-";
 
   const html = await render(
     React.createElement(ConfirmationEmail, {
