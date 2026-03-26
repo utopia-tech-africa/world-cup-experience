@@ -15,6 +15,7 @@ export default function Home() {
       <Packages />
       <InclusionsExclusions />
       {/* <ComparePackages /> */}
+      <FifaFanfest />
       <Explore />
       <FAQ />
     </main>
