@@ -5,6 +5,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import { NavbarWrapper } from "@/components/navbar-wrapper";
 import "./globals.css";
 import Footer from "@/components/footer/footer";
+import { HotPackagesToggle } from "@/components/hot-packages-toggle";
 
 /** General Sans variable font (weight 200–700) from app/fonts. */
 const generalSans = localFont({
@@ -204,6 +205,7 @@ export default function RootLayout({
             {/* <NavbarWrapper /> */}
             {children}
             <Footer />
+            <HotPackagesToggle />
           </ToastProvider>
         </QueryProvider>
       </body>
