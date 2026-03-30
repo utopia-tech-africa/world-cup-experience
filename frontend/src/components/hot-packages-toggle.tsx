@@ -31,7 +31,7 @@ export function HotPackagesToggle() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed top-32 right-4 md:right-10 lg:right-16 z-9999 pointer-events-none">
+    <div className="fixed bottom-32 right-4 md:right-10 lg:right-30 lg:bottom-26 z-9999 pointer-events-none">
       <AnimatePresence mode="wait">
         {!showWidget ? (
           <motion.button
