@@ -17,9 +17,9 @@ const faqs = [
   },
   {
     question:
-      "What is the difference between the Single Game and Double Game packages?",
+      "What is the difference between the Double Game and Triple Game packages?",
     answer:
-      "The difference between the Single Game, Double Game, and Triple Game packages comes down to both the number of matches and the length of your stay: the Single Game package includes access to one match with a 4-night stay, the Double Game package covers two matches with a 7-night stay, and the Triple Game package includes three matches with an extended 13-night stay, all while offering the same transportation, tour access, and support services across each option.",
+      "The difference between the Double Game and Triple Game packages comes down to both the number of matches and the length of your stay: the Double Game package covers two matches with a 7-night stay, while the Triple Game package includes three matches with an extended 13-night stay, with both options offering the same transportation, tour access, and support services. If you would like a custom package, it’s available just contact us.",
   },
   {
     question: "Are match tickets included in the package?",
@@ -29,12 +29,12 @@ const faqs = [
   {
     question: "What accommodation options are available?",
     answer:
-      "Accommodation options include both hostel and hotel stay: the hotel option offers double occupancy rooms, while the hostel option involves shared accommodation with other attendees.",
+      "Accommodation options include both four-star and three-star hotel stays, with all rooms offered on a double occupancy basis featuring queen-size beds. Single occupancy is available upon request at an additional cost.",
   },
   {
     question: "Can I choose between a single room or a shared room?",
     answer:
-      "Room options depend on the type of accommodation selected: hotel stays are based on double occupancy, meaning rooms are shared by two people, while hostel accommodations are shared with multiple attendees; single rooms are not part of the standard package.",
+      "Room options depend on the type of accommodation selected: hotel stays are based on double occupancy, meaning rooms are shared by two people. Single occupancy is available upon request at an additional cost.",
   },
   {
     question: "What activities are included in the experience days?",
@@ -49,7 +49,7 @@ const faqs = [
   {
     question: "Can I upgrade my package?",
     answer:
-      "Yes, you can upgrade your package. Altair Logistics & Hospitality offers several tiers, allowing you to move from the Essential (Hostel) package to the Signature (Hotel) packages. Upgrades typically include moving from shared hostel accommodations to private hotel rooms, adding additional match-day experiences, or switching from a single-game to a double-game package. Please contact the team directly to check availability and pay the price difference",
+      "Yes, you can upgrade your package. Upgrades are available upon request, please contact the team directly to check availability and pay any applicable price difference.",
   },
 ];
 
