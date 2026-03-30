@@ -5,7 +5,6 @@ import { HeroLoader } from "./components/hero-loader";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { WTWCLogoWhite, ballGif } from "@/assets";
-import { HotPackagesWidget } from "./components/hot-packages-widget";
 
 export function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -178,17 +177,6 @@ export function Hero() {
         className="absolute inset-0 z-20 cursor-pointer"
         onClick={handleToggleAudio}
       />
-
-      <motion.div
-        className="relative z-30 h-full w-full flex flex-col justify-end p-8 md:p-14 lg:px-20 lg:py-8 pointer-events-none"
-        initial={{ opacity: 0 }}
-        animate={loaderDone ? { opacity: 1 } : {}}
-        transition={{ duration: 1, delay: 1.2 }}
-      >
-        <div className="absolute top-24  md:top-26 right-3 md:right-24 2xl:right-28">
-          <HotPackagesWidget />
-        </div>
-      </motion.div>
     </section>
   );
 }

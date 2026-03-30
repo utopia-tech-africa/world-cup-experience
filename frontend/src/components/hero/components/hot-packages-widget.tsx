@@ -8,9 +8,9 @@ import Link from "next/link";
 export const HotPackagesWidget = () => {
   return (
     <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.8, delay: 1.5 }}
+      // initial={{ opacity: 0, x: 20 }}
+      // animate={{ opacity: 1, x: 0 }}
+      // transition={{ duration: 0.8, delay: 1.5 }}
       className="pointer-events-auto w-full max-w-[320px] md:max-w-[380px] bg-black/40 backdrop-blur-xl border-6 border-white/30 rounded-lg p-3 flex flex-col gap-3"
     >
       {/* Header */}
