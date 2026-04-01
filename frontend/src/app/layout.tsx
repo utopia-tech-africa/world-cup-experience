@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import localFont from "next/font/local";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { ToastProvider } from "@/components/ui/toast";
@@ -197,6 +198,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Google tag (gtag.js) */}
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-VMS93J5NPV"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-VMS93J5NPV');
+          `}
+        </Script>
+      </head>
       <body
         className={`${generalSans.variable} ${clashDisplay.variable} ${helveticaNeue.variable} font-helvetica antialiased`}
       >
