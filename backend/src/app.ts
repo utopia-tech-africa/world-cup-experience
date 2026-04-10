@@ -8,6 +8,16 @@ import { errorHandler } from "./middleware/errorHandler.middleware";
 
 const app = express();
 
+// When behind a reverse proxy (typical in production), req.ip must reflect the client
+// (X-Forwarded-For). Otherwise express-rate-limit keys every request as the proxy IP and
+// all users share one bucket → 429 Too Many Requests on normal browsing.
+const trustProxyHops = process.env.TRUST_PROXY_HOPS;
+if (trustProxyHops !== undefined && trustProxyHops !== "") {
+  app.set("trust proxy", Number(trustProxyHops));
+} else if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
 // Security middleware
 app.use(helmet());
 
