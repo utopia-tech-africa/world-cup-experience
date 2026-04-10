@@ -17,11 +17,11 @@ const leftLinks = [
   { label: "PACKAGES", href: "#packages" },
   { label: "FAQ", href: "#faq" },
   { label: "EXPERIENCE", href: "#explore" },
-  { label: "CORPORATE", href: "tel:+233593679741" },
+  { label: "CORPORATE", href: "tel:+233257554514" },
 ];
 
 const rightLinks = [
-  { label: "PHONE", href: "tel:+233593679741" },
+  { label: "PHONE", href: "tel:+233257554514" },
   { label: "EMAIL", href: "mailto:info@watchtheworldcup.live" },
   { label: "TERMS OF SERVICE", href: "#" },
   { label: "PRIVACY POLICY", href: "#" },

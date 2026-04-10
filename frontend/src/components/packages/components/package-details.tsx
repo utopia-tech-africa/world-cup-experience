@@ -128,7 +128,7 @@ export const PackageDetails = ({
           Book now
         </MaskRevealButton>
 
-        <Link href="tel:+233593679741" className="flex-1">
+        <Link href="tel:+233257554514" className="flex-1">
           <MaskRevealButton
             className="w-full px-3 sm:px-6 py-8 text-xl md:text-2xl font-normal min-w-[200px] "
             hoverBgClass={bgColorClass}
