@@ -7,6 +7,7 @@ import { NavbarWrapper } from "@/components/navbar-wrapper";
 import "./globals.css";
 import Footer from "@/components/footer/footer";
 import { HotPackagesToggle } from "@/components/hot-packages-toggle";
+import { ContactToggle } from "@/components/contact-toggle";
 
 /** General Sans variable font (weight 200–700) from app/fonts. */
 const generalSans = localFont({
@@ -214,6 +215,16 @@ export default function RootLayout({
             gtag('config', 'G-VMS93J5NPV');
           `}
         </Script>
+        <Script id="smartlook" strategy="afterInteractive">
+          {`
+            window.smartlook||(function(d) {
+              var o=smartlook=function(){ o.api.push(arguments)},h=d.getElementsByTagName('head')[0];
+              var c=d.createElement('script');o.api=new Array();c.async=true;c.type='text/javascript';
+              c.charset='utf-8';c.src='https://web-sdk.smartlook.com/recorder.js';h.appendChild(c);
+              })(document);
+              smartlook('init', '35f9aa36c383fc1daac3e9160d82fc79653bd499', { region: 'eu' });
+          `}
+        </Script>
       </head>
       <body
         className={`${generalSans.variable} ${clashDisplay.variable} ${helveticaNeue.variable} font-helvetica antialiased`}
@@ -224,6 +235,7 @@ export default function RootLayout({
             {children}
             <Footer />
             <HotPackagesToggle />
+            <ContactToggle />
           </ToastProvider>
         </QueryProvider>
       </body>
