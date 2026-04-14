@@ -215,15 +215,13 @@ export default function RootLayout({
             gtag('config', 'G-VMS93J5NPV');
           `}
         </Script>
-        <Script id="smartlook" strategy="afterInteractive">
-          {`
-            window.smartlook||(function(d) {
-              var o=smartlook=function(){ o.api.push(arguments)},h=d.getElementsByTagName('head')[0];
-              var c=d.createElement('script');o.api=new Array();c.async=true;c.type='text/javascript';
-              c.charset='utf-8';c.src='https://web-sdk.smartlook.com/recorder.js';h.appendChild(c);
-              })(document);
-              smartlook('init', '35f9aa36c383fc1daac3e9160d82fc79653bd499', { region: 'eu' });
-          `}
+        <Script type="text/javascript">
+          {` window.smartlook||(function(d) {
+    var o=smartlook=function(){ o.api.push(arguments)},h=d.getElementsByTagName('head')[0];
+    var c=d.createElement('script');o.api=new Array();c.async=true;c.type='text/javascript';
+    c.charset='utf-8';c.src='https://web-sdk.smartlook.com/recorder.js';h.appendChild(c);
+    })(document);
+    smartlook('init', '35f9aa36c383fc1daac3e9160d82fc79653bd499', { region: 'eu' });`}
         </Script>
       </head>
       <body
