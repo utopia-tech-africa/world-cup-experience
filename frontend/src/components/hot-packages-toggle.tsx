@@ -36,11 +36,16 @@ export function HotPackagesToggle() {
         {!showWidget ? (
           <motion.button
             key="widget-trigger"
+            drag="y"
+            dragMomentum={false}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            whileDrag={{ scale: 1.1, cursor: "grabbing" }}
             onClick={(e) => {
               e.stopPropagation();
               setShowWidget(true);
             }}
-            className="pointer-events-auto size-14 md:size-16 rounded-full bg-black/80 backdrop-blur-xl border border-red-500/50 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.2)] group hover:bg-white/20 transition-all hover:scale-110 active:scale-95"
+            className="pointer-events-auto size-14 md:size-16 rounded-full bg-black/80 backdrop-blur-xl border border-red-500/50 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.2)] group touch-none"
             initial={{ scale: 0, opacity: 0, rotate: -20 }}
             animate={{ scale: 1, opacity: 1, rotate: 0 }}
             exit={{ scale: 0, opacity: 0, rotate: 20 }}
@@ -58,11 +63,14 @@ export function HotPackagesToggle() {
         ) : (
           <motion.div
             key="widget-content"
-            className="pointer-events-auto"
+            drag="y"
+            dragMomentum={false}
+            whileDrag={{ cursor: "grabbing" }}
+            className="pointer-events-auto touch-none"
             initial={{ x: 100, opacity: 0, scale: 0.8 }}
             animate={{ x: 0, opacity: 1, scale: 1 }}
             exit={{ x: 100, opacity: 0, scale: 0.8 }}
-            transition={{ type: "spring", damping: 15, stiffness: 500 }}
+            transition={{ type: "spring", damping: 20, stiffness: 300 }}
           >
             <button
               onClick={(e) => {
