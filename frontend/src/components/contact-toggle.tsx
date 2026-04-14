@@ -32,18 +32,23 @@ export function ContactToggle() {
         {!showWidget ? (
           <motion.button
             key="contact-trigger"
+            drag="y"
+            dragMomentum={false}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            whileDrag={{ scale: 1.1, cursor: "grabbing" }}
             onClick={(e) => {
               e.stopPropagation();
               setShowWidget(true);
             }}
-            className="pointer-events-auto size-14 md:size-16 rounded-full bg-black/80 backdrop-blur-xl border border-blue-500/50 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.2)] group hover:bg-white/10 transition-all hover:scale-110 active:scale-95"
+            className="pointer-events-auto size-14 md:size-16 rounded-full bg-black/80 backdrop-blur-xl border border-blue-500/50 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.2)] group touch-none"
             initial={{ scale: 0, opacity: 0, rotate: 20 }}
             animate={{ scale: 1, opacity: 1, rotate: 0 }}
             exit={{ scale: 0, opacity: 0, rotate: -20 }}
             transition={{ type: "spring", stiffness: 500, damping: 15 }}
           >
             <div className="relative drop-shadow-[0_0_10px_rgba(30,144,255,0.8)]">
-              <MessageCircle className="size-6 md:size-7 text-[#1E90FF] fill-[#1E90FF] transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12" />
+              <Headset className="size-6 md:size-7 text-[#1E90FF]  transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12" />
               <div className="absolute -top-1 -right-1 size-2 md:size-3 bg-blue-500 rounded-full animate-ping" />
               <div className="absolute -top-1 -right-1 size-2 md:size-3 bg-blue-500 rounded-full shadow-[0_0_8px_#1E90FF]" />
             </div>
@@ -54,11 +59,14 @@ export function ContactToggle() {
         ) : (
           <motion.div
             key="contact-widget-content"
-            className="pointer-events-auto"
+            drag="y"
+            dragMomentum={false}
+            whileDrag={{ cursor: "grabbing" }}
+            className="pointer-events-auto touch-none"
             initial={{ x: 100, opacity: 0, scale: 0.8 }}
             animate={{ x: 0, opacity: 1, scale: 1 }}
             exit={{ x: 100, opacity: 0, scale: 0.8 }}
-            transition={{ type: "spring", damping: 15, stiffness: 500 }}
+            transition={{ type: "spring", damping: 20, stiffness: 300 }}
           >
             <button
               onClick={(e) => {
