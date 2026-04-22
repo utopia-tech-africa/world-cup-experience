@@ -117,6 +117,12 @@ const ContactWidget = () => {
           href="tel:+233257554514"
         />
         <ContactItem
+          icon={Phone}
+          label="CALL US (Secondary)"
+          value="+233 548 266 715"
+          href="tel:+233257554514"
+        />
+        <ContactItem
           icon={Mail}
           label="EMAIL US"
           value="info@watchtheworldcup.live"
