@@ -112,14 +112,14 @@ const ContactWidget = () => {
       <div className="flex flex-col gap-3">
         <ContactItem
           icon={Phone}
-          label="CALL US"
-          value="+233 257 554 514"
+          label="CALL US (Secondary)"
+          value="+233 548 266 715"
           href="tel:+233257554514"
         />
         <ContactItem
           icon={Phone}
-          label="CALL US (Secondary)"
-          value="+233 548 266 715"
+          label="CALL US"
+          value="+233 257 554 514"
           href="tel:+233257554514"
         />
         <ContactItem
