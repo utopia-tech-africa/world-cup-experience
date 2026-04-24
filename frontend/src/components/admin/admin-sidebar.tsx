@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   CalendarCheck,
@@ -14,21 +14,27 @@ import {
   LogOut,
   Upload,
   Settings,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+  Mail,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/bookings', label: 'Bookings', icon: CalendarCheck },
-  { href: '/admin/bulk-booking', label: 'Bulk booking', icon: Upload },
-  { href: '/admin/addons', label: 'Add-ons', icon: Box },
-  { href: '/admin/package-types', label: 'Game types', icon: Tags },
-  { href: '/admin/packages', label: 'Packages', icon: Package },
-  { href: '/admin/package-comparisons', label: 'Package comparisons', icon: Columns3 },
-  { href: '/admin/teams', label: 'Teams', icon: Users },
-  { href: '/admin/games', label: 'Games', icon: Trophy },
-  { href: '/admin/settings', label: 'Settings', icon: Settings },
+  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
+  { href: "/admin/inquiries", label: "Inquiries", icon: Mail },
+  { href: "/admin/bulk-booking", label: "Bulk booking", icon: Upload },
+  { href: "/admin/addons", label: "Add-ons", icon: Box },
+  { href: "/admin/package-types", label: "Game types", icon: Tags },
+  { href: "/admin/packages", label: "Packages", icon: Package },
+  {
+    href: "/admin/package-comparisons",
+    label: "Package comparisons",
+    icon: Columns3,
+  },
+  { href: "/admin/teams", label: "Teams", icon: Users },
+  { href: "/admin/games", label: "Games", icon: Trophy },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ] as const;
 
 type AdminSidebarProps = {
@@ -47,16 +53,16 @@ export function AdminSidebar({ onLogout }: AdminSidebarProps) {
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive =
             pathname === href ||
-            (href !== '/admin/dashboard' && pathname.startsWith(href));
+            (href !== "/admin/dashboard" && pathname.startsWith(href));
           return (
             <Link
               key={href}
               href={href}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
               <Icon className="size-5 shrink-0" />

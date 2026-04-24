@@ -62,3 +62,31 @@ export const getContactMessages = async (_req: Request, res: Response) => {
     res.status(500).json({ error: message });
   }
 };
+
+export const updateContactStatus = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!id || typeof id !== "string") {
+      res.status(400).json({ error: "ID is required" });
+      return;
+    }
+
+    if (!["pending", "read", "archived"].includes(status)) {
+      res.status(400).json({ error: "Invalid status" });
+      return;
+    }
+
+    const updated = await prisma.contactMessage.update({
+      where: { id },
+      data: { status },
+    });
+
+    res.json({ message: "Status updated successfully", data: updated });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to update status";
+    res.status(500).json({ error: message });
+  }
+};
