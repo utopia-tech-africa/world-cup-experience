@@ -6,6 +6,7 @@ import addonRoutes from "./addon.routes";
 import packageRoutes from "./package.routes";
 import gameRoutes from "./game.routes";
 import testRoutes from "./test.routes";
+import contactRoutes from "./contact.routes";
 
 const router = express.Router();
 
@@ -15,6 +16,7 @@ router.use("/admin", adminRoutes);
 router.use("/", addonRoutes);
 router.use("/", packageRoutes);
 router.use("/", gameRoutes);
+router.use("/", contactRoutes);
 router.use("/test", testRoutes);
 
 export default router;

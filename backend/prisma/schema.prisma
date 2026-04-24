@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
   engineType = "library"
 }
 
@@ -28,44 +28,44 @@ enum UserRole {
 }
 
 model Booking {
-  id                  String            @id @default(uuid())
-  bookingReference    String            @unique @map("booking_reference")
-  fullName            String            @map("full_name")
-  email               String
-  phone               String
-  passportNumber      String            @map("passport_number")
-  passportExpiry      DateTime          @map("passport_expiry")
-  packageType         String            @map("package_type")
-  accommodationType   AccommodationType @map("accommodation_type")
-  numberOfTravelers   Int               @map("number_of_travelers")
-  specialRequests     String?           @map("special_requests")
-  paymentAccountType  PaymentAccountType @map("payment_account_type")
-  basePackagePrice    Decimal           @map("base_package_price") @db.Decimal(10, 2)
-  addonsTotalPrice    Decimal           @default(0) @map("addons_total_price") @db.Decimal(10, 2)
-  totalAmount         Decimal           @map("total_amount") @db.Decimal(10, 2)
-  paymentProofUrl     String            @map("payment_proof_url")
-  bookingStatus       BookingStatus     @default(pending) @map("booking_status")
-  rejectionReason     String?           @map("rejection_reason")
-  submittedAt         DateTime          @default(now()) @map("submitted_at")
-  confirmedAt         DateTime?         @map("confirmed_at")
-  confirmedBy         String?           @map("confirmed_by")
-  updatedAt           DateTime          @updatedAt @map("updated_at")
+  id                 String             @id @default(uuid())
+  bookingReference   String             @unique @map("booking_reference")
+  fullName           String             @map("full_name")
+  email              String
+  phone              String
+  passportNumber     String             @map("passport_number")
+  passportExpiry     DateTime           @map("passport_expiry")
+  packageType        String             @map("package_type")
+  accommodationType  AccommodationType  @map("accommodation_type")
+  numberOfTravelers  Int                @map("number_of_travelers")
+  specialRequests    String?            @map("special_requests")
+  paymentAccountType PaymentAccountType @map("payment_account_type")
+  basePackagePrice   Decimal            @map("base_package_price") @db.Decimal(10, 2)
+  addonsTotalPrice   Decimal            @default(0) @map("addons_total_price") @db.Decimal(10, 2)
+  totalAmount        Decimal            @map("total_amount") @db.Decimal(10, 2)
+  paymentProofUrl    String             @map("payment_proof_url")
+  bookingStatus      BookingStatus      @default(pending) @map("booking_status")
+  rejectionReason    String?            @map("rejection_reason")
+  submittedAt        DateTime           @default(now()) @map("submitted_at")
+  confirmedAt        DateTime?          @map("confirmed_at")
+  confirmedBy        String?            @map("confirmed_by")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
 
-  confirmedByUser User?            @relation("ConfirmedBy", fields: [confirmedBy], references: [id])
-  bookingAddOns   BookingAddOn[]
+  confirmedByUser  User?             @relation("ConfirmedBy", fields: [confirmedBy], references: [id])
+  bookingAddOns    BookingAddOn[]
   bookingTravelers BookingTraveler[]
 
   @@map("bookings")
 }
 
 model BookingTraveler {
-  id              String   @id @default(uuid())
-  bookingId       String   @map("booking_id")
-  firstName       String   @map("first_name")
-  lastName        String   @map("last_name")
+  id             String   @id @default(uuid())
+  bookingId      String   @map("booking_id")
+  firstName      String   @map("first_name")
+  lastName       String   @map("last_name")
   passportNumber String   @map("passport_number")
-  passportExpiry  DateTime @map("passport_expiry")
-  createdAt       DateTime @default(now()) @map("created_at")
+  passportExpiry DateTime @map("passport_expiry")
+  createdAt      DateTime @default(now()) @map("created_at")
 
   booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
@@ -73,12 +73,12 @@ model BookingTraveler {
 }
 
 model PackageType {
-  id           String           @id @default(uuid())
+  id           String   @id @default(uuid())
   name         String
-  code         String           @unique
-  displayOrder Int              @default(0) @map("display_order")
-  createdAt    DateTime         @default(now()) @map("created_at")
-  updatedAt    DateTime         @updatedAt @map("updated_at")
+  code         String   @unique
+  displayOrder Int      @default(0) @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   packages BookingPackage[]
   games    Game[]
@@ -101,42 +101,42 @@ model Team {
 }
 
 model Game {
-  id          String   @id @default(uuid())
-  typeId      String?  @map("type_id")
-  stadium     String   @db.Text
-  team1Id     String   @map("team1_id")
-  team2Id     String   @map("team2_id")
-  matchDate   String   @map("match_date") @db.Text
-  displayOrder Int     @default(0) @map("display_order")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(uuid())
+  typeId       String?  @map("type_id")
+  stadium      String   @db.Text
+  team1Id      String   @map("team1_id")
+  team2Id      String   @map("team2_id")
+  matchDate    String   @map("match_date") @db.Text
+  displayOrder Int      @default(0) @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
-  type   PackageType? @relation(fields: [typeId], references: [id], onDelete: Cascade)
-  team1  Team         @relation("GameTeam1", fields: [team1Id], references: [id], onDelete: Restrict)
-  team2  Team         @relation("GameTeam2", fields: [team2Id], references: [id], onDelete: Restrict)
+  type         PackageType?         @relation(fields: [typeId], references: [id], onDelete: Cascade)
+  team1        Team                 @relation("GameTeam1", fields: [team1Id], references: [id], onDelete: Restrict)
+  team2        Team                 @relation("GameTeam2", fields: [team2Id], references: [id], onDelete: Restrict)
   packageGames BookingPackageGame[]
 
   @@map("games")
 }
 
 model BookingPackage {
-  id           String       @id @default(uuid())
-  name         String
-  typeId       String       @map("type_id")
-  duration     String       @db.Text
-  startDate    String?      @map("start_date") @db.Text
-  endDate      String?      @map("end_date") @db.Text
-  hostelPrice  Decimal      @map("hostel_price") @db.Decimal(10, 2)
-  hotelPrice   Decimal      @map("hotel_price") @db.Decimal(10, 2)
-  cityCount    Int          @default(0) @map("city_count")
-  includedItems String[]    @default([]) @map("included_items")
-  displayOrder Int          @default(0) @map("display_order")
-  isActive     Boolean      @default(true) @map("is_active")
-  createdAt    DateTime     @default(now()) @map("created_at")
-  updatedAt    DateTime     @updatedAt @map("updated_at")
+  id            String   @id @default(uuid())
+  name          String
+  typeId        String   @map("type_id")
+  duration      String   @db.Text
+  startDate     String?  @map("start_date") @db.Text
+  endDate       String?  @map("end_date") @db.Text
+  hostelPrice   Decimal  @map("hostel_price") @db.Decimal(10, 2)
+  hotelPrice    Decimal  @map("hotel_price") @db.Decimal(10, 2)
+  cityCount     Int      @default(0) @map("city_count")
+  includedItems String[] @default([]) @map("included_items")
+  displayOrder  Int      @default(0) @map("display_order")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
-  type PackageType @relation(fields: [typeId], references: [id], onDelete: Restrict)
-  packageGames BookingPackageGame[]
+  type              PackageType            @relation(fields: [typeId], references: [id], onDelete: Restrict)
+  packageGames      BookingPackageGame[]
   comparisonOptions BookingPackageOption[]
 
   @@map("packages")
@@ -148,19 +148,19 @@ enum PackageComparisonTier {
 }
 
 model BookingPackageOption {
-  id           String                 @id @default(uuid())
-  packageId    String                 @map("package_id")
+  id           String                @id @default(uuid())
+  packageId    String                @map("package_id")
   tier         PackageComparisonTier
-  label        String                 @db.Text
-  price        Decimal                @db.Decimal(10, 2)
-  roomLabel    String?                @map("room_label") @db.Text
-  imageUrl     String?                @map("image_url") @db.Text
-  ctaLabel     String?                @map("cta_label") @db.Text
-  displayOrder Int                    @default(0) @map("display_order")
-  createdAt    DateTime               @default(now()) @map("created_at")
-  updatedAt    DateTime               @updatedAt @map("updated_at")
+  label        String                @db.Text
+  price        Decimal               @db.Decimal(10, 2)
+  roomLabel    String?               @map("room_label") @db.Text
+  imageUrl     String?               @map("image_url") @db.Text
+  ctaLabel     String?               @map("cta_label") @db.Text
+  displayOrder Int                   @default(0) @map("display_order")
+  createdAt    DateTime              @default(now()) @map("created_at")
+  updatedAt    DateTime              @updatedAt @map("updated_at")
 
-  package  BookingPackage             @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  package  BookingPackage                @relation(fields: [packageId], references: [id], onDelete: Cascade)
   features BookingPackageOptionFeature[]
 
   @@unique([packageId, tier])
@@ -189,7 +189,7 @@ model BookingPackageGame {
   gameId    String @map("game_id")
 
   package BookingPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  game    Game          @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  game    Game           @relation(fields: [gameId], references: [id], onDelete: Cascade)
 
   @@id([packageId, gameId])
   @@map("package_games")
@@ -212,15 +212,15 @@ enum BookingStatus {
 }
 
 model AddOn {
-  id          String   @id @default(uuid())
-  name        String
-  description String   @db.Text
-  price       Decimal  @db.Decimal(10, 2)
-  category    AddOnCategory
-  isActive    Boolean  @default(true) @map("is_active")
-  displayOrder Int     @map("display_order")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id           String        @id @default(uuid())
+  name         String
+  description  String        @db.Text
+  price        Decimal       @db.Decimal(10, 2)
+  category     AddOnCategory
+  isActive     Boolean       @default(true) @map("is_active")
+  displayOrder Int           @map("display_order")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
 
   bookingAddOns BookingAddOn[]
 
@@ -235,12 +235,12 @@ enum AddOnCategory {
 }
 
 model BookingAddOn {
-  id            String   @id @default(uuid())
-  bookingId     String   @map("booking_id")
-  addonId       String   @map("addon_id")
-  quantity      Int      @default(1)
-  priceAtBooking Decimal @map("price_at_booking") @db.Decimal(10, 2)
-  createdAt     DateTime  @default(now()) @map("created_at")
+  id             String   @id @default(uuid())
+  bookingId      String   @map("booking_id")
+  addonId        String   @map("addon_id")
+  quantity       Int      @default(1)
+  priceAtBooking Decimal  @map("price_at_booking") @db.Decimal(10, 2)
+  createdAt      DateTime @default(now()) @map("created_at")
 
   booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
   addOn   AddOn   @relation(fields: [addonId], references: [id], onDelete: Cascade)
@@ -256,4 +256,19 @@ model Setting {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("settings")
+}
+
+model ContactMessage {
+  id      String  @id @default(uuid())
+  name    String
+  email   String?
+  phone   String?
+  message String? @db.Text
+
+  packageName String?  @map("package_name")
+  status      String   @default("pending") // pending, read, archived
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("contact_messages")
 }
