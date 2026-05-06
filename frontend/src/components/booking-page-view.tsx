@@ -8,6 +8,7 @@ import { useBookingStore, computeBookingTotal } from "@/stores/booking-store";
 import { useAddons } from "@/hooks/queries/useAddons";
 import { usePackages } from "@/hooks/queries/usePackages";
 import { useBookingStoreRehydrated } from "@/hooks/use-booking-store-rehydrated";
+import { trackFBEvent } from "@/lib/fpixel";
 
 /**
  * Client wrapper for the booking page. Uses the booking store for the summary
@@ -18,6 +19,7 @@ export function BookingPageView() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    trackFBEvent("ViewContent");
   }, []);
 
   const hasHydrated = useBookingStore((s) => s.hasHydrated);
@@ -35,7 +37,7 @@ export function BookingPageView() {
     apiAddons,
     packageName,
     packages,
-    extraTravelers
+    extraTravelers,
   );
 
   return (

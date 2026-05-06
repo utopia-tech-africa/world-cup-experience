@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { SuccessModal } from "@/components/success-modal";
 import { verifyPaystackPayment } from "@/services/paymentService";
 import { Button } from "@/components/ui/button";
+import { trackFBEvent } from "@/lib/fpixel";
 
 type PaystackCallbackViewProps = {
   reference: string | null;
@@ -35,10 +36,13 @@ export function PaystackCallbackView({ reference }: PaystackCallbackViewProps) {
       try {
         const result = await verifyPaystackPayment(effectiveReference);
         if (!result.success || !result.bookingReference) {
-          setError("We could not confirm your payment. Please contact support.");
+          setError(
+            "We could not confirm your payment. Please contact support.",
+          );
         } else {
           setBookingReference(result.bookingReference);
           setModalOpen(true);
+          trackFBEvent("Purchase");
         }
       } catch {
         setError("Something went wrong while verifying your payment.");
@@ -80,4 +84,3 @@ export function PaystackCallbackView({ reference }: PaystackCallbackViewProps) {
     </div>
   );
 }
-
