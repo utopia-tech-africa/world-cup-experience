@@ -6,6 +6,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import { NavbarWrapper } from "@/components/navbar-wrapper";
 import "./globals.css";
 import Footer from "@/components/footer/footer";
+import { FacebookPixel } from "@/components/analytics/FacebookPixel";
 
 /** General Sans variable font (weight 200–700) from app/fonts. */
 const generalSans = localFont({
@@ -228,6 +229,7 @@ export default function RootLayout({
         <QueryProvider>
           <ToastProvider>
             {/* <NavbarWrapper /> */}
+            <FacebookPixel />
             {children}
             <Footer />
           </ToastProvider>
