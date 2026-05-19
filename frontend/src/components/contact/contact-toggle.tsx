@@ -11,6 +11,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { ContactModal } from "./contact-modal";
+import { FaWhatsapp } from "react-icons/fa6";
 
 export function ContactToggle() {
   const [showWidget, setShowWidget] = useState(false);
@@ -197,14 +198,20 @@ const ContactWidget = ({ onOpenModal }: { onOpenModal: () => void }) => {
           />
         </button>
         <ContactItem
+          icon={FaWhatsapp}
+          label="WHATSAPP"
+          value="+233 548 266 715"
+          href="https://wa.me/233548266715"
+        />
+        <ContactItem
           icon={Phone}
-          label="CALL US (Secondary)"
+          label="CALL US"
           value="+233 548 266 715"
           href="tel:+233548266715"
         />
         <ContactItem
           icon={Phone}
-          label="CALL US"
+          label="CALL US (Secondary)"
           value="+233 257 554 514"
           href="tel:+233257554514"
         />
